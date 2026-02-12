@@ -1,29 +1,52 @@
-# README #
+# Energy Tracker
+> Outline a brief description of your project.
 
-This README would normally document whatever steps are necessary to get your application up and running.
+## Team Members
+[Bruce Ngere]
+[Daniel Delgado]
+[Tobi O'jori]
+[Trevor Strother]
+[Davos D]
 
-### What is this repository for? ###
+## What are we creating?
+- We are creating a web-based dashboard application that tracks and 
+  visualizes neighborhood-level energy consumption, renewable energy adoption, and sustainability trends.
+- The system will allow users to: 
+- Upload energy usage datasets 
+- Analyze time-based consumption trends 
+- Compare neighborhoods 
+- Identify areas that require sustainability intervention 
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+- The application will transform raw energy data into meaningful visual insights.
 
-### How do I get set up? ###
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+## Who are we doing this for?
+Our primary audience is:
+- City planners
+- Municipal sustainability departments
+- Urban policy makers
 
-### Contribution guidelines ###
+Secondarily, this platform could also benefit:
+- Environmental researchers
+- Community advocacy groups
+- Educational institutions studying sustainability
 
-* Writing tests
-* Code review
-* Other guidelines
 
-### Who do I talk to? ###
+## Why are we doing this?
+Cities are increasingly focused on sustainability and reducing environmental impact, but decision-makers often lack clear, accessible tools to analyze localized energy data.
 
-* Repo owner or admin
-* Other community or team contact
+Our goal is to:
+- Make neighborhood energy trends easier to understand
+- Support data-driven sustainability initiatives
+- Help prioritize investments in renewable energy and efficiency improvements
+- Encourage transparency and accountability in urban environmental planning
+
+
+## General Info
+---
+
+## Technologies
+---
+
+## Features
+---
