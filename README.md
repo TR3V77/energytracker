@@ -5,7 +5,7 @@
 [Daniel Delgado]
 [Tobi O'jori]
 [Trevor Strother]
-[Davos D]
+[Davos De Hoyos]
 
 ## What are we creating?
 - We are creating a web-based dashboard application that tracks and 
