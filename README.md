@@ -1,5 +1,4 @@
 # Energy Tracker
-> Outline a brief description of your project.
 
 ## Team Members
 [Bruce Ngere]
@@ -16,7 +15,6 @@
 - Analyze time-based consumption trends 
 - Compare neighborhoods 
 - Identify areas that require sustainability intervention 
-
 - The application will transform raw energy data into meaningful visual insights.
 
 
@@ -30,6 +28,7 @@ Secondarily, this platform could also benefit:
 - Environmental researchers
 - Community advocacy groups
 - Educational institutions studying sustainability
+- Local inhabitants 
 
 
 ## Why are we doing this?
@@ -46,7 +45,29 @@ Our goal is to:
 ---
 
 ## Technologies
----
+- Basic / Tools: GitKraken, Jira, Slack, Bitbucket, VS Code
+- Languages: Python, HTML, JavaScript
+- Database:____
+- Cloud Storage: AWS S3
+- Data/APIs: TBD (Focused dataset/API integration if a reliable source is found)
+- Frameworks: React (frontend)
+- Deployment: Docker
 
 ## Features
----
+- **Dataset Upload & Validation**
+  - Upload CSV/JSON energy datasets
+  - Schema checks + helpful error messages for bad files
+- **Neighborhood Dashboard**
+  - Select neighborhood and view key metrics:
+    - Energy consumption over time (kWh)
+    - Renewable adoption (if available)
+    - Efficiency indicator (e.g., kWh/household or kWh/sq-ft if included)
+- **Time Range Filtering**
+  - Filter by date range (weekly/monthly/quarterly)
+  - Compare two neighborhoods across the same window
+- **Hotspot Identification**
+  - “Top N neighborhoods” table for highest usage and/or worst trend
+  - Quick trend indicators (rising/falling consumption)
+- **Basic Reporting**
+  - Summary stats: totals, averages, percent change
+  - Export a simple report (CSV/JSON) or screenshot-ready “summary view”
