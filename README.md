@@ -54,24 +54,17 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 - Deployment: Docker
 
 ## Features
-**Dataset Upload & Validation**
-  - Upload CSV/JSON energy datasets
-  - Schema checks + helpful error messages for bad files
+**Dataset Upload & Validation**  
+Upload CSV/JSON energy datasets with schema validation and friendly error messages.
 
-**Neighborhood Dashboard**
-- Select neighborhood and view key metrics:
-  - Energy consumption over time (kWh)
-  - Renewable adoption (if available)
-  - Efficiency indicator (e.g., kWh/household or kWh/sq-ft if included)
+**Neighborhood Dashboard**  
+Explore neighborhood metrics like consumption over time (kWh), renewable adoption (if available), and efficiency (e.g., kWh/household).
 
-**Time Range Filtering**
-- Filter by date range (weekly/monthly/quarterly)
-- Compare two neighborhoods across the same window
+**Time Range Filtering**  
+Filter by weekly/monthly/quarterly ranges and compare neighborhoods across the same time window.
 
-- **Hotspot Identification:**
-  - “Top N neighborhoods” table for highest usage and/or worst trend
-  - Quick trend indicators (rising/falling consumption)
+**Hotspot Identification**  
+Surface “Top N” neighborhoods by highest usage or worst trend, with quick rising/falling indicators.
 
-**Basic Reporting**
-- Summary stats: totals, averages, percent change
-- Export a simple report (CSV/JSON) or screenshot-ready “summary view”
+**Basic Reporting**  
+Create summary stats (totals, averages, percent change) and export CSV/JSON or a screenshot-ready summary view.
