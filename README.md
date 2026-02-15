@@ -68,3 +68,5 @@ Highlight the highest-usage neighborhoods and those with the fastest-worsening t
 
 **Basic Reporting**  
 Create summary stats (totals, averages, percent change) and export CSV/JSON or a screenshot-ready summary view.
+
+**These features are designed for city planners and sustainability analysts reviewing neighborhood energy data.**
