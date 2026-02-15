@@ -47,7 +47,7 @@ Our goal is to:
 ## Technologies
 - Basic / Tools: GitKraken, Jira, Slack, Bitbucket, VS Code
 - Languages: Python, HTML, JavaScript
-- Database:____
+- Database: PostgreSQL, SQLAlchemy
 - Cloud Storage: AWS S3
 - Data/APIs: TBD (Focused dataset/API integration if a reliable source is found)
 - Frameworks: React (frontend)
