@@ -64,7 +64,7 @@ Explore neighborhood metrics like consumption over time (kWh), renewable adoptio
 Filter by weekly/monthly/quarterly ranges and compare neighborhoods across the same time window.
 
 **Hotspot Identification**  
-Surface “Top N” neighborhoods by highest usage or worst trend, with quick rising/falling indicators.
+Highlight the highest-usage neighborhoods and those with the fastest-worsening trends, with quick up/down indicators.
 
 **Basic Reporting**  
 Create summary stats (totals, averages, percent change) and export CSV/JSON or a screenshot-ready summary view.
