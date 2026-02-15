@@ -42,7 +42,7 @@ Our goal is to:
 
 
 ## General Info
-img/logo.png
+![Project Logo](img/logo.png)
 
 ## Technologies
 - Basic / Tools: GitKraken, Jira, Slack, Bitbucket, VS Code
