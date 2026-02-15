@@ -19,12 +19,12 @@
 
 
 ## Who are we doing this for?
-Our primary audience is:
+Primary audience:
 - City planners
 - Municipal sustainability departments
 - Urban policy makers
 
-Secondarily, this platform could also benefit:
+Secondarily audience:
 - Environmental researchers
 - Community advocacy groups
 - Educational institutions studying sustainability
@@ -45,7 +45,7 @@ Our goal is to:
 ![Project Logo](img/logo.png)
 
 ## Technologies
-- Basic / Tools: GitKraken, Jira, Slack, Bitbucket, VS Code
+- Tools: GitKraken, Jira, Slack, Bitbucket, VS Code
 - Languages: Python, HTML, JavaScript
 - Database: PostgreSQL, SQLAlchemy
 - Cloud Storage: AWS S3
