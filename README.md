@@ -20,6 +20,7 @@
 
 ## Who are we doing this for?
 ### Primary audience:
+- Primarily the audience in Central Texas
 - City planners
 - Municipal sustainability departments
 - Urban policy makers
