@@ -78,6 +78,7 @@ def process_upload(file, filename):
         record = EnergyRecord(
             neighborhood_id=neighborhood.id,
             date=datetime.strptime(row['date'], '%Y-%m-%d').date(),
+            energy_type=row.get('energy_type', 'electric') or 'electric',
             consumption_kwh=float(row['consumption_kwh']),
             renewable_kwh=float(row.get('renewable_kwh', 0) or 0),
             num_households=int(row['num_households']) if row.get('num_households') else None,
