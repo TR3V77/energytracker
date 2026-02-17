@@ -20,12 +20,12 @@
 
 ## Who are we doing this for?
 ### Primary audience:
-- Primarily the audience in Central Texas
+- Central Texas communities
 - City planners
 - Municipal sustainability departments
 - Urban policy makers
 
-### Secondarily audience:
+### Secondary audience:
 - Environmental researchers
 - Community advocacy groups
 - Educational institutions studying sustainability
@@ -55,52 +55,46 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 - Deployment: Docker
 
 ## Features
-**CSV Upload & Data Validation** 
-• Upload energy consumption CSV files
-• Validate schema (columns, types, missing values)
-• Show error messages for bad rows
-• Store valid data in PostgreSQL
-• Trigger automatic summary calculation
+**CSV Upload & Data Validation**
+- Upload energy consumption CSV files
+- Validate schema (columns, types, missing values)
+- Show error messages for bad rows
+- Store valid data in PostgreSQL
+- Trigger automatic summary calculation
 
-**Interactive Dashboard**  
-• Line charts showing energy usage over time
-• Bar charts comparing neighborhoods
-• Filters:
+**Interactive Dashboard**
+- Line charts showing energy usage over time
+- Bar charts comparing neighborhoods
+- Filters:
   - Neighborhood
   - Date range
   - Energy type (electric, gas, etc.)
-• Real-time updates when filters change
+- Real-time updates when filters change
 
-**Neighborhood Efficiency Rankings**  
-• Rank neighborhoods by efficiency score
-• Example metric:
-  - efficiency_score = total_kwh / number_of_households
-• Show leaderboard:
-Rank | Neighborhood | Efficiency Score
-1 | Downtown | 320
-2 | Riverside | 355
-Lower score = more efficient
-This demonstrates analytics and SQL skills.
+**Neighborhood Efficiency Rankings**
+- Rank neighborhoods by efficiency score
+- Example metric: `efficiency_score = total_kwh / number_of_households`
+- Show leaderboard:
 
-**Trend Analysis**  
+| Rank | Neighborhood | Efficiency Score |
+|------|-------------|-----------------|
+| 1 | Downtown | 320 |
+| 2 | Riverside | 355 |
+
+Lower score = more efficient. This demonstrates analytics and SQL skills.
+
+**Trend Analysis**
 - Show month-over-month changes
 - Show percent increase/decrease
-Example:
-  - Downtown usage:
-  - Jan: 12000 kWh
-  - Feb: 11000 kWh
-  - Trend: ↓ 8.3%
-Visual indicators:
-  - arrows ↑ ↓
-  - color coding
-  
-**Recommendations Engine**  
-Rule-based recommendations such as:
-If efficiency_score > threshold
-→ Recommend energy reduction
-Example output:
-  - "Downtown uses 25% more energy than average. Recommend insulation improvements."
-This shows business intelligence logic.
+- Example:
+  - Downtown usage: Jan 12,000 kWh → Feb 11,000 kWh → Trend: ↓ 8.3%
+- Visual indicators: arrows (↑ ↓) and color coding
+
+**Recommendations Engine**
+- Rule-based recommendations (e.g., if `efficiency_score > threshold` → recommend energy reduction)
+- Example output: "Downtown uses 25% more energy than average. Recommend insulation improvements."
+- This demonstrates business intelligence logic.
+
 **These features are designed for city planners and sustainability analysts reviewing neighborhood energy data.**
 
 ## User Stories 
