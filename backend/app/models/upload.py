@@ -18,12 +18,21 @@ class Upload(db.Model):
     def __repr__(self):
         return f'<Upload {self.filename}>'
 
+    @property
+    def invalid_row_count(self):
+        if self.errors:
+            import json
+            return len(json.loads(self.errors))
+        return 0
+
     def to_dict(self):
         return {
             'id': self.id,
             'filename': self.filename,
             'file_type': self.file_type,
             'record_count': self.record_count,
+            'invalid_row_count': self.invalid_row_count,
             'status': self.status,
+            'errors': self.errors,
             'uploaded_at': self.uploaded_at.isoformat(),
         }

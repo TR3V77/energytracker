@@ -23,6 +23,15 @@ def get_recommendations(threshold=400):
     """Generate rule-based recommendations for neighborhoods.
 
     If efficiency_score > threshold, recommend energy reduction.
+    Each recommendation should include an estimated_impact_pct.
     """
     # TODO: Implement recommendation logic
+    # Expected return shape per item:
+    # {
+    #     "neighborhood_id": int,
+    #     "neighborhood": str,
+    #     "efficiency_score": float,
+    #     "estimated_impact_pct": float,
+    #     "recommendation": str,
+    # }
     return []

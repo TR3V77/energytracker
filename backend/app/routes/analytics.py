@@ -25,7 +25,17 @@ def trends():
 
 @analytics_bp.route('/api/analytics/recommendations')
 def recommendations():
-    """Get rule-based energy recommendations."""
+    """Get rule-based energy recommendations.
+
+    Expected response shape per item:
+    {
+        "neighborhood_id": 1,
+        "neighborhood": "Downtown",
+        "efficiency_score": 450,
+        "estimated_impact_pct": 12.5,
+        "recommendation": "Downtown uses 450 kWh per household..."
+    }
+    """
     # TODO: Call analytics_service.get_recommendations
     return jsonify({
         "recommendations": [],
