@@ -55,19 +55,50 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 - Deployment: Docker
 
 ## Features
-**Dataset Upload & Validation**  
-Upload CSV/JSON energy datasets with schema validation and friendly error messages.
+**CSV Upload & Data Validation** 
+• Upload energy consumption CSV files
+• Validate schema (columns, types, missing values)
+• Show error messages for bad rows
+• Store valid data in PostgreSQL
+• Trigger automatic summary calculation
 
-**Neighborhood Dashboard**  
-Explore neighborhood metrics like consumption over time (kWh), renewable adoption (if available), and efficiency (e.g., kWh/household).
+**Interactive Dashboard**  
+• Line charts showing energy usage over time
+• Bar charts comparing neighborhoods
+• Filters:
+  - Neighborhood
+  - Date range
+  - Energy type (electric, gas, etc.)
+• Real-time updates when filters change
 
-**Time Range Filtering**  
-Filter by weekly/monthly/quarterly ranges and compare neighborhoods across the same time window.
+**Neighborhood Efficiency Rankings**  
+• Rank neighborhoods by efficiency score
+• Example metric:
+  - efficiency_score = total_kwh / number_of_households
+• Show leaderboard:
+Rank | Neighborhood | Efficiency Score
+1 | Downtown | 320
+2 | Riverside | 355
+Lower score = more efficient
+This demonstrates analytics and SQL skills.
 
-**Hotspot Identification**  
-Highlight the highest-usage neighborhoods and those with the fastest-worsening trends, with quick up/down indicators.
-
-**Basic Reporting**  
-Create summary stats (totals, averages, percent change) and export CSV/JSON or a screenshot-ready summary view.
-
+**Trend Analysis**  
+- Show month-over-month changes
+- Show percent increase/decrease
+Example:
+  - Downtown usage:
+  - Jan: 12000 kWh
+  - Feb: 11000 kWh
+  - Trend: ↓ 8.3%
+Visual indicators:
+  - arrows ↑ ↓
+  - color coding
+  
+**Recommendations Engine**  
+Rule-based recommendations such as:
+If efficiency_score > threshold
+→ Recommend energy reduction
+Example output:
+  - "Downtown uses 25% more energy than average. Recommend insulation improvements."
+This shows business intelligence logic.
 **These features are designed for city planners and sustainability analysts reviewing neighborhood energy data.**
