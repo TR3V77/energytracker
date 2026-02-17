@@ -106,7 +106,10 @@ This shows business intelligence logic.
 ## User Stories 
 **Interactive Dashboard**
   - As a user, I would like to view an interactive dashboard showing energy usage charts and summary metrics so that I can understand energy consumption trends across neighborhoods.
+
 **Neighborhood Efficiency Rankings**
   - As a sustainability manager, I would like to see neighborhoods ranked by efficiency score so that I can identify high and low performing areas.
+
 **Recommendations Engine**
   - As a city planner, I would like the dashboard to generate recommendations (e.g., insulation, HVAC upgrades, rebate outreach) based on the neighborhood’s metrics so that I can propose actionable next steps.
+  
