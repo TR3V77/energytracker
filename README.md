@@ -105,5 +105,8 @@ Lower score = more efficient. This demonstrates analytics and SQL skills.
   - As a sustainability manager, I would like to see neighborhoods ranked by efficiency score so that I can identify high and low performing areas.
 
 **Recommendations Engine**
-  - As a city planner, I would like the dashboard to generate recommendations (e.g., insulation, HVAC upgrades, rebate outreach) based on the neighborhood’s metrics so that I can propose actionable next steps.
-  
+  - As a city planner, I would like the dashboard to generate recommendations (e.g., insulation, HVAC upgrades, rebate outreach) based on the neighborhood's metrics so that I can propose actionable next steps.
+
+**CSV Upload & Data Validation**
+  - As a data administrator, I would like to see a detailed report after uploading a file showing valid records imported and specific row-level errors so that I can correct and re-upload invalid data.
+  - As an analyst, I would like to upload energy data in either CSV or JSON format so that I can import data from different sources and tools without manual conversion.
