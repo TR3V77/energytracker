@@ -81,7 +81,7 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 | 1 | Downtown | 320 |
 | 2 | Riverside | 355 |
 
-Lower score = more efficient. This demonstrates analytics and SQL skills.
+**Lower score = more efficient. This demonstrates analytics and SQL skills.**
 
 ### Trend Analysis
 - Show month-over-month changes
