@@ -4,13 +4,13 @@ from typing import Optional, List, Dict, Any
 """Analytics services for efficiency rankings, trends, and recommendations."""
 
 
-def get_efficiency_rankings(limit=10):
-    """Rank neighborhoods by efficiency score (total_kwh / num_households).
-
-    Lower score = more efficient.
+def get_efficiency_rankings(
+    date_from: Optional[date] = None, 
+    date_to: Optional[date] = None,
+    ) -> Dict [str, List[Dict[str, Any]]]:
     """
-    # TODO: Implement aggregation query
-    return []
+    Compute efficiency rankings for neighborhoods over an optional date range.
+    
 
 
 def get_trends(neighborhood_id=None):
