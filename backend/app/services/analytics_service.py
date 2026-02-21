@@ -32,12 +32,21 @@ def get_efficiency_rankings(
     return {"rankings": rankings}
 
 
-def get_trends(neighborhood_id=None):
+def get_trends(neighborhood_id= Optional[int] = None
+               )-> List[Dict[str, float]]:
     """Calculate month-over-month consumption trends.
 
-    Returns percent change between consecutive months.
+    Expected return shape:
+        [
+            {
+                "period": "YYYY-MM",
+                "kWh": float,
+                "pct_change": float | None      # percent change vs previous period
+            },
+            ...
+        ]
     """
-    # TODO: Implement trend calculation
+    # TODO: Implement trend calculation grouped by month, compute percent change
     return []
 
 
