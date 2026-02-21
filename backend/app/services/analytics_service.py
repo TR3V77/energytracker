@@ -7,7 +7,7 @@ from typing import Optional, List, Dict, Any
 def get_efficiency_rankings(
     date_from: Optional[date] = None, 
     date_to: Optional[date] = None,
-    ) -> Dict [str, List[Dict[str, Any]]]:
+    ) -> Dict[str, List[Dict[str, Any]]]:
     """
     Compute efficiency rankings for neighborhoods over an optional date range.
     
@@ -17,14 +17,14 @@ def get_efficiency_rankings(
                 {
                     "neighborhood_id": int,
                     "name": str,
-                    "efficiency": float,    # kWh/household
-                    "score": float          # composite score kWh / # of households
+                    "efficiency": float,    # kwh/household
+                    "score": float          # composite score kwh / # of households
                 },
                 ...
             ]
         }
     """
-    # TODO: Implement aggregation query (sum kWh + households per neighborhood)
+    # TODO: Implement aggregation query (sum kwh + households per neighborhood)
     rankings: List[Dict[str, Any]] = []
     
     # return empty rankings for now for stable API shape
@@ -32,15 +32,15 @@ def get_efficiency_rankings(
     return {"rankings": rankings}
 
 
-def get_trends(neighborhood_id= Optional[int] = None
-               )-> List[Dict[str, float]]:
+def get_trends(neighborhood_id: Optional[int] = None
+               )-> List[Dict[str, Any]]:
     """Calculate month-over-month consumption trends.
 
     Expected return shape:
         [
             {
                 "period": "YYYY-MM",            # can be changed based on needs
-                "kWh": float,
+                "kwh": float,
                 "pct_change": float | None      # percent change vs previous period
             },
             ...
