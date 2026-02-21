@@ -38,6 +38,12 @@ def validate_rows(rows):
         for field in REQUIRED_FIELDS:
             if field not in row or not row[field]:
                 row_errors.append(f"Missing required field: {field}")
+        if not row_errors and row.get('consumption_kwh'):
+            try:
+                if float(row['consumption_kwh']) < 0:
+                    row_errors.append("consumption_kwh must not be negative")
+            except (ValueError, TypeError):
+                pass
         if row_errors:
             errors.append({"row": i + 1, "errors": row_errors})
         else:
