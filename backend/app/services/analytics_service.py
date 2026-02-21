@@ -39,7 +39,7 @@ def get_trends(neighborhood_id= Optional[int] = None
     Expected return shape:
         [
             {
-                "period": "YYYY-MM",
+                "period": "YYYY-MM",            # can be changed based on needs
                 "kWh": float,
                 "pct_change": float | None      # percent change vs previous period
             },
@@ -50,19 +50,21 @@ def get_trends(neighborhood_id= Optional[int] = None
     return []
 
 
-def get_recommendations(threshold=400):
+def get_recommendations(threshold: float = 400.0
+                        ) -> List[Dict[str, float | int | str]]:
     """Generate rule-based recommendations for neighborhoods.
 
     If efficiency_score > threshold, recommend energy reduction.
     Each recommendation should include an estimated_impact_pct.
+    
+    Expected return shape per item:
+        {
+            "neighborhood_id": int,
+            "neighborhood": str,
+            "efficiency_score": float,
+            "estimated_impact_pct": float,
+            "recommendation": str,
+        }
     """
     # TODO: Implement recommendation logic
-    # Expected return shape per item:
-    # {
-    #     "neighborhood_id": int,
-    #     "neighborhood": str,
-    #     "efficiency_score": float,
-    #     "estimated_impact_pct": float,
-    #     "recommendation": str,
-    # }
     return []
