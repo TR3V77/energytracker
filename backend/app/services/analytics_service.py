@@ -11,6 +11,25 @@ def get_efficiency_rankings(
     """
     Compute efficiency rankings for neighborhoods over an optional date range.
     
+    Returns:
+        {
+            "rankings": [
+                {
+                    "neighborhood_id": int,
+                    "name": str,
+                    "efficiency": float,    # kWh/household
+                    "score": float          # composite score kWh / # of households
+                },
+                ...
+            ]
+        }
+    """
+    # TODO: Implement aggregation query (sum kWh + households per neighborhood)
+    rankings: List[Dict[str, Any]] = []
+    
+    # return empty rankings for now for stable API shape
+    # once database query implemented, will populate rankings above
+    return {"rankings": rankings}
 
 
 def get_trends(neighborhood_id=None):
