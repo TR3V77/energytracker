@@ -25,15 +25,31 @@ def get_efficiency_rankings(
         }
     """
     # TODO: Implement aggregation query (sum kwh + households per neighborhood)
-    rankings: List[Dict[str, Any]] = []
+    # **TEMP MOCK DATA WHILE AWAITING DB QUERY**
+    rankings: List[Dict[str, Any]] = [
+        {
+            "neighborhood_id": 1,
+            "name": "Downtown",
+            "efficiency": 435.3,
+            "score": 435.3,
+        },
+        {
+            "neighborhood_id": 2,
+            "name": "Southside",
+            "efficiency": 390.1,
+            "score": 390.1,
+        },
+    ]
     
-    # return empty rankings for now for stable API shape
+    # return mock rankings for now for stable API shape
+    # date_from / date_to not used yet
     # once database query implemented, will populate rankings above
     return {"rankings": rankings}
 
 
-def get_trends(neighborhood_id: Optional[int] = None
-               )-> List[Dict[str, Any]]:
+def get_trends(
+    neighborhood_id: Optional[int] = None
+    )-> List[Dict[str, Any]]:
     """Calculate month-over-month consumption trends.
 
     Expected return shape:
@@ -50,8 +66,9 @@ def get_trends(neighborhood_id: Optional[int] = None
     return []
 
 
-def get_recommendations(threshold: float = 400.0
-                        ) -> List[Dict[str, float | int | str]]:
+def get_recommendations(
+    threshold: float = 400.0
+    ) -> List[Dict[str, float | int | str]]:
     """Generate rule-based recommendations for neighborhoods.
 
     If efficiency_score > threshold, recommend energy reduction.
@@ -66,5 +83,5 @@ def get_recommendations(threshold: float = 400.0
             "recommendation": str,
         }
     """
-    # TODO: Implement recommendation logic
+    # TODO: Implement recommendation logic for engine can be rule-based initially, made smarter later
     return []
