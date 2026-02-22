@@ -7,6 +7,13 @@ analytics_bp = Blueprint('analytics', __name__)
 
 def _parse_date(param_name: str):
     """Helper to parse date_from=YYYY-MM-DD style query parameters"""
+    value = request.args.get(param_name)
+    if not value:
+        return None
+    try:
+        return date.fromisoformat(value)
+    except ValueError:
+        return None     # prob change to handle invalid date better later
 
 @analytics_bp.route('/api/analytics/rankings')
 def efficiency_rankings():
