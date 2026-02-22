@@ -15,7 +15,7 @@ pipelines:
           - pip
         script:
           - pip install -r backend/requirements.txt
-          - cd backend && pytest
+          - cd backend && pytest --cov=app --cov-fail-under=70
 
   pull-requests:
     main:
@@ -32,7 +32,7 @@ pipelines:
             - pip
           script:
             - pip install -r backend/requirements.txt
-            - cd backend && pytest
+            - cd backend && pytest --cov=app --cov-fail-under=70
 
   branches:
     main:
@@ -49,4 +49,4 @@ pipelines:
             - pip
           script:
             - pip install -r backend/requirements.txt
-            - cd backend && pytest
+            - cd backend && pytest --cov=app --cov-fail-under=70
