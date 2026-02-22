@@ -1,7 +1,12 @@
 from flask import Blueprint, request, jsonify
+from datetime import date
+
+from app.services import analytics_service
 
 analytics_bp = Blueprint('analytics', __name__)
 
+def _parse_date(param_name: str):
+    """Helper to parse date_from=YYYY-MM-DD style query parameters"""
 
 @analytics_bp.route('/api/analytics/rankings')
 def efficiency_rankings():
