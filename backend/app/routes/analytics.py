@@ -18,11 +18,13 @@ def _parse_date(param_name: str):
 @analytics_bp.route('/api/analytics/rankings')
 def efficiency_rankings():
     """Get neighborhoods ranked by efficiency score."""
-    # TODO: Call analytics_service.get_efficiency_rankings
-    return jsonify({
-        "rankings": [],
-        "message": "Efficiency rankings endpoint - not yet implemented"
-    }), 501
+    # Call analytics_service.get_efficiency_rankings
+    date_from = _parse_date("date_from")
+    date_to = _parse_date("date_to")
+    
+    data = analytics_service.get_efficiency_rankings(date_from, date_to)
+    # data already {"rankings": [...]}
+    return jsonify(data), 200
 
 
 @analytics_bp.route('/api/analytics/trends')
