@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify
 
 analytics_bp = Blueprint('analytics', __name__)
 

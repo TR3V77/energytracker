@@ -11,9 +11,13 @@ class Upload(db.Model):
     record_count = db.Column(db.Integer, nullable=False, default=0)
     status = db.Column(db.String(20), nullable=False, default='completed')
     errors = db.Column(db.Text, nullable=True)
-    uploaded_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    uploaded_at = db.Column(
+        db.DateTime, nullable=False, default=datetime.utcnow
+    )
 
-    energy_records = db.relationship('EnergyRecord', backref='upload', lazy=True)
+    energy_records = db.relationship(
+        'EnergyRecord', backref='upload', lazy=True
+    )
 
     def __repr__(self):
         return f'<Upload {self.filename}>'
