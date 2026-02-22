@@ -16,6 +16,14 @@ pipelines:
         script:
           - pip install -r backend/requirements.txt
           - cd backend && pytest --cov=app --cov-fail-under=70
+    - step:
+        name: Build frontend
+        image: node:18
+        caches:
+          - node
+        script:
+          - cd frontend && npm install
+          - cd frontend && npm run build
 
   pull-requests:
     main:
@@ -33,6 +41,14 @@ pipelines:
           script:
             - pip install -r backend/requirements.txt
             - cd backend && pytest --cov=app --cov-fail-under=70
+      - step:
+          name: Build frontend
+          image: node:18
+          caches:
+            - node
+          script:
+            - cd frontend && npm install
+            - cd frontend && npm run build
 
   branches:
     main:
@@ -50,3 +66,11 @@ pipelines:
           script:
             - pip install -r backend/requirements.txt
             - cd backend && pytest --cov=app --cov-fail-under=70
+      - step:
+          name: Build frontend
+          image: node:18
+          caches:
+            - node
+          script:
+            - cd frontend && npm install
+            - cd frontend && npm run build
