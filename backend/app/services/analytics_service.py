@@ -1,37 +1,87 @@
+from datetime import date
+from typing import Optional, List, Dict, Any
+
 """Analytics services for efficiency rankings, trends, and recommendations."""
 
 
-def get_efficiency_rankings(limit=10):
-    """Rank neighborhoods by efficiency score (total_kwh / num_households).
-
-    Lower score = more efficient.
+def get_efficiency_rankings(
+    date_from: Optional[date] = None, 
+    date_to: Optional[date] = None,
+    ) -> Dict[str, List[Dict[str, Any]]]:
     """
-    # TODO: Implement aggregation query
-    return []
+    Compute efficiency rankings for neighborhoods over an optional date range.
+    
+    Returns:
+        {
+            "rankings": [
+                {
+                    "neighborhood_id": int,
+                    "name": str,
+                    "efficiency": float,    # kwh/household
+                    "score": float          # composite score kwh / # of households
+                },
+                ...
+            ]
+        }
+    """
+    # TODO: Implement aggregation query (sum kwh + households per neighborhood)
+    # **TEMP MOCK DATA WHILE AWAITING DB QUERY**
+    rankings: List[Dict[str, Any]] = [
+        {
+            "neighborhood_id": 1,
+            "name": "Downtown",
+            "efficiency": 435.3,
+            "score": 435.3,
+        },
+        {
+            "neighborhood_id": 2,
+            "name": "Southside",
+            "efficiency": 390.1,
+            "score": 390.1,
+        },
+    ]
+    
+    # return mock rankings for now for stable API shape
+    # date_from / date_to not used yet
+    # once database query implemented, will populate rankings above
+    return {"rankings": rankings}
 
 
-def get_trends(neighborhood_id=None):
+def get_trends(
+    neighborhood_id: Optional[int] = None
+    )-> List[Dict[str, Any]]:
     """Calculate month-over-month consumption trends.
 
-    Returns percent change between consecutive months.
+    Expected return shape:
+        [
+            {
+                "period": "YYYY-MM",            # can be changed based on needs
+                "kwh": float,
+                "pct_change": float | None      # percent change vs previous period
+            },
+            ...
+        ]
     """
-    # TODO: Implement trend calculation
+    # TODO: Implement trend calculation grouped by month, compute percent change
     return []
 
 
-def get_recommendations(threshold=400):
+def get_recommendations(
+    threshold: float = 400.0
+    ) -> List[Dict[str, float | int | str]]:
     """Generate rule-based recommendations for neighborhoods.
 
     If efficiency_score > threshold, recommend energy reduction.
     Each recommendation should include an estimated_impact_pct.
+    
+    Expected return shape per item:
+        {
+            "neighborhood_id": int,
+            "neighborhood": str,
+            "efficiency_score": float,
+            "estimated_impact_pct": float,
+            "recommendation": str,
+        }
     """
-    # TODO: Implement recommendation logic
-    # Expected return shape per item:
-    # {
-    #     "neighborhood_id": int,
-    #     "neighborhood": str,
-    #     "efficiency_score": float,
-    #     "estimated_impact_pct": float,
-    #     "recommendation": str,
-    # }
+    # TODO: Implement recommendation logic for engine can be rule-based initially, made smarter later
     return []
