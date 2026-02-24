@@ -47,6 +47,8 @@ def recommendations():
     threshold = request.args.get(
         "threshold", default=400.0, type=float
     )
-    analytics_service.get_recommendations(threshold)
+    
+    # Call analytics_service.get_recommendations
+    recs = analytics_service.get_recommendations(threshold)
 
-    return jsonify({}), 200
+    return jsonify({"recommendations": recs}), 200
