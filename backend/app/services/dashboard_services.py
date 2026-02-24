@@ -47,4 +47,13 @@ def get_dashboard_overview(
         total_kwh / total_households if total_households > 0 else 0.0
     )
 
-    
+    return {
+        "hasData": True,
+        "message": None,
+        "kpis": {
+            "total_kwh": total_kwh,
+            "avg_kwh_per_household": avg_kwh_per_household,
+            "neighborhood_count": neighborhood_count,
+        },
+        "timeseries": timeseries,
+    }
