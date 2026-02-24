@@ -3,14 +3,17 @@ import json
 
 
 def _upload_csv(client, csv_text):
-    """Helper: upload a CSV string via the test client and return the JSON response."""
+    """Helper: upload a CSV string and return the response."""
     data = {'file': (io.BytesIO(csv_text.encode()), 'test.csv')}
-    response = client.post('/api/upload', data=data, content_type='multipart/form-data')
+    response = client.post(
+        '/api/upload', data=data,
+        content_type='multipart/form-data'
+    )
     return response
 
 
 def test_all_valid_rows_no_errors(client):
-    """CSV with all valid rows produces invalid_row_count=0 and no errors."""
+    """CSV with all valid rows produces no errors."""
     csv_data = (
         "neighborhood,date,consumption_kwh\n"
         "Hyde Park,2024-01-15,45200.5\n"
@@ -26,7 +29,7 @@ def test_all_valid_rows_no_errors(client):
 
 
 def test_missing_required_field_reports_row(client):
-    """CSV with a row missing 'neighborhood' reports the correct row number and field."""
+    """CSV missing 'neighborhood' reports correct row."""
     csv_data = (
         "neighborhood,date,consumption_kwh\n"
         ",2024-01-15,45200.5\n"
@@ -41,7 +44,7 @@ def test_missing_required_field_reports_row(client):
 
 
 def test_negative_kwh_flagged(client):
-    """CSV with negative consumption_kwh is flagged as invalid."""
+    """CSV with negative consumption_kwh is flagged."""
     csv_data = (
         "neighborhood,date,consumption_kwh\n"
         "Hyde Park,2024-01-15,-50\n"
@@ -57,7 +60,7 @@ def test_negative_kwh_flagged(client):
 
 
 def test_mixed_valid_invalid_rows(client):
-    """CSV with 2 valid and 1 invalid row stores valid rows and reports invalid."""
+    """CSV with 2 valid and 1 invalid row stores valid rows."""
     csv_data = (
         "neighborhood,date,consumption_kwh\n"
         "Hyde Park,2024-01-15,45200.5\n"

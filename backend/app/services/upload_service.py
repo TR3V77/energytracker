@@ -26,22 +26,31 @@ def parse_json(file_stream):
         return data
     if isinstance(data, dict) and 'records' in data:
         return data['records']
-    raise ValueError("JSON must be an array or an object with a 'records' key.")
+    raise ValueError(
+        "JSON must be an array or an object with a 'records' key."
+    )
 
 
 def validate_rows(rows):
-    """Validate that all required fields are present. Returns (valid_rows, errors)."""
+    """Validate required fields are present.
+
+    Returns (valid_rows, errors).
+    """
     errors = []
     valid = []
     for i, row in enumerate(rows):
         row_errors = []
         for field in REQUIRED_FIELDS:
             if field not in row or not row[field]:
-                row_errors.append(f"Missing required field: {field}")
+                row_errors.append(
+                    f"Missing required field: {field}"
+                )
         if not row_errors and row.get('consumption_kwh'):
             try:
                 if float(row['consumption_kwh']) < 0:
-                    row_errors.append("consumption_kwh must not be negative")
+                    row_errors.append(
+                        "consumption_kwh must not be negative"
+                    )
             except (ValueError, TypeError):
                 pass
         if row_errors:
@@ -75,7 +84,9 @@ def process_upload(file, filename):
     db.session.flush()
 
     for row in valid_rows:
-        neighborhood = Neighborhood.query.filter_by(name=row['neighborhood']).first()
+        neighborhood = Neighborhood.query.filter_by(
+            name=row['neighborhood']
+        ).first()
         if not neighborhood:
             neighborhood = Neighborhood(name=row['neighborhood'])
             db.session.add(neighborhood)
@@ -83,11 +94,20 @@ def process_upload(file, filename):
 
         record = EnergyRecord(
             neighborhood_id=neighborhood.id,
-            date=datetime.strptime(row['date'], '%Y-%m-%d').date(),
-            energy_type=row.get('energy_type', 'electric') or 'electric',
+            date=datetime.strptime(
+                row['date'], '%Y-%m-%d'
+            ).date(),
+            energy_type=(
+                row.get('energy_type', 'electric') or 'electric'
+            ),
             consumption_kwh=float(row['consumption_kwh']),
-            renewable_kwh=float(row.get('renewable_kwh', 0) or 0),
-            num_households=int(row['num_households']) if row.get('num_households') else None,
+            renewable_kwh=float(
+                row.get('renewable_kwh', 0) or 0
+            ),
+            num_households=(
+                int(row['num_households'])
+                if row.get('num_households') else None
+            ),
             upload_id=upload.id,
         )
         db.session.add(record)
