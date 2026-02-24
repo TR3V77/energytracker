@@ -5,9 +5,11 @@ def register_blueprints(app):
     from app.routes.neighborhoods import neighborhoods_bp
     from app.routes.energy import energy_bp
     from app.routes.analytics import analytics_bp
+    from app.routes.dashboard import dashboard_bp
 
     app.register_blueprint(health_bp)
     app.register_blueprint(upload_bp)
     app.register_blueprint(neighborhoods_bp)
     app.register_blueprint(energy_bp)
     app.register_blueprint(analytics_bp)
+    app.register_blueprint(dashboard_bp)
