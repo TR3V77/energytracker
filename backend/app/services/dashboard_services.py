@@ -29,3 +29,22 @@ def get_dashboard_overview(
             "timeseries": List[{"date": str, "kwh": float}],
         }
     """
+    
+    # TODO: Replace this MOCK with the real SQLAlchemy aggregation
+    # For now, return stubbed data so frontend can build Overview UI.
+    
+    timeseries: List[Dict[str, Any]] = [
+        {"date": "2025-01-01", "kwh": 100.0},
+        {"date": "2025-01-02", "kwh": 120.5},
+        {"date": "2025-01-03", "kwh": 98.3},
+    ]
+
+    total_kwh = sum(point["kwh"] for point in timeseries)
+    neighborhood_count = 3  # mock number for now
+    total_households = 150  # mock number for now
+    
+    avg_kwh_per_household = (
+        total_kwh / total_households if total_households > 0 else 0.0
+    )
+
+    
