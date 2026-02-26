@@ -12,7 +12,7 @@ export default function EnergyChart({ data }) {
         <YAxis />
         <Tooltip />
         <Legend />
-        <Line type="monotone" dataKey="kWh" stroke="#8884d8" />
+        <Line type="monotone" dataKey="consumption_kwh" stroke="#8884d8" />
       </LineChart>
     </ResponsiveContainer>
   );
