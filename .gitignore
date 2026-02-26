@@ -39,3 +39,5 @@ TEST*.xml
 
 # Logs
 *.log
+
+EnergyCharts.js
