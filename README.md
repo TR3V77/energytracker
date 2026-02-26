@@ -1,5 +1,7 @@
 # Energy Tracker
 
+[![Build Status](https://img.shields.io/bitbucket/pipelines/cs3398-rodians-s26/energytracker/main)](https://bitbucket.org/cs3398-rodians-s26/energytracker/addon/pipelines/home)
+
 ## Team Members
 [Bruce Ngere]
 [Daniel Delgado]

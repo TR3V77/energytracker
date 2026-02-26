@@ -1,0 +1,76 @@
+image: python:3.12-slim
+
+pipelines:
+  default:
+    - step:
+        name: Lint backend
+        caches:
+          - pip
+        script:
+          - pip install -r backend/requirements.txt
+          - cd backend && flake8
+    - step:
+        name: Run backend tests
+        caches:
+          - pip
+        script:
+          - pip install -r backend/requirements.txt
+          - cd backend && pytest --cov=app --cov-fail-under=70
+    - step:
+        name: Build frontend
+        image: node:18
+        caches:
+          - node
+        script:
+          - cd frontend && npm install
+          - cd frontend && npm run build
+
+  pull-requests:
+    main:
+      - step:
+          name: Lint backend
+          caches:
+            - pip
+          script:
+            - pip install -r backend/requirements.txt
+            - cd backend && flake8
+      - step:
+          name: Run backend tests
+          caches:
+            - pip
+          script:
+            - pip install -r backend/requirements.txt
+            - cd backend && pytest --cov=app --cov-fail-under=70
+      - step:
+          name: Build frontend
+          image: node:18
+          caches:
+            - node
+          script:
+            - cd frontend && npm install
+            - cd frontend && npm run build
+
+  branches:
+    main:
+      - step:
+          name: Lint backend
+          caches:
+            - pip
+          script:
+            - pip install -r backend/requirements.txt
+            - cd backend && flake8
+      - step:
+          name: Run backend tests
+          caches:
+            - pip
+          script:
+            - pip install -r backend/requirements.txt
+            - cd backend && pytest --cov=app --cov-fail-under=70
+      - step:
+          name: Build frontend
+          image: node:18
+          caches:
+            - node
+          script:
+            - cd frontend && npm install
+            - cd frontend && npm run build

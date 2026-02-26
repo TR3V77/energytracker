@@ -20,7 +20,8 @@ def get_energy_data(neighborhood_id=None, start_date=None, end_date=None,
         query = query.filter(EnergyRecord.energy_type == energy_type)
     if start_date:
         query = query.filter(
-            EnergyRecord.date >= datetime.strptime(start_date, '%Y-%m-%d').date()
+            EnergyRecord.date >= datetime.strptime(
+                start_date, '%Y-%m-%d').date()
         )
     if end_date:
         query = query.filter(
