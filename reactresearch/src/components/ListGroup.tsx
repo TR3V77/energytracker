@@ -1,21 +1,14 @@
 import { Fragment } from "react";
 
 function ListGroup() {
-  const items = [
-    "Line Charts",
-    "Bar Charts",
-    "Filters: ",
-    "Neighborhood",
-    "Date Range",
-    "Energy Type",
-  ];
+  const items = ["New York", "San Fransisco", "Tokyo", "London", "Paris"];
 
   return (
     <>
       <h1>List</h1>
       <ul className="list-group">
         {items.map((item) => (
-          <li>{item}</li>
+          <li key={item}>{item}</li>
         ))}
       </ul>
     </>
