@@ -31,8 +31,9 @@ def test_dashboard_with_data_structure(client):
 
     if data["hasData"]:
         # KPI fields exist
-        assert "totalConsumption" in data
-        assert isinstance(data["totalConsumption"], (int, float))
+        assert "kpis" in data
+        assert "total_kwh" in data["kpis"]
+        assert isinstance(data["kpis"]["total_kwh"], (int, float))
 
         # Timeseries exists
         assert "timeseries" in data
