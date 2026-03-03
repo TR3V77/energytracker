@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 
 client = TestClient(app)
 
+
 def test_dashboard_with_data():
     response = client.get("/api/dashboard")
     data = response.json()
