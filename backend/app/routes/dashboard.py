@@ -18,7 +18,7 @@ def _parse_date(param_name: str) -> Optional[date]:
         return None
 
 
-@dashboard_bp.route('/api/dashboard')
+@dashboard_bp.get("/api/dashboard")
 def dashboard_overview():
     """
     Dashboard overview: KPIs + timeseries for the main dashboard view.
