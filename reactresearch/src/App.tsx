@@ -1,10 +1,10 @@
 import { useState } from "react";
 import "./App.css";
 import Dashboard from "./components/Dashboard";
-import EfficiencyRankings from "./components/EfficiencyRankings";
+import EfficiencyRankings from "../../frontend/src/components/EfficiencyRankings";
 import DataUpload from "./components/DataUpload";
-import TrendAnalysis from "./components/TrendAnalysis";
-import Recommendations from "./components/Recommendations";
+import TrendAnalysis from "../../frontend/src/components/TrendAnalysis";
+import Recommendations from "../../frontend/src/components/Recommendations";
 import "bootstrap/dist/css/bootstrap.css";
 
 function App() {
