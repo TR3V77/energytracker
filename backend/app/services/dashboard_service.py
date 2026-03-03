@@ -36,7 +36,7 @@ def get_dashboard_overview(
         }
 
     # Total kWh (consumption)
-    total_stmt = select(func.coalesce(func.sum(EnergyRecord.consumption_kwh), 0.0))
+    total_stmt = select(func.coalesce(func.sum(EnergyRecord.total_kwh), 0))
     if filters:
         total_stmt = total_stmt.where(*filters)
     total_kwh = float(db.session.execute(total_stmt).scalar_one())

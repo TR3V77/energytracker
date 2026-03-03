@@ -4,7 +4,7 @@ class Neighborhood(db.Model):
     __tablename__ = 'neighborhoods'
 
     neighborhood_id = db.Column(db.Integer, primary_key=True)
-    neighborhood_name = db.Column(db.Text, nullable=False, unique=True)
+    neighborhood_name = db.Column(db.Text, nullable=False)
     households = db.Column(db.Integer, nullable=False)
 
     energy_records = db.relationship(
