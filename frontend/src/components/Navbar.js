@@ -3,17 +3,29 @@ import { Link } from 'react-router-dom';
 
 function Navbar() {
   return (
-    <nav>
-      <h1>Energy Tracker</h1>
-      <ul>
-        <li><Link to="/">Home</Link></li>
-        <li><Link to="/dashboard">Dashboard</Link></li>
-        <li><Link to="/upload">Upload</Link></li>
-        <li><Link to="/compare">Compare</Link></li>
-        <li><Link to="/rankings">Rankings</Link></li>
-        <li><Link to="/trends">Trends</Link></li>
-        <li><Link to="/recommendations">Recommendations</Link></li>
-      </ul>
+    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div className="container-fluid">
+        <Link className="navbar-brand" to="/">
+          <span>⚡</span> Energy Tracker
+        </Link>
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+        <div className="collapse navbar-collapse" id="navbarNav">
+          <ul className="navbar-nav ms-auto">
+            <li className="nav-item"><Link className="nav-link" to="/dashboard">📊 Dashboard</Link></li>
+            <li className="nav-item"><Link className="nav-link" to="/upload">📁 Upload</Link></li>
+            <li className="nav-item"><Link className="nav-link" to="/rankings">🏆 Rankings</Link></li>
+            <li className="nav-item"><Link className="nav-link" to="/trends">📈 Trends</Link></li>
+            <li className="nav-item"><Link className="nav-link" to="/recommendations">💡 Recommendations</Link></li>
+          </ul>
+        </div>
+      </div>
     </nav>
   );
 }
