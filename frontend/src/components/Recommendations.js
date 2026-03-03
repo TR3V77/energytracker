@@ -44,7 +44,7 @@ const Recommendations = () => {
     },
   ];
 
-  const getPriorityClass = (priority: string) => {
+  const getPriorityClass = (priority) => {
     switch (priority) {
       case "high":
         return "danger";
