@@ -72,7 +72,9 @@ class TestParseCsv:
 class TestParseJson:
     def test_valid_json_array(self):
         data = [
-            {"neighborhood": "Downtown", "date": "2024-01-01", "consumption_kwh": 120},
+            {"neighborhood": "Downtown",
+             "date": "2024-01-01",
+             "consumption_kwh": 120},
         ]
         rows = parse_json(_bytes_stream(json.dumps(data)))
         assert rows == data
@@ -80,7 +82,9 @@ class TestParseJson:
     def test_json_object_with_records_key(self):
         data = {
             "records": [
-                {"neighborhood": "A", "date": "2024-01-01", "consumption_kwh": 50},
+                {"neighborhood": "A",
+                 "date": "2024-01-01",
+                 "consumption_kwh": 50},
             ]
         }
         rows = parse_json(_bytes_stream(json.dumps(data)))
@@ -112,8 +116,10 @@ class TestParseJson:
 class TestValidateRows:
     def test_all_valid_rows(self):
         rows = [
-            {"neighborhood": "A", "date": "2024-01-01", "consumption_kwh": "100"},
-            {"neighborhood": "B", "date": "2024-01-02", "consumption_kwh": "200"},
+            {"neighborhood": "A", "date": "2024-01-01",
+             "consumption_kwh": "100"},
+            {"neighborhood": "B", "date": "2024-01-02",
+             "consumption_kwh": "200"},
         ]
         valid, errors = validate_rows(rows)
         assert len(valid) == 2
@@ -136,7 +142,8 @@ class TestValidateRows:
         assert "consumption_kwh" in missing_fields
 
     def test_empty_string_treated_as_missing(self):
-        rows = [{"neighborhood": "", "date": "2024-01-01", "consumption_kwh": "100"}]
+        rows = [{"neighborhood": "", "date": "2024-01-01",
+                 "consumption_kwh": "100"}]
         valid, errors = validate_rows(rows)
         assert valid == []
         assert len(errors) == 1
@@ -144,9 +151,12 @@ class TestValidateRows:
 
     def test_mix_of_valid_and_invalid(self):
         rows = [
-            {"neighborhood": "A", "date": "2024-01-01", "consumption_kwh": "100"},
-            {"date": "2024-01-02", "consumption_kwh": "200"},  # missing neighborhood
-            {"neighborhood": "C", "date": "2024-01-03", "consumption_kwh": "300"},
+            {"neighborhood": "A", "date": "2024-01-01",
+             "consumption_kwh": "100"},
+            {"date": "2024-01-02",
+             "consumption_kwh": "200"},  # missing neighborhood
+            {"neighborhood": "C", "date": "2024-01-03",
+             "consumption_kwh": "300"},
         ]
         valid, errors = validate_rows(rows)
         assert len(valid) == 2
@@ -160,9 +170,11 @@ class TestValidateRows:
 
     def test_error_row_numbers_are_one_indexed(self):
         rows = [
-            {"neighborhood": "A", "date": "2024-01-01", "consumption_kwh": "100"},
+            {"neighborhood": "A", "date": "2024-01-01",
+             "consumption_kwh": "100"},
             {"neighborhood": "B"},  # row index 1 -> row number 2
-            {"neighborhood": "C", "date": "2024-01-03", "consumption_kwh": "300"},
+            {"neighborhood": "C", "date": "2024-01-03",
+             "consumption_kwh": "300"},
             {},  # row index 3 -> row number 4
         ]
         valid, errors = validate_rows(rows)
