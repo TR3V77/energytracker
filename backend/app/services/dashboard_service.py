@@ -10,10 +10,11 @@ from typing import Optional, Dict, Any, List
 # from app.models.neighborhood import Neighborhood
 # from app.database import SessionLocal
 
+
 def get_dashboard_overview(
     date_from: Optional[date] = None,
     date_to: Optional[date] = None,
-    ) -> Dict[str, Any]:
+) -> Dict[str, Any]:
     """
     Compute high-level dashboard metrics and a simple kwh timeseries.
 
@@ -29,10 +30,10 @@ def get_dashboard_overview(
             "timeseries": List[{"date": str, "kwh": float}],
         }
     """
-    
+
     # TODO: Replace this MOCK with the real SQLAlchemy aggregation
     # For now, return stubbed data so frontend can build Overview UI.
-    
+
     timeseries: List[Dict[str, Any]] = [
         {"date": "2025-01-01", "kwh": 100.0},
         {"date": "2025-01-02", "kwh": 120.5},
@@ -42,7 +43,7 @@ def get_dashboard_overview(
     total_kwh = sum(point["kwh"] for point in timeseries)
     neighborhood_count = 3  # mock number for now
     total_households = 150  # mock number for now
-    
+
     avg_kwh_per_household = (
         total_kwh / total_households if total_households > 0 else 0.0
     )
