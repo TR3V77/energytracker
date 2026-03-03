@@ -57,6 +57,20 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 - Deployment: Docker
 
 ## Features
+## Sprint 1
+
+### Contributions
+
+**Trevor:** "provied the database and the data in the database for the dashboard"
+
+- **Jira Task:** Trevor - Designed and prepared the PostgreSQL database and queries  
+  - [PROJ-16](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-16), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/7)
+
+- **Jira Task:** Trevor - Defines the API contract and database query strategy for the Energy Tracker Dashboard.
+  - [PROJ-58](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-58), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/10)
+
+- **Jira Task:** Trevor - Implemented multiple SQL verification queries to confirm successful data import and ensure database integrity. 
+  - [PROJ-57](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-57), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/8)
 #### CSV Upload & Data Validation
 - Upload energy consumption CSV files
 - Validate schema (columns, types, missing values)
