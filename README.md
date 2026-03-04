@@ -66,7 +66,7 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 - **Jira Task:** Daniel - Research: Flask Rest API
   - [PROJ-45](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-45), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/src/RESEARCH/research/)
 
-- **Jira Task: ** Daniel - Backend: Dashboard analytics setup
+- **Jira Task:** Daniel - Backend: Dashboard analytics setup
   - [PROJ-47](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-47), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/src/RESEARCH/research/)
 
 - **Jira Task:** Daniel - Backend: GET dashboard & analytics endpoints
