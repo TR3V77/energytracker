@@ -48,12 +48,8 @@ def get_dashboard_overview(
     neighborhood_count = int(db.session.execute(n_stmt).scalar_one())
 
     # Total households from neighborhoods table
-    households_stmt = select(func.coalesce(func.sum(Neighborhood.households), 0))
-    total_households = int(db.session.execute(households_stmt).scalar_one())
-
-    avg_kwh_per_household = (
-        consumption_kwh / total_households if total_households > 0 else 0.0
-    )
+    total_households = 0
+    avg_kwh_per_household = (consumption_kwh / neighborhood_count if neighborhood_count > 0 else 0.0)
 
     # Timeseries grouped by day
     ts_stmt = (
