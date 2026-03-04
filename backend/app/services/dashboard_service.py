@@ -35,11 +35,11 @@ def get_dashboard_overview(
             "timeseries": [],
         }
 
-    # Total kWh (consumption)
-    total_stmt = select(func.coalesce(func.sum(EnergyRecord.total_kwh), 0))
+    # consumption kWh (total)
+    total_stmt = select(func.coalesce(func.sum(EnergyRecord.consumption_kwh), 0))
     if filters:
         total_stmt = total_stmt.where(*filters)
-    total_kwh = float(db.session.execute(total_stmt).scalar_one())
+    consumption_kwh = float(db.session.execute(total_stmt).scalar_one())
 
     # Neighborhood count (distinct in filtered set)
     n_stmt = select(func.count(distinct(EnergyRecord.neighborhood_id)))
@@ -48,18 +48,18 @@ def get_dashboard_overview(
     neighborhood_count = int(db.session.execute(n_stmt).scalar_one())
 
     # Total households from neighborhoods table
-    households_stmt = select(func.coalesce(func.sum(Neighborhood.households), ))
+    households_stmt = select(func.coalesce(func.sum(Neighborhood.households), 0))
     total_households = int(db.session.execute(households_stmt).scalar_one())
 
     avg_kwh_per_household = (
-        total_kwh / total_households if total_households > 0 else 0.0
+        consumption_kwh / total_households if total_households > 0 else 0.0
     )
 
     # Timeseries grouped by day
     ts_stmt = (
         select(
             EnergyRecord.date.label("day"),
-            func.coalesce(func.sum(EnergyRecord.total_kwh), 0).label("kwh"),
+            func.coalesce(func.sum(EnergyRecord.consumption_kwh), 0).label("kwh"),
         )
         .group_by(EnergyRecord.date)
         .order_by(EnergyRecord.date.asc())

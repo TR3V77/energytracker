@@ -12,7 +12,7 @@ class EnergyRecord(db.Model):
         nullable=False,
     )
     date = db.Column(db.Date, nullable=False)
-    total_kwh = db.Column(db.Numeric(12,2), nullable=False)
+    consumption_kwh = db.Column(db.Numeric(12,2), nullable=False)
     energy_type = db.Column(db.String(50), nullable=False, default="electric")
 
     __table_args__ = (
@@ -21,13 +21,13 @@ class EnergyRecord(db.Model):
     )
 
     def __repr__(self):
-        return f'<EnergyRecord {self.neighborhood_id} {self.date} {self.total_kwh}>'
+        return f'<EnergyRecord {self.neighborhood_id} {self.date} {self.consumption_kwh}>'
 
     def to_dict(self):
         return {
             'id': self.id,
             'neighborhood_id': self.neighborhood_id,
             'date': self.date.isoformat(),
-            "total_kwh": float(self.total_kwh),
+            "consumption_kwh": float(self.consumption_kwh),
             "energy_type": self.energy_type,
         }
