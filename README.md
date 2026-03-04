@@ -71,6 +71,11 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 
 - **Jira Task:** Trevor - Implemented multiple SQL verification queries to confirm successful data import and ensure database integrity. 
   - [PROJ-57](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-57), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/8)
+
+## Report
+
+![Burn Up Chart](img/burnupsprint1.png)
+
 #### CSV Upload & Data Validation
 - Upload energy consumption CSV files
 - Validate schema (columns, types, missing values)
