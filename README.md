@@ -61,6 +61,24 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 
 ### Contributions
 
+**Daniel:** "Provided backend endpoints and filled in mock data until the database was set up. Then connected the backend API to the database. Did research for datasets as well"
+
+- **Jira Task:** Daniel - Research: Flask Rest API
+  - [PROJ-45](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-45), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/src/RESEARCH/research/)
+
+- **Jira Task: ** Daniel - Backend: Dashboard analytics setup
+  - [PROJ-47](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-47), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/src/RESEARCH/research/)
+
+- **Jira Task:** Daniel - Backend: GET dashboard & analytics endpoints
+  - [PROJ-18](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-18), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/6)
+
+- **Jira Task:** Daniel - Research: Find Real Dataset
+  - [PROJ-54](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-54), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/src/RESEARCH/research/)
+  
+- **Jira Task:** Daniel - Backend: Integrate DB layer into existing endpoints
+  - [PROJ-53](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-53), [Bitbucket *NOT MERGED*]()
+  
+
 **Trevor:** "provied the database and the data in the database for the dashboard"
 
 - **Jira Task:** Trevor - Designed and prepared the PostgreSQL database and queries  
