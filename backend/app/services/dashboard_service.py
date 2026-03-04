@@ -76,7 +76,7 @@ def get_dashboard_overview(
         "hasData": True,
         "message": None,
         "kpis": {
-            "total_kwh": total_kwh,
+            "consumption_kwh": consumption_kwh,
             "avg_kwh_per_household": avg_kwh_per_household,
             "neighborhood_count": neighborhood_count,
         },
