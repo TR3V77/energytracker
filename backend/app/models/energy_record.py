@@ -8,11 +8,17 @@ class EnergyRecord(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     neighborhood_id = db.Column(
         db.Integer,
-        db.ForeignKey("neighborhoods.neighborhood.id", ondelete="CASCADE"),
+        db.ForeignKey("neighborhoods.id", ondelete="CASCADE"),
         nullable=False,
     )
+
     date = db.Column(db.Date, nullable=False)
-    total_kwh = db.Column(db.Numeric(12,2), nullable=False)
+    energy_type = db.Column(db.String(50), nullable=False, default='electric')
+    total_kwh = db.Column(db.Float, nullable=False)
+    renewable_kwh = db.Column(db.Float, nullable=True)
+    num_households = db.Column(db.Integer, nullable=True)
+    upload_id = db.Column(db.Integer, db.ForeignKey("uploads.id"), nullable=True)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     __table_args__ = (
         db.Index("idx_energy_records_neighborhood_date", "neighborhood_id", "date"),
@@ -20,13 +26,16 @@ class EnergyRecord(db.Model):
     )
 
     def __repr__(self):
-        return f'<EnergyRecord {self.neighborhood_id} {self.date} {self.consumption_kwh}>'
+        return f'<EnergyRecord {self.neighborhood_id} {self.date} {self.total_kwh}>'
 
     def to_dict(self):
         return {
             'id': self.id,
             'neighborhood_id': self.neighborhood_id,
             'date': self.date.isoformat(),
-            "consumption_kwh": float(self.consumption_kwh),
             "energy_type": self.energy_type,
+            "total_kwh": float(self.total_kwh),
+            "renewable_kwh": float(self.renewable_kwh) if self.renewable_kwh is not None else None,
+            "num_households": self.num_households,
+            "upload_id": self.upload_id
         }
