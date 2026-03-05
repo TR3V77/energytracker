@@ -13,12 +13,18 @@ class EnergyRecord(db.Model):
         nullable=False,
     )
     date = db.Column(db.Date, nullable=False)
-    energy_type = db.Column(db.String(50), nullable=False, default='electric')
+    energy_type = db.Column(
+        db.String(50), nullable=False, default='electric'
+    )
     total_kwh = db.Column(db.Float, nullable=False)
     renewable_kwh = db.Column(db.Float, nullable=True)
     num_households = db.Column(db.Integer, nullable=True)
-    upload_id = db.Column(db.Integer, db.ForeignKey("uploads.id"), nullable=True)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    upload_id = db.Column(
+        db.Integer, db.ForeignKey("uploads.id"), nullable=True
+    )
+    created_at = db.Column(
+        db.DateTime, nullable=False, default=datetime.utcnow
+    )
 
     __table_args__ = (
         db.Index("idx_energy_records_neighborhood_date", 
@@ -37,7 +43,9 @@ class EnergyRecord(db.Model):
         self.total_kwh = value
 
     def __repr__(self):
-        return f'<EnergyRecord {self.neighborhood_id} {self.date} {self.total_kwh}>'
+        return {
+            f'<EnergyRecord {self.neighborhood_id} {self.date} {self.total_kwh}>'
+        }
 
     def to_dict(self):
         renewable = (
