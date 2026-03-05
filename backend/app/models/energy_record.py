@@ -3,17 +3,16 @@ from app.extensions import db
 
 
 class EnergyRecord(db.Model):
-    __tablename__ = 'energy_records'
+    __tablename__ = "energy_records"
 
     id = db.Column(db.Integer, primary_key=True)
     neighborhood_id = db.Column(
         db.Integer,
-        db.ForeignKey("neighborhoods.neighborhood_id", ondelete="CASCADE"),
+        db.ForeignKey("neighborhoods.neighborhood.id", ondelete="CASCADE"),
         nullable=False,
     )
     date = db.Column(db.Date, nullable=False)
-    consumption_kwh = db.Column(db.Numeric(12,2), nullable=False)
-    energy_type = db.Column(db.String(50), nullable=False, default="electric")
+    total_kwh = db.Column(db.Numeric(12,2), nullable=False)
 
     __table_args__ = (
         db.Index("idx_energy_records_neighborhood_date", "neighborhood_id", "date"),

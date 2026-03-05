@@ -8,7 +8,7 @@ from app.models.neighborhood import Neighborhood
 from app.models.energy_record import EnergyRecord
 from app.models.upload import Upload
 
-REQUIRED_FIELDS = ['neighborhood', 'date', 'consumption_kwh']
+REQUIRED_FIELDS = ['neighborhood_id', 'date', 'total_kwh']
 
 
 def parse_csv(file_stream):
@@ -98,10 +98,9 @@ def process_upload(file, filename):
             db.session.flush()
 
         record = EnergyRecord(
-            neighborhood_id=neighborhood.neighborhood_id,
+            neighborhood_id=int(row["neighborhood_id"]),
             date=datetime.strptime(row['date'], '%Y-%m-%d').date(),
-            energy_type=(row.get('energy_type') or 'electric'),
-            consumption_kwh=float(row['consumption_kwh']),            upload_id=upload.id,
+            total_kwh=float(row['consumption_kwh']),            upload_id=upload.id,
         )
         db.session.add(record)
 

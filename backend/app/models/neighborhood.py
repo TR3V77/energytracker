@@ -7,14 +7,6 @@ class Neighborhood(db.Model):
     neighborhood_name = db.Column(db.Text, nullable=False)
     households = db.Column(db.Integer, nullable=False)
 
-    energy_records = db.relationship(
-        "EnergyRecord",
-        backref="neighborhood",
-        lazy=True,
-        cascade="all, delete",
-        passive_deletes=True,
-    )
-
     def __repr__(self):
         return f'<Neighborhood {self.neighborhood_id} {self.neighborhood_name}>'
 
