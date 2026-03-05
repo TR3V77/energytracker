@@ -44,14 +44,14 @@ def validate_rows(rows):
                 row_errors.append(
                     f"Missing required field: {field}"
                 )
-        if not row_errors and row.get('consumption_kwh'):
+        if not row_errors and row.get('total_kwh'):
             try:
-                if float(row['consumption_kwh']) < 0:
+                if float(row['total_kwh']) < 0:
                     row_errors.append(
-                        "consumption_kwh must not be negative"
+                        "total_kwh must not be negative"
                     )
             except (ValueError, TypeError):
-                row_errors.append("consumption_kwh must be a number")
+                row_errors.append("total_kwh must be a number")
 
         if row_errors:
             errors.append({"row": i + 1, "errors": row_errors})
@@ -85,22 +85,21 @@ def process_upload(file, filename):
     db.session.flush()
 
     for row in valid_rows:
-        neighborhood_name=row['neighborhood']
-        neighborhood = Neighborhood.query.filter_by(
-            neighborhood_name=neighborhood_name
-        ).first()
-
+        n_id = int(row["neighborhood_id"])
+        neighborhood = Neighborhood.query.get(n_id)
         if not neighborhood:
-            neighborhood = Neighborhood(
-                neighborhood_name=neighborhood_name,
-                households=int(row.get('households') or 1),)
-            db.session.add(neighborhood)
-            db.session.flush()
+            errors = json.loads(upload.errors) if upload.errors else []
+            errors.append({"row": "?", "errors": [f"Unknown neighborhood_id: {n_id}"]})
+            upload.status = "partial"
+            upload.errors = json.dumps(errors)
+            continue
 
         record = EnergyRecord(
             neighborhood_id=int(row["neighborhood_id"]),
             date=datetime.strptime(row['date'], '%Y-%m-%d').date(),
-            total_kwh=float(row['consumption_kwh']),            upload_id=upload.id,
+            total_kwh=float(row['total_kwh']),            
+            energy_type=row.get("energy_type") or "electric",
+            upload_id=upload.id
         )
         db.session.add(record)
 
