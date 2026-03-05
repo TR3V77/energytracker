@@ -29,8 +29,7 @@ class EnergyRecord(db.Model):
     __table_args__ = (
         db.Index("idx_energy_records_neighborhood_date",
                  "neighborhood_id",
-                 "date"
-                ),
+                 "date"),
         db.Index("idx_energy_records_date", "date"),
     )
 
