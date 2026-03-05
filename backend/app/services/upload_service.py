@@ -2,13 +2,13 @@ import csv
 import io
 import json
 from datetime import datetime
-
 from app.extensions import db
 from app.models.neighborhood import Neighborhood
 from app.models.energy_record import EnergyRecord
 from app.models.upload import Upload
 
-REQUIRED_FIELDS = ['neighborhood_id', 'date', 'total_kwh']
+
+REQUIRED_FIELDS = ['neighborhood', 'date', 'consumption_kwh']
 
 
 def parse_csv(file_stream):
@@ -44,14 +44,14 @@ def validate_rows(rows):
                 row_errors.append(
                     f"Missing required field: {field}"
                 )
-        if not row_errors and row.get('total_kwh'):
+        if not row_errors and row.get('consumption_kwh'):
             try:
-                if float(row['total_kwh']) < 0:
+                if float(row['consumption_kwh']) < 0:
                     row_errors.append(
-                        "total_kwh must not be negative"
+                        "consumption_kwh must not be negative"
                     )
             except (ValueError, TypeError):
-                row_errors.append("total_kwh must be a number")
+                row_errors.append("consumption_kwh must be a number")
 
         if row_errors:
             errors.append({"row": i + 1, "errors": row_errors})
@@ -85,23 +85,26 @@ def process_upload(file, filename):
     db.session.flush()
 
     for row in valid_rows:
-        n_id = int(row["neighborhood_id"])
-        neighborhood = Neighborhood.query.get(n_id)
+        neighborhood_name = row["neighborhood"].strip()
+
+        neighborhood = Neighborhood.query.filter_by(
+            name=neighborhood_name
+        ).first()
         if not neighborhood:
-            errors = json.loads(upload.errors) if upload.errors else []
-            errors.append({"row": "?", "errors": [f"Unknown neighborhood_id: {n_id}"]})
-            upload.status = "partial"
-            upload.errors = json.dumps(errors)
-            continue
+            neighborhood = Neighborhood(
+                name=neighborhood_name,
+                city="Unknown",
+            )
+            db.session.add(neighborhood)
+            db.session.flush()
 
         record = EnergyRecord(
-            neighborhood_id=int(row["neighborhood_id"]),
-            date=datetime.strptime(row['date'], '%Y-%m-%d').date(),
-            total_kwh=float(row['total_kwh']),            
+            neighborhood_id=neighborhood.id,
+            date=datetime.strptime(row["date"], "%Y-%m-%d").date(),
+            total_kwh=float(row["consumption_kwh"]),
             energy_type=row.get("energy_type") or "electric",
-            upload_id=upload.id
+            upload_id=upload.id,
         )
         db.session.add(record)
-
     db.session.commit()
     return upload

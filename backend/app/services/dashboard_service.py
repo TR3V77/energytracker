@@ -1,20 +1,19 @@
 from datetime import date
 from typing import Optional, Dict, Any, List
 
-"""Service-layer logic for the dashboard overview endpoint (/api/dashboard)."""
-
-# Later import SQLAlchemy models & session here, e.g.:
 from sqlalchemy import select, func, distinct
+
 from app.extensions import db
 from app.models.energy_record import EnergyRecord
-from app.models.neighborhood import Neighborhood
+
+
+"""Service-layer logic for the dashboard overview endpoint (/api/dashboard)."""
 
 
 def get_dashboard_overview(
     date_from: Optional[date] = None,
     date_to: Optional[date] = None,
 ) -> Dict[str, Any]:
-    
     filters = []
     if date_from:
         filters.append(EnergyRecord.date >= date_from)
@@ -35,8 +34,8 @@ def get_dashboard_overview(
             "timeseries": [],
         }
 
-    # consumption kWh (total)
-    total_stmt = select(func.coalesce(func.sum(EnergyRecord.consumption_kwh), 0))
+    # total kwh
+    total_stmt = select(func.coalesce(func.sum(EnergyRecord.total_kwh), 0.0))
     if filters:
         total_stmt = total_stmt.where(*filters)
     consumption_kwh = float(db.session.execute(total_stmt).scalar_one())
@@ -47,15 +46,15 @@ def get_dashboard_overview(
         n_stmt = n_stmt.where(*filters)
     neighborhood_count = int(db.session.execute(n_stmt).scalar_one())
 
-    # Total households from neighborhoods table
-    total_households = 0
-    avg_kwh_per_household = (consumption_kwh / neighborhood_count if neighborhood_count > 0 else 0.0)
+    avg_kwh_per_household = (
+        consumption_kwh / neighborhood_count if neighborhood_count else 0.0
+    )
 
     # Timeseries grouped by day
     ts_stmt = (
         select(
             EnergyRecord.date.label("day"),
-            func.coalesce(func.sum(EnergyRecord.consumption_kwh), 0).label("kwh"),
+            func.coalesce(func.sum(EnergyRecord.total_kwh), 0.0).label("kwh"),
         )
         .group_by(EnergyRecord.date)
         .order_by(EnergyRecord.date.asc())
@@ -73,6 +72,7 @@ def get_dashboard_overview(
         "message": None,
         "kpis": {
             "consumption_kwh": consumption_kwh,
+            "total_kwh": consumption_kwh,
             "avg_kwh_per_household": avg_kwh_per_household,
             "neighborhood_count": neighborhood_count,
         },
