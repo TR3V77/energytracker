@@ -1,19 +1,14 @@
 -- =============================================
 -- Schema Cleanup and Column Updates
 -- Removes unused tables and columns and renames
--- columns to match the updated database schema.
+-- columns to match the updated schema.
 -- =============================================
-
--- =============================================
--- DROP UNUSED TABLES
--- These tables are no longer required in the system.
--- =============================================
-
-DROP TABLE IF EXISTS uploads;
 
 
 -- =============================================
 -- DROP UNUSED COLUMNS FROM energy_records
+-- Drop upload_id before dropping uploads table
+-- because of the foreign key dependency.
 -- =============================================
 
 ALTER TABLE energy_records
@@ -34,8 +29,24 @@ DROP COLUMN IF EXISTS city;
 
 
 -- =============================================
+-- DROP UNUSED TABLES
+-- uploads can be removed after upload_id is dropped
+-- =============================================
+ALTER TABLE uploads
+DROP COLUMN IF EXISTS id,
+DROP COLUMN IF EXISTS filename,
+DROP COLUMN IF EXISTS file_type,
+DROP COLUMN IF EXISTS record_count,
+DROP COLUMN IF EXISTS status,
+DROP COLUMN IF EXISTS errors,
+DROP COLUMN IF EXISTS uploaded_at,
+
+DROP TABLE IF EXISTS uploads;
+
+
+-- =============================================
 -- RENAME COLUMN IN energy_records
--- Davos change: consumption_kwh -> total_kwh
+-- consumption_kwh -> total_kwh
 -- =============================================
 
 ALTER TABLE energy_records
