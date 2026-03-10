@@ -1,7 +1,7 @@
 from datetime import timedelta
 from typing import Any
 
-from sqlalchemy import select, func, distinct
+from sqlalchemy import select, func
 
 from app.extensions import db
 from app.models.energy_record import EnergyRecord
@@ -42,7 +42,7 @@ def get_dashboard_overview(
         }, 400
 
     neighborhood_exists = db.session.execute(
-        select(function.count())
+        select(func.count())
         .select_from(Neighborhood)
         .where(Neighborhood.neighborhood_id == neighborhood_id)
     ).scalar_one()
@@ -82,7 +82,7 @@ def get_dashboard_overview(
     }
 
     base_response = {
-        "unit": "kWh",
+        "unit": "kwh",
         "filters": response_filters,
     }
 
@@ -168,7 +168,7 @@ def get_dashboard_overview(
     }, 200
 
 def _get_window_start_date(window: str, latest_record_date):
-    """Convert suppoerted window string into start date"""
+    """Convert supported window string into start date"""
     if window == "30d":
         return latest_record_date - timedelta(days = 30)
     
