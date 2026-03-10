@@ -15,7 +15,7 @@ services:
     ports:
       - "5000:5000"
     environment:
-      DATABASE_URL: postgresql://energytracker:devpassword@db:5432/energytracker
+      DATABASE_URL: postgresql://energytracker:devpassword@db:5432/energy_tracker
       FLASK_ENV: development
     volumes:
       - ./backend:/app
