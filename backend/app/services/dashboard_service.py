@@ -84,10 +84,40 @@ def get_dashboard_overview(
         ).scalar_one()
     )
 
-    rows = db.session.execute(ts_stmt).all()
-    timeseries: List[Dict[str, Any]] = [
-        {"date": r.day.isoformat(), "kwh": float(r.kwh)} for r in rows
-    ]
+    min_record_date, max_record_date = db.session.execute(
+        select(
+            func.min(EnergyRecord.date),
+            func.max(EnergyRecord.date),
+        ).where(*filter_conditions)
+    ).one()
+
+    household_count = db.session.execute(
+        select(Neighborhood.households)
+        .where(Neighborhood.neighborhood_id == neighborhood_id)
+    ).scalar_one()
+
+    total_days = (
+        (max_record_date - min_record_date).days + 1
+        if min_record_date and max_record_date
+        else 0
+    )
+
+    # average_kwh_per_day = total_kwh / total_days if total_days > 0 else 0.0
+    # average_kwh_per_household = (
+    #     total_kwh / household_count if household_count else 0.0
+    # )
+
+    period_expression = _get_period_expression(normalized_granularity)
+
+    time_series_rows = db.session.execute(
+        select(
+            period_expression.label("period"),
+            func.coalesce(func.sum(EnergyRecord.total_kwh), 0).label("total_kwh"),
+        )
+        .where(*filter_conditions)
+        .group_by(period_expression)
+        .order_by(period_expression)
+    ).all()
 
     return {
         "hasData": True,
