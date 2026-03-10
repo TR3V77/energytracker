@@ -119,14 +119,30 @@ def get_dashboard_overview(
         .order_by(period_expression)
     ).all()
 
+    time_series = [
+        {
+        "period": row.period.isoformat(),
+        "total_kwh": float(row.total_kwh),
+        }
+        for row in time_series_rows
+    ]
+
     return {
-        "hasData": True,
+        **base_response,
+        "has_data": True,
         "message": None,
         "kpis": {
-            "consumption_kwh": consumption_kwh,
-            "total_kwh": consumption_kwh,
-            "avg_kwh_per_household": avg_kwh_per_household,
-            "neighborhood_count": neighborhood_count,
+            "total_kwh": total_kwh,
+            # "average_kwh_per_day": average_kwh_per_day,
+            # "average_kwh_per_household": average_kwh_per_household,
+            "household_count": int(household_count),
+            "neighborhood_count": 1,
+            "date_range": {
+                "start": min_record_date.isoformat(),
+                "end": max_record_date.isoformat(),
+            },
         },
-        "timeseries": timeseries,
-    }
+        "time_series": time_series,
+    }, 200
+
+
