@@ -50,7 +50,24 @@ def get_dashboard_overview(
     if neighborhood_exists == 0:
         return {"error": "neighborhood not found"}, 404
 
-    
+    latest_record_date = db.session.execute(
+        select(func.max(EnergyRecord.date))
+        .where(EnergyRecord.neighborhood_id == neighborhood_id)
+    ).scalar_one()
+
+    if latest_record_date is None:
+        return {
+            "filters": {
+                "window": normalized_window,
+                "neighborhood_id": neighborhood_id,
+                "granularity": normalized_granularity,
+            },
+            "unit": "kwh",
+            "has_data": False,
+            "message": "no dashboard data found for the selected filters",
+            "kpis": None,
+            "time_series": [],
+        }, 200
 
     filter_conditions = [EnergyRecord.neighborhood_id == neighborhood_id]
 
