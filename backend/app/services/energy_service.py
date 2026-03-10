@@ -18,18 +18,15 @@ def get_energy_data(
     """Query energy records with optional filters."""
     query = EnergyRecord.query
 
-    if neighborhood_id:
+    if neighborhood_id is not None:
         query = query.filter(EnergyRecord.neighborhood_id == neighborhood_id)
-    if energy_type:
-        query = query.filter(EnergyRecord.energy_type == energy_type)
-    if start_date:
-        query = query.filter(
-            EnergyRecord.date >= datetime.strptime(
-                start_date, '%Y-%m-%d').date()
-        )
-    if end_date:
-        query = query.filter(
-            EnergyRecord.date <= datetime.strptime(end_date, '%Y-%m-%d').date()
-        )
 
-    return query.order_by(EnergyRecord.date).all()
+    if start_date:
+        parsed_start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+        query = query.filter(EnergyRecord.date >= start_date)
+
+    if end_date:
+        parsed_end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+        query = query.filter(EnergyRecord.date <= end_date)
+
+    return query.order_by(EnergyRecord.date.asc()).all()
