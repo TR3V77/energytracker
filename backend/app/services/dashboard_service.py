@@ -40,7 +40,27 @@ def get_dashboard_overview(
         return {
             "error": "invalid neighborhood_id; expected an integer"
         }, 400
-    
+
+    neighborhood_exists = db.session.execute(
+        select(function.count())
+        .select_from(Neighborhood)
+        .where(Neighborhood.neighborhood_id == neighborhood_id)
+    ).scalar_one()
+
+    if neighborhood_exists == 0:
+        return {"error": "neighborhood not found"}, 404
+
+    filter_conditions = [EnergyRecord.neighborhood_id == neighborhood_id]
+
+    start_date = _get_window_start_date(normalized_window)
+    if start_date is not None:
+        filter_conditions.append(EnergyRecord.date >= start_date)
+
+    response_filters = {
+        "window": normalized_window,
+        "neighborhood_id": neighborhood_id,
+        "granularity": normalized_granularity,
+    }
     # filters = []
     # if date_from:
     #     filters.append(EnergyRecord.date >= date_from)
