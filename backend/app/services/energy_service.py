@@ -6,11 +6,15 @@ from app.models.neighborhood import Neighborhood
 
 def get_all_neighborhoods():
     """Return all neighborhoods ordered by name."""
-    return Neighborhood.query.order_by(Neighborhood.name).all()
+    return Neighborhood.query.order_by(Neighborhood.neighborhood_name).all()
 
 
-def get_energy_data(neighborhood_id=None, start_date=None, end_date=None,
-                    energy_type=None):
+def get_energy_data(
+        neighborhood_id = None,
+        start_date = None,
+        end_date = None,
+        energy_type = None
+    ):
     """Query energy records with optional filters."""
     query = EnergyRecord.query
 
