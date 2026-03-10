@@ -5,20 +5,30 @@ from sqlalchemy import select, func, distinct
 
 from app.extensions import db
 from app.models.energy_record import EnergyRecord
+from app.models.neighborhood import Neighborhood
 
 
 """Service-layer logic for the dashboard overview endpoint (/api/dashboard)."""
 
 
+VALID_WINDOWS = {"30d", "90d", "all"}
+VALID_GRANULARITIES = {"day", "week"}
+
+
 def get_dashboard_overview(
-    date_from: Optional[date] = None,
-    date_to: Optional[date] = None,
-) -> Dict[str, Any]:
-    filters = []
-    if date_from:
-        filters.append(EnergyRecord.date >= date_from)
-    if date_to:
-        filters.append(EnergyRecord.date <= date_to)
+    window: str = "30d",
+    neighborhood_id_raw: str = "1",
+    granularity: str = "day",
+    ) -> tuple[Dict[str, Any], int]:
+    """Return dashboard KPI and time series data for request filters."""
+    normalized_window = window.strip().lower()
+    normalized_granularity = granularity.strip().lower()
+
+    # filters = []
+    # if date_from:
+    #     filters.append(EnergyRecord.date >= date_from)
+    # if date_to:
+    #     filters.append(EnergyRecord.date <= date_to)
 
     # Count rows to decide hasData
     count_stmt = select(func.count(EnergyRecord.id))
