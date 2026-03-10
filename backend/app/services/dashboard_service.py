@@ -145,4 +145,23 @@ def get_dashboard_overview(
         "time_series": time_series,
     }, 200
 
+def _get_window_start_date(window: str):
+    """Convert suppoerted window string into start date"""
+    today = datetime.itcnow().date()
 
+    if window == "30d":
+        return today - timedelta(days = 30)
+    
+    if window == "90d":
+        return today - timedelta(days = 90)
+    
+    return None
+
+def _get_utc_timestamp() -> str:
+    """Return compact utc timestamp for API responses."""
+    return (
+        datetime.now(timezone.utc)
+        .replace(microsecond = 0)
+        .isoformat()
+        .replce("+000:00", "Z")
+    )
