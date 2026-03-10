@@ -14,11 +14,19 @@ class EnergyRecord(db.Model):
     total_kwh = db.Column(db.Float, nullable=False)
 
     __table_args__ = (
-        db.Index("idx_energy_records_neighborhood_date",
-                 "neighborhood_id",
-                 "date"),
+        db.Index(
+            "idx_energy_records_neighborhood_date",
+            "neighborhood_id",
+            "date"
+        ),
         db.Index("idx_energy_records_date", "date"),
     )
+
+    def __repr__(self):
+        return (
+            f"<EnergyRecord neighborhood_id = {self.neighborhood_id} "
+            f"date = {self.date} total_kwh = {self.total_kwh}>"
+        )
 
     @property
     def consumption_kwh(self):
