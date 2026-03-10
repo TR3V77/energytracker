@@ -1,5 +1,5 @@
-from datetime import date
-from typing import Optional, Dict, Any, List
+from datetime import timedelta
+from typing import Any
 
 from sqlalchemy import select, func, distinct
 
@@ -19,7 +19,7 @@ def get_dashboard_overview(
     window: str = "30d",
     neighborhood_id_raw: str = "1",
     granularity: str = "day",
-    ) -> tuple[Dict[str, Any], int]:
+    ) -> tuple[dict[str, Any], int]:
     """Return dashboard KPI and time series data for request filters."""
     normalized_window = window.strip().lower()
     normalized_granularity = granularity.strip().lower()
@@ -49,6 +49,8 @@ def get_dashboard_overview(
 
     if neighborhood_exists == 0:
         return {"error": "neighborhood not found"}, 404
+
+    
 
     filter_conditions = [EnergyRecord.neighborhood_id == neighborhood_id]
 
