@@ -1,26 +1,12 @@
 -- =============================================
-<<<<<<< HEAD
--- QUERY: Daily Energy Consumption Aggregation
--- This query calculates the total energy usage per day.
--- DATE_TRUNC('day', date) removes the time portion and groups records by calendar day.
--- SUM(total_kwh) calculates the total kilowatt-hours consumed for each day.
--- GROUP BY ensures all records from the same day are combined.
--- ORDER BY ASC sorts results from oldest to newest for time-series visualization.
--- Used for daily trends in dashboards and analytics.
-=======
 -- Daily Energy Aggregation with Filters
 -- Used when granularity = "day"
 -- This query aggregates total energy usage per day
 -- and applies optional filters for time window
 -- and neighborhood selection.
->>>>>>> 2fc0a69 (PROJ-53: Add time window and neighborhood filters to energy aggregation queries)
 -- =============================================
 
-SELECT 
-<<<<<<< HEAD
-    DATE_TRUNC('day', date) AS day,
-    SUM(total_kwh) AS total_kwh
-=======
+SELECT
     -- DATE_TRUNC removes any time component and groups
     -- records by calendar day for daily aggregation
     DATE_TRUNC('day', date) AS period,
@@ -29,7 +15,6 @@ SELECT
     -- for all records within each grouped day
     SUM(total_kwh) AS kwh
 
->>>>>>> 2fc0a69 (PROJ-53: Add time window and neighborhood filters to energy aggregation queries)
 FROM public.energy_records
 
 WHERE
@@ -61,28 +46,14 @@ ORDER BY period ASC;
 
 
 -- =============================================
-<<<<<<< HEAD
--- QUERY: Weekly Energy Consumption Aggregation
--- This query calculates the total energy usage per week.
--- DATE_TRUNC('week', date) groups all records into their respective calendar week.
--- SUM(total_kwh) calculates total weekly energy consumption.
--- GROUP BY combines all records within the same week.
--- ORDER BY ASC sorts results chronologically for trend analysis.
--- Used for weekly summaries, reporting, and long-term energy analysis.
-=======
 -- Weekly Energy Aggregation with Filters
 -- Used when granularity = "week"
 -- This query aggregates total energy usage per week
 -- and applies optional filters for time window
 -- and neighborhood selection.
->>>>>>> 2fc0a69 (PROJ-53: Add time window and neighborhood filters to energy aggregation queries)
 -- =============================================
 
-SELECT 
-<<<<<<< HEAD
-    DATE_TRUNC('week', date) AS week,
-    SUM(total_kwh) AS total_kwh
-=======
+SELECT
     -- DATE_TRUNC groups records into calendar weeks
     -- (week starting Monday in PostgreSQL)
     DATE_TRUNC('week', date) AS period,
@@ -90,7 +61,6 @@ SELECT
     -- SUM calculates total energy consumption for each week
     SUM(total_kwh) AS kwh
 
->>>>>>> 2fc0a69 (PROJ-53: Add time window and neighborhood filters to energy aggregation queries)
 FROM public.energy_records
 
 WHERE
