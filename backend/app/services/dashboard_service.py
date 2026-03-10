@@ -71,7 +71,7 @@ def get_dashboard_overview(
 
     filter_conditions = [EnergyRecord.neighborhood_id == neighborhood_id]
 
-    start_date = _get_window_start_date(normalized_window)
+    start_date = _get_window_start_date(normalized_window, latest_record_date)
     if start_date is not None:
         filter_conditions.append(EnergyRecord.date >= start_date)
 
@@ -82,10 +82,13 @@ def get_dashboard_overview(
     }
 
     base_response = {
-        "generated_at": _get_utc_timestamp(),
         "unit": "kWh",
         "filters": response_filters,
     }
+
+    record_count = db.session.execute(
+        select(func.count(EnergyRecord.id)).where(*filter_conditions)
+    ).scalar_one()
 
     if int(record_count) == 0:
         return {
@@ -115,11 +118,11 @@ def get_dashboard_overview(
         .where(Neighborhood.neighborhood_id == neighborhood_id)
     ).scalar_one()
 
-    total_days = (
-        (max_record_date - min_record_date).days + 1
-        if min_record_date and max_record_date
-        else 0
-    )
+    # total_days = (
+    #     (max_record_date - min_record_date).days + 1
+    #     if min_record_date and max_record_date
+    #     else 0
+    # )
 
     # average_kwh_per_day = total_kwh / total_days if total_days > 0 else 0.0
     # average_kwh_per_household = (
@@ -164,23 +167,19 @@ def get_dashboard_overview(
         "time_series": time_series,
     }, 200
 
-def _get_window_start_date(window: str):
+def _get_window_start_date(window: str, latest_record_date):
     """Convert suppoerted window string into start date"""
-    today = datetime.itcnow().date()
-
     if window == "30d":
-        return today - timedelta(days = 30)
+        return latest_record_date - timedelta(days = 30)
     
     if window == "90d":
-        return today - timedelta(days = 90)
+        return latest_record_date - timedelta(days = 90)
     
     return None
 
-def _get_utc_timestamp() -> str:
-    """Return compact utc timestamp for API responses."""
-    return (
-        datetime.now(timezone.utc)
-        .replace(microsecond = 0)
-        .isoformat()
-        .replce("+000:00", "Z")
-    )
+def _get_period_expression(granularity: str):
+    """Return SQL for dashboard time series grouping"""
+    if granularity == "week":
+        return func.date_trunc("week", EnergyRecord.date).cast(db.Date)
+    
+    return EnergyRecord.date
