@@ -8,10 +8,19 @@ class Neighborhood(db.Model):
     neighborhood_name = db.Column(db.Text, nullable=False)
     households = db.Column(db.Integer, nullable=False)
 
-    energy_records = db.relationship()
+    energy_records = db.relationship(
+        "EnergyRecord",
+        backref = "neighborhood",
+        lazy = True,
+        cascade = "all, delete",
+        passive_deletes = True,
+    )
 
     def __repr__(self):
-        return f'<Neighborhood {self.id} {self.name} {self.city}>'
+        return (
+            f"<Neighborhood neighborhood_id = {self.neighborhood_id} "
+            f"name = {self.neighborhood_name}>"
+        )
 
     def to_dict(self):
         return {
