@@ -24,7 +24,7 @@ class Neighborhood(db.Model):
 
     def to_dict(self):
         return {
-            'id': self.id,
-            'name': self.name,
-            'city': self.city,
+            "neighborhood_id": self.neighborhood_id,
+            "neighborhood_name": self.neighborhood_name,
+            "households": self.households,
         }
