@@ -24,6 +24,23 @@ def get_dashboard_overview(
     normalized_window = window.strip().lower()
     normalized_granularity = granularity.strip().lower()
 
+    if normalized_window not in VALID_WINDOWS:
+        return {
+            "error": "invalid window; expected: '30d', '90d', or 'all'"
+        }, 400
+    
+    if normalized_granularity not in VALID_GRANULARITIES:
+        return {
+            "error": "invalid granularity; expected: 'day' or 'week'"
+        }, 400
+    
+    try:
+        neighborhood_id = int(neighborhood_id_raw)
+    except (TypeError, ValueError):
+        return {
+            "error": "invalid neighborhood_id; expected an integer"
+        }, 400
+    
     # filters = []
     # if date_from:
     #     filters.append(EnergyRecord.date >= date_from)
