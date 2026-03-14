@@ -1,5 +1,6 @@
 // Energy Tracker Database Schema
-// Auto-generated from SQLAlchemy models (backend/app/models/)
+// Source of truth: database/Tables.sql
+// Paste into https://dbdiagram.io to visualize
 
 Table neighborhoods {
   neighborhood_id int [pk]
@@ -11,8 +12,7 @@ Table energy_records {
   id serial [pk]
   neighborhood_id int [not null, ref: > neighborhoods.neighborhood_id]
   date date [not null]
-  consumption_kwh numeric(12,2) [not null, note: 'CHECK (consumption_kwh >= 0)']
-  energy_type varchar(50) [not null, default: 'electric']
+  total_kwh numeric(12,2) [not null, note: 'CHECK (total_kwh >= 0)']
 
   indexes {
     date [name: 'idx_energy_records_date']
@@ -20,16 +20,4 @@ Table energy_records {
   }
 
   note: 'ON DELETE CASCADE via neighborhood_id FK'
-}
-
-Table uploads {
-  id serial [pk]
-  filename varchar(255) [not null]
-  file_type varchar(10) [not null]
-  record_count int [not null, default: 0]
-  status varchar(20) [not null, default: 'completed']
-  errors text
-  uploaded_at datetime [not null, default: `now()`]
-
-  note: 'Tracks CSV/JSON file upload metadata. No FK to energy_records yet.'
 }
