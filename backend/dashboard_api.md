@@ -91,19 +91,19 @@ All successful responses include:
 ```json
 
 {
-  "hasData": true,
-  "generatedAt": "2026-02-26T18:05:12Z",
+  "has_data": true,
+  "generated_at": "2026-02-26T18:05:12Z",
   "unit": "kwh",
   "filters": {
     "window": "90d",
-    "neighborhoodId": "all",
+    "neighborhood_id": "all",
     "granularity": "day"
   },
   "kpis": {
-    "totalKwh": 123456.78,
-    "avgKwhPerDay": 1371.74,
-    "neighborhoodCount": 10,
-    "dateRange": {
+    "total_kwh": 123456.78,
+    "avg_kwh_per_day": 1371.74,
+    "neighborhood_count": 10,
+    "date_range": {
       "start": "2025-01-01",
       "end": "2025-12-31"
     }
@@ -119,13 +119,13 @@ All successful responses include:
 
 ```json
 {
-  "hasData": false,
-  "generatedAt": "2026-02-26T18:05:12Z",
+  "has_data": false,
+  "generated_at": "2026-02-26T18:05:12Z",
   "unit": "kwh",
   "message": "Upload data to view your dashboard.",
   "filters": {
     "window": "90d",
-    "neighborhoodId": "all",
+    "neighborhood_id": "all",
     "granularity": "day"
   }
 }
