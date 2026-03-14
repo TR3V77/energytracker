@@ -123,7 +123,9 @@ def get_dashboard_overview(
     time_series_rows = db.session.execute(
         select(
             period_expression.label("period"),
-            func.coalesce(func.sum(EnergyRecord.total_kwh), 0).label("total_kwh"),
+            func.coalesce(
+                func.sum(EnergyRecord.total_kwh), 0)
+                .label("total_kwh"),
         )
         .where(*filter_conditions)
         .group_by(period_expression)
@@ -159,7 +161,7 @@ def _get_window_start_date(window: str, latest_record_date):
     """Convert supported window string into start date"""
     if window == "30d":
         return latest_record_date - timedelta(days=30)
-    
+
     if window == "90d":
         return latest_record_date - timedelta(days=90)
 
