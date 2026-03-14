@@ -1,60 +1,176 @@
-from datetime import date
-from typing import Optional, Dict, Any, List
+from datetime import timedelta
+from typing import Any
+
+from sqlalchemy import select, func
+
+from app.extensions import db
+from app.models.energy_record import EnergyRecord
+from app.models.neighborhood import Neighborhood
+
 
 """Service-layer logic for the dashboard overview endpoint (/api/dashboard)."""
 
-# Later import SQLAlchemy models & session here, e.g.:
-# from sqlalchemy import select, func
-# from sqlalchemy.orm import Session
-# from app.models.energy_record import EnergyRecord
-# from app.models.neighborhood import Neighborhood
-# from app.database import SessionLocal
+
+VALID_WINDOWS = {"30d", "90d", "all"}
+VALID_GRANULARITIES = {"day", "week"}
 
 
 def get_dashboard_overview(
-    date_from: Optional[date] = None,
-    date_to: Optional[date] = None,
-) -> Dict[str, Any]:
-    """
-    Compute high-level dashboard metrics and a simple kwh timeseries.
+    window: str = "30d",
+    neighborhood_id_raw: str = "1",
+    granularity: str = "day",
+) -> tuple[dict[str, Any], int]:
+    """Return dashboard KPI and time series data for request filters."""
+    normalized_window = window.strip().lower()
+    normalized_granularity = granularity.strip().lower()
 
-    Returns:
-        {
-            "hasData": bool,
-            "message": str | None,
-            "kpis": {
-                "total_kwh": float,
-                "avg_kwh_per_household": float,
-                "neighborhood_count": int,
-            } | None,
-            "timeseries": List[{"date": str, "kwh": float}],
-        }
-    """
+    if normalized_window not in VALID_WINDOWS:
+        return {
+            "error": "invalid window; expected: '30d', '90d', or 'all'"
+        }, 400
 
-    # TODO: Replace this MOCK with the real SQLAlchemy aggregation
-    # For now, return stubbed data so frontend can build Overview UI.
+    if normalized_granularity not in VALID_GRANULARITIES:
+        return {
+            "error": "invalid granularity; expected: 'day' or 'week'"
+        }, 400
 
-    timeseries: List[Dict[str, Any]] = [
-        {"date": "2025-01-01", "kwh": 100.0},
-        {"date": "2025-01-02", "kwh": 120.5},
-        {"date": "2025-01-03", "kwh": 98.3},
-    ]
+    try:
+        neighborhood_id = int(neighborhood_id_raw)
+    except (TypeError, ValueError):
+        return {
+            "error": "invalid neighborhood_id; expected an integer"
+        }, 400
 
-    total_kwh = sum(point["kwh"] for point in timeseries)
-    neighborhood_count = 3  # mock number for now
-    total_households = 150  # mock number for now
+    neighborhood_exists = db.session.execute(
+        select(func.count())
+        .select_from(Neighborhood)
+        .where(Neighborhood.neighborhood_id == neighborhood_id)
+    ).scalar_one()
 
-    avg_kwh_per_household = (
-        total_kwh / total_households if total_households > 0 else 0.0
+    if neighborhood_exists == 0:
+        return {"error": "neighborhood not found"}, 404
+
+    latest_record_date = db.session.execute(
+        select(func.max(EnergyRecord.date))
+        .where(EnergyRecord.neighborhood_id == neighborhood_id)
+    ).scalar_one()
+
+    if latest_record_date is None:
+        return {
+            "filters": {
+                "window": normalized_window,
+                "neighborhood_id": neighborhood_id,
+                "granularity": normalized_granularity,
+            },
+            "unit": "kwh",
+            "has_data": False,
+            "message": "no dashboard data found for the selected filters",
+            "kpis": None,
+            "time_series": [],
+        }, 200
+
+    filter_conditions = [EnergyRecord.neighborhood_id == neighborhood_id]
+
+    start_date = _get_window_start_date(normalized_window, latest_record_date)
+    if start_date is not None:
+        filter_conditions.append(EnergyRecord.date >= start_date)
+
+    response_filters = {
+        "window": normalized_window,
+        "neighborhood_id": neighborhood_id,
+        "granularity": normalized_granularity,
+    }
+
+    base_response = {
+        "unit": "kwh",
+        "filters": response_filters,
+    }
+
+    record_count = db.session.execute(
+        select(func.count(EnergyRecord.id)).where(*filter_conditions)
+    ).scalar_one()
+
+    if int(record_count) == 0:
+        return {
+            **base_response,
+            "has_data": False,
+            "message": "no dashboard data found for the selected filters",
+            "kpis": None,
+            "time_series": [],
+        }, 200
+
+    total_kwh = float(
+        db.session.execute(
+            select(func.coalesce(func.sum(EnergyRecord.total_kwh), 0))
+            .where(*filter_conditions)
+        ).scalar_one()
     )
 
+    min_record_date, max_record_date = db.session.execute(
+        select(
+            func.min(EnergyRecord.date),
+            func.max(EnergyRecord.date),
+        ).where(*filter_conditions)
+    ).one()
+
+    household_count = db.session.execute(
+        select(Neighborhood.households)
+        .where(Neighborhood.neighborhood_id == neighborhood_id)
+    ).scalar_one()
+
+    period_expression = _get_period_expression(normalized_granularity)
+
+    time_series_rows = db.session.execute(
+        select(
+            period_expression.label("period"),
+            func.coalesce(
+                func.sum(EnergyRecord.total_kwh), 0)
+                .label("total_kwh"),
+        )
+        .where(*filter_conditions)
+        .group_by(period_expression)
+        .order_by(period_expression)
+    ).all()
+
+    time_series = [
+        {
+            "period": row.period.isoformat(),
+            "total_kwh": float(row.total_kwh),
+        }
+        for row in time_series_rows
+    ]
+
     return {
-        "hasData": True,
+        **base_response,
+        "has_data": True,
         "message": None,
         "kpis": {
             "total_kwh": total_kwh,
-            "avg_kwh_per_household": avg_kwh_per_household,
-            "neighborhood_count": neighborhood_count,
+            "household_count": int(household_count),
+            "neighborhood_count": 1,
+            "date_range": {
+                "start": min_record_date.isoformat(),
+                "end": max_record_date.isoformat(),
+            },
         },
-        "timeseries": timeseries,
-    }
+        "time_series": time_series,
+    }, 200
+
+
+def _get_window_start_date(window: str, latest_record_date):
+    """Convert supported window string into start date"""
+    if window == "30d":
+        return latest_record_date - timedelta(days=30)
+
+    if window == "90d":
+        return latest_record_date - timedelta(days=90)
+
+    return None
+
+
+def _get_period_expression(granularity: str):
+    """Return SQL for dashboard time series grouping"""
+    if granularity == "week":
+        return func.date_trunc("week", EnergyRecord.date).cast(db.Date)
+
+    return EnergyRecord.date

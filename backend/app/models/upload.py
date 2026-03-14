@@ -15,9 +15,9 @@ class Upload(db.Model):
         db.DateTime, nullable=False, default=datetime.utcnow
     )
 
-    energy_records = db.relationship(
-        'EnergyRecord', backref='upload', lazy=True
-    )
+    # energy_records = db.relationship(
+    #     'energy_records', backref='upload', lazy=True
+    # )
 
     def __repr__(self):
         return f'<Upload {self.filename}>'
