@@ -10,10 +10,10 @@ class Neighborhood(db.Model):
 
     energy_records = db.relationship(
         "EnergyRecord",
-        backref = "neighborhood",
-        lazy = True,
-        cascade = "all, delete",
-        passive_deletes = True,
+        backref="neighborhood",
+        lazy=True,
+        cascade="all, delete",
+        passive_deletes=True,
     )
 
     def __repr__(self):

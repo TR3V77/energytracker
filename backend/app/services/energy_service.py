@@ -10,10 +10,10 @@ def get_all_neighborhoods():
 
 
 def get_energy_data(
-        neighborhood_id = None,
-        start_date = None,
-        end_date = None,
-    ):
+        neighborhood_id=None,
+        start_date=None,
+        end_date=None,
+):
     """Query energy records with optional filters."""
     query = EnergyRecord.query
 

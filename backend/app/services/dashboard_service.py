@@ -19,7 +19,7 @@ def get_dashboard_overview(
     window: str = "30d",
     neighborhood_id_raw: str = "1",
     granularity: str = "day",
-    ) -> tuple[dict[str, Any], int]:
+) -> tuple[dict[str, Any], int]:
     """Return dashboard KPI and time series data for request filters."""
     normalized_window = window.strip().lower()
     normalized_granularity = granularity.strip().lower()
@@ -28,12 +28,12 @@ def get_dashboard_overview(
         return {
             "error": "invalid window; expected: '30d', '90d', or 'all'"
         }, 400
-    
+
     if normalized_granularity not in VALID_GRANULARITIES:
         return {
             "error": "invalid granularity; expected: 'day' or 'week'"
         }, 400
-    
+
     try:
         neighborhood_id = int(neighborhood_id_raw)
     except (TypeError, ValueError):
@@ -118,17 +118,6 @@ def get_dashboard_overview(
         .where(Neighborhood.neighborhood_id == neighborhood_id)
     ).scalar_one()
 
-    # total_days = (
-    #     (max_record_date - min_record_date).days + 1
-    #     if min_record_date and max_record_date
-    #     else 0
-    # )
-
-    # average_kwh_per_day = total_kwh / total_days if total_days > 0 else 0.0
-    # average_kwh_per_household = (
-    #     total_kwh / household_count if household_count else 0.0
-    # )
-
     period_expression = _get_period_expression(normalized_granularity)
 
     time_series_rows = db.session.execute(
@@ -143,8 +132,8 @@ def get_dashboard_overview(
 
     time_series = [
         {
-        "period": row.period.isoformat(),
-        "total_kwh": float(row.total_kwh),
+            "period": row.period.isoformat(),
+            "total_kwh": float(row.total_kwh),
         }
         for row in time_series_rows
     ]
@@ -155,8 +144,6 @@ def get_dashboard_overview(
         "message": None,
         "kpis": {
             "total_kwh": total_kwh,
-            # "average_kwh_per_day": average_kwh_per_day,
-            # "average_kwh_per_household": average_kwh_per_household,
             "household_count": int(household_count),
             "neighborhood_count": 1,
             "date_range": {
@@ -167,19 +154,21 @@ def get_dashboard_overview(
         "time_series": time_series,
     }, 200
 
+
 def _get_window_start_date(window: str, latest_record_date):
     """Convert supported window string into start date"""
     if window == "30d":
-        return latest_record_date - timedelta(days = 30)
+        return latest_record_date - timedelta(days=30)
     
     if window == "90d":
-        return latest_record_date - timedelta(days = 90)
-    
+        return latest_record_date - timedelta(days=90)
+
     return None
+
 
 def _get_period_expression(granularity: str):
     """Return SQL for dashboard time series grouping"""
     if granularity == "week":
         return func.date_trunc("week", EnergyRecord.date).cast(db.Date)
-    
+
     return EnergyRecord.date
