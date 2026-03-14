@@ -11,7 +11,7 @@ class EnergyRecord(db.Model):
         nullable=False,
     )
     date = db.Column(db.Date, nullable=False)
-    total_kwh = db.Column(db.Float, nullable=False)
+    total_kwh = db.Column(db.Numeric(12, 2), nullable=False)
 
     __table_args__ = (
         db.Index(
