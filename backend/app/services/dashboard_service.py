@@ -124,8 +124,8 @@ def get_dashboard_overview(
         select(
             period_expression.label("period"),
             func.coalesce(
-                func.sum(EnergyRecord.total_kwh), 0)
-                .label("total_kwh"),
+                func.sum(EnergyRecord.total_kwh), 0
+            ).label("total_kwh"),
         )
         .where(*filter_conditions)
         .group_by(period_expression)
