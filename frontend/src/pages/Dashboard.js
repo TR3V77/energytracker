@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import KpiCard from "../components/KpiCard";
 import EnergyChart from "../components/EnergyChart";
 import { getEnergyData } from "../services/api";
+import { Link } from "react-router-dom";
 
 export default function Dashboard() {
   const [data, setData] = useState([]);
