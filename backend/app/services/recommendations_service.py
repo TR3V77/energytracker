@@ -12,9 +12,9 @@ from app.models.neighborhood import Neighborhood
 """
 Service-layer logic for the recommendations endpoint.
 
-This module should orchestrate data access and apply recommendation rules.
+This module should control data access and apply recommendation rules.
 Keep Flask request/response concerns in the route layer, and keep pure rule
-logic in a separate module if/when it grows (e.g., app/rules/).
+logic in a separate module if/when it grows.
 """
 
 VALID_WINDOWS = {"30d", "90d", "all"}
@@ -37,3 +37,22 @@ def get_recommendations(
             "recommendation": str,
         }
     """
+
+    normalized_window = window.strip().lower()
+    if normalized_window not in VALID_WINDOWS:
+        # Route layer can translate this to 400 for raising exceptions
+        # for now we keep a simple "return empty" contract.
+        return []
+
+    filters = []
+    if neighborhood_id is not None:
+        filters.append(EnergyRecord.neighborhood_id == neighborhood_id)
+
+    latest_date_stmt = select(func.max(EnergyRecord.date))
+    if filters:
+        latest_date_stmt = latest_date_stmt.where(*filters)
+
+    latest_record_date = db.session.execute(latest_date_stmt).scalar_one()
+
+    if latest_record_date is None:
+        return []
