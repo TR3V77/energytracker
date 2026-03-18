@@ -56,3 +56,21 @@ def get_recommendations(
 
     if latest_record_date is None:
         return []
+
+    start_date = _get_window_start_date(normalized_window, latest_record_date)
+    if start_date is not None:
+        filters.append(EnergyRecord.date >= start_date)
+
+    # NOTE: Intentionally minimal; will plug in the actual
+    # rules + queries next once rule set confirmed.
+    _ = threshold
+    _ = filters
+    return []
+
+
+def _get_window_start_date(window: str, latest_record_date):
+    if window == "30d":
+        return latest_record_date - timedelta(days=30)
+    if window == "90d":
+        return latest_record_date - timedelta(days=90)
+    return None
