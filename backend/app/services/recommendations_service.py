@@ -154,3 +154,51 @@ def get_recommendations(
                     },
                 ]
             )
+        else:
+            # Triggered high band: 3 recommendations
+            priority = "high"
+            recommendations.extend(
+                [
+                    {
+                        "neighborhood": row.neighborhood_name,
+                        "score": efficiency_score,
+                        "message": (
+                            f"High consumption detected in "
+                            f"{row.neighborhood_name}. "
+                            f"Efficiency score ({efficiency_score:.2f} "
+                            "kWh/household) exceeds the threshold. "
+                            f"Threshold: {threshold:.2f} over the selected "
+                            "window."
+                        ),
+                        "action": "Efficiency Upgrade",
+                        "priority": priority,
+                    },
+                    {
+                        "neighborhood": row.neighborhood_name,
+                        "score": efficiency_score,
+                        "message": (
+                            "Recommend HVAC upgrades and better climate "
+                            f"control for {row.neighborhood_name}. "
+                            f"(Efficiency: {efficiency_score:.2f} "
+                            "kWh/household.)"
+                        ),
+                        "action": "HVAC Upgrades",
+                        "priority": priority,
+                    },
+                    {
+                        "neighborhood": row.neighborhood_name,
+                        "score": efficiency_score,
+                        "message": (
+                            "Consider weatherization assistance for "
+                            f"{row.neighborhood_name} to reduce overall "
+                            "loads. "
+                            f"(Efficiency: {efficiency_score:.2f} "
+                            "kWh/household.)"
+                        ),
+                        "action": "Weatherization Assistance",
+                        "priority": priority,
+                    },
+                ]
+            )
+
+    return recommendations
