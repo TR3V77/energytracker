@@ -119,3 +119,38 @@ def get_recommendations(
                     "priority": priority,
                 }
             )
+        elif efficiency_score < threshold:
+            # Triggered medium band: 2 recommendations
+            priority = "medium"
+            recommendations.extend(
+                [
+                    {
+                        "neighborhood": row.neighborhood_name,
+                        "score": efficiency_score,
+                        "message": (
+                            f"{row.neighborhood_name} uses more energy "
+                            "than the efficient baseline. "
+                            f"Efficiency score ({efficiency_score:.2f} "
+                            "kWh/household) is between "
+                            f"{efficiency_cutoff:.2f} and {threshold:.2f} "
+                            "over the selected window."
+                        ),
+                        "action": "Schedule Energy Audit",
+                        "priority": priority,
+                    },
+                    {
+                        "neighborhood": row.neighborhood_name,
+                        "score": efficiency_score,
+                        "message": (
+                            f"Target efficiency improvements for "
+                            f"{row.neighborhood_name}. "
+                            "Suggested first step: insulation improvements "
+                            "to reduce heating/cooling losses. "
+                            f"(Efficiency: {efficiency_score:.2f} "
+                            "kWh/household.)"
+                        ),
+                        "action": "Insulation Improvements",
+                        "priority": priority,
+                    },
+                ]
+            )
