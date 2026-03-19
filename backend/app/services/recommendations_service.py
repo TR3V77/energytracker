@@ -6,6 +6,7 @@ from sqlalchemy import select, func
 
 from app.extensions import db
 from app.models.energy_record import EnergyRecord
+from app.models.neighborhood import Neighborhood
 from app.utils.date_window import VALID_WINDOWS, get_window_start_date
 
 """
@@ -25,13 +26,13 @@ def get_recommendations(
     """
     Return rule-based recommendations.
 
-    Response item shape (intended):
+    Response item shape (aligned to frontend):
         {
-            "neighborhood_id": int,
             "neighborhood": str,
-            "efficiency_score": float,  # kWh per household over window
-            "estimated_impact_pct": float,
-            "recommendation": str,
+            "score": float,  # efficiency score in kWh/household
+            "message": str,  # brief reasoning/explanation
+            "action": str,
+            "priority": "low" | "medium" | "high",
         }
     """
 
@@ -41,13 +42,13 @@ def get_recommendations(
         # for now we keep a simple "return empty" contract.
         return []
 
-    filters = []
+    energy_filters = []
     if neighborhood_id is not None:
-        filters.append(EnergyRecord.neighborhood_id == neighborhood_id)
+        energy_filters.append(EnergyRecord.neighborhood_id == neighborhood_id)
 
-    latest_date_stmt = select(func.max(EnergyRecord.date))
-    if filters:
-        latest_date_stmt = latest_date_stmt.where(*filters)
+    latest_date_stmt = select(func.max(EnergyRecord.date)).where(
+        *energy_filters
+    ) if energy_filters else select(func.max(EnergyRecord.date))
 
     latest_record_date = db.session.execute(latest_date_stmt).scalar_one()
 
@@ -58,7 +59,7 @@ def get_recommendations(
         normalized_window, latest_record_date
     )
     if start_date is not None:
-        filters.append(EnergyRecord.date >= start_date)
+        energy_filters.append(EnergyRecord.date >= start_date)
 
     # NOTE: Intentionally minimal; will plug in the actual
     # rules + queries next once rule set confirmed.
