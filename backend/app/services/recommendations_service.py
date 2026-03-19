@@ -101,3 +101,21 @@ def get_recommendations(
 
         efficiency_score = float(row.total_kwh) / households
 
+        if efficiency_score <= efficiency_cutoff:
+            priority = "low"
+            action = "Community Recognition"
+            message = (
+                f"{row.neighborhood_name} is performing well! "
+                f"Efficiency score ({efficiency_score:.2f} kWh/household) "
+                f"is at or below the cutoff ({efficiency_cutoff:.2f}) "
+                "over the selected window."
+            )
+            recommendations.append(
+                {
+                    "neighborhood": row.neighborhood_name,
+                    "score": efficiency_score,
+                    "message": message,
+                    "action": action,
+                    "priority": priority,
+                }
+            )
