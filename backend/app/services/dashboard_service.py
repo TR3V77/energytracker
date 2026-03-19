@@ -1,4 +1,3 @@
-from datetime import timedelta
 from typing import Any
 
 from sqlalchemy import select, func
@@ -6,12 +5,12 @@ from sqlalchemy import select, func
 from app.extensions import db
 from app.models.energy_record import EnergyRecord
 from app.models.neighborhood import Neighborhood
+from app.utils.date_window import VALID_WINDOWS, get_window_start_date
 
 
 """Service-layer logic for the dashboard overview endpoint (/api/dashboard)."""
 
 
-VALID_WINDOWS = {"30d", "90d", "all"}
 VALID_GRANULARITIES = {"day", "week"}
 
 
@@ -71,7 +70,9 @@ def get_dashboard_overview(
 
     filter_conditions = [EnergyRecord.neighborhood_id == neighborhood_id]
 
-    start_date = _get_window_start_date(normalized_window, latest_record_date)
+    start_date = get_window_start_date(
+        normalized_window, latest_record_date
+    )
     if start_date is not None:
         filter_conditions.append(EnergyRecord.date >= start_date)
 
@@ -124,8 +125,8 @@ def get_dashboard_overview(
         select(
             period_expression.label("period"),
             func.coalesce(
-                func.sum(EnergyRecord.total_kwh), 0)
-                .label("total_kwh"),
+                func.sum(EnergyRecord.total_kwh), 0
+            ).label("total_kwh"),
         )
         .where(*filter_conditions)
         .group_by(period_expression)
@@ -155,17 +156,6 @@ def get_dashboard_overview(
         },
         "time_series": time_series,
     }, 200
-
-
-def _get_window_start_date(window: str, latest_record_date):
-    """Convert supported window string into start date"""
-    if window == "30d":
-        return latest_record_date - timedelta(days=30)
-
-    if window == "90d":
-        return latest_record_date - timedelta(days=90)
-
-    return None
 
 
 def _get_period_expression(granularity: str):

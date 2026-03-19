@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from datetime import timedelta
 from typing import Any, Optional
 
 from sqlalchemy import select, func
 
 from app.extensions import db
 from app.models.energy_record import EnergyRecord
-from app.models.neighborhood import Neighborhood
+from app.utils.date_window import VALID_WINDOWS, get_window_start_date
 
 """
 Service-layer logic for the recommendations endpoint.
@@ -16,8 +15,6 @@ This module should control data access and apply recommendation rules.
 Keep Flask request/response concerns in the route layer, and keep pure rule
 logic in a separate module if/when it grows.
 """
-
-VALID_WINDOWS = {"30d", "90d", "all"}
 
 
 def get_recommendations(
@@ -57,7 +54,9 @@ def get_recommendations(
     if latest_record_date is None:
         return []
 
-    start_date = _get_window_start_date(normalized_window, latest_record_date)
+    start_date = get_window_start_date(
+        normalized_window, latest_record_date
+    )
     if start_date is not None:
         filters.append(EnergyRecord.date >= start_date)
 
@@ -66,11 +65,3 @@ def get_recommendations(
     _ = threshold
     _ = filters
     return []
-
-
-def _get_window_start_date(window: str, latest_record_date):
-    if window == "30d":
-        return latest_record_date - timedelta(days=30)
-    if window == "90d":
-        return latest_record_date - timedelta(days=90)
-    return None

@@ -1,27 +1,17 @@
 from flask import Blueprint, request, jsonify
-from datetime import date
 
 from app.services import analytics_service
+from app.services import recommendations_service
+from app.utils.date_window import parse_iso_date
 
 analytics_bp = Blueprint('analytics', __name__)
-
-
-def _parse_date(param_name: str):
-    """Helper to parse date_from=YYYY-MM-DD style query params."""
-    value = request.args.get(param_name)
-    if not value:
-        return None
-    try:
-        return date.fromisoformat(value)
-    except ValueError:
-        return None
 
 
 @analytics_bp.route('/api/analytics/rankings')
 def efficiency_rankings():
     """Get neighborhoods ranked by efficiency score."""
-    date_from = _parse_date("date_from")
-    date_to = _parse_date("date_to")
+    date_from = parse_iso_date(request.args.get("date_from"))
+    date_to = parse_iso_date(request.args.get("date_to"))
 
     data = analytics_service.get_efficiency_rankings(
         date_from, date_to
@@ -48,7 +38,13 @@ def recommendations():
         "threshold", default=400.0, type=float
     )
 
-    # Call analytics_service.get_recommendations
-    recs = analytics_service.get_recommendations(threshold)
+    window = request.args.get("window", default="30d")
+    neighborhood_id = request.args.get("neighborhood_id", type=int)
+
+    recs = recommendations_service.get_recommendations(
+        threshold=threshold,
+        window=window,
+        neighborhood_id=neighborhood_id,
+    )
 
     return jsonify({"recommendations": recs}), 200
