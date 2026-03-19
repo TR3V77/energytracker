@@ -85,3 +85,19 @@ def get_recommendations(
     if energy_filters:
         metrics_stmt = metrics_stmt.where(*energy_filters)
 
+    rows = db.session.execute(metrics_stmt).all()
+
+    # Rule thresholds:
+    # - low/efficient: efficiency_score <= threshold * 0.85
+    # - medium: between efficient band and threshold
+    # - high: efficiency_score > threshold
+    efficiency_cutoff = threshold * 0.85
+
+    recommendations: list[dict[str, Any]] = []
+    for row in rows:
+        households = int(row.households or 0)
+        if households <= 0:
+            continue
+
+        efficiency_score = float(row.total_kwh) / households
+
