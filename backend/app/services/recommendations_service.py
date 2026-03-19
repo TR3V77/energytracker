@@ -61,8 +61,27 @@ def get_recommendations(
     if start_date is not None:
         energy_filters.append(EnergyRecord.date >= start_date)
 
-    # NOTE: Intentionally minimal; will plug in the actual
-    # rules + queries next once rule set confirmed.
-    _ = threshold
-    _ = filters
-    return []
+    # Aggregate kWh per neighborhood, then compute kWh/household
+    metrics_stmt = (
+        select(
+            Neighborhood.neighborhood_id,
+            Neighborhood.neighborhood_name,
+            Neighborhood.households,
+            func.coalesce(
+                func.sum(EnergyRecord.total_kwh), 0
+            ).label("total_kwh"),
+        )
+        .select_from(Neighborhood)
+        .join(
+            EnergyRecord,
+            EnergyRecord.neighborhood_id == Neighborhood.neighborhood_id,
+        )
+        .group_by(
+            Neighborhood.neighborhood_id,
+            Neighborhood.neighborhood_name,
+            Neighborhood.households,
+        )
+    )
+    if energy_filters:
+        metrics_stmt = metrics_stmt.where(*energy_filters)
+
