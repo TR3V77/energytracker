@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 
 from app.services.energy_service import get_energy_data as query_energy_data
+from app.services.energy_service import get_neighborhood_energy_metrics
 
 energy_bp = Blueprint("energy", __name__)
 
@@ -19,3 +20,22 @@ def get_energy_records():
     )
 
     return jsonify([record.to_dict() for record in records]), 200
+
+@energy_bp.route("/api/energy/metrics")
+def get_energy_metrics():
+    """Get aggregated energy metrics for recommendation system."""
+    neighborhood_id = request.args.get("neighborhood_id", type=int)
+    time_window = request.args.get("time_window", default="30d")
+
+    if neighborhood_id is None:
+        return jsonify({"error": "neighborhood_id is required"}), 400
+
+    try:
+        data = get_neighborhood_energy_metrics(
+            neighborhood_id=neighborhood_id,
+            time_window=time_window,
+        )
+        return jsonify(data), 200
+
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 404
