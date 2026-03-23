@@ -2,12 +2,9 @@ from __future__ import annotations
 
 from typing import Any, Optional
 
-from sqlalchemy import select, func
-
-from app.extensions import db
-from app.models.energy_record import EnergyRecord
-from app.models.neighborhood import Neighborhood
-from app.utils.date_window import VALID_WINDOWS, get_window_start_date
+from app.services.efficiency_metrics_service import (
+    get_efficiency_metrics,
+)
 
 """
 Service-layer logic for the recommendations endpoint.
@@ -36,56 +33,10 @@ def get_recommendations(
         }
     """
 
-    normalized_window = window.strip().lower()
-    if normalized_window not in VALID_WINDOWS:
-        # Route layer can translate this to 400 for raising exceptions
-        # for now we keep a simple "return empty" contract.
-        return []
-
-    energy_filters = []
-    if neighborhood_id is not None:
-        energy_filters.append(EnergyRecord.neighborhood_id == neighborhood_id)
-
-    latest_date_stmt = select(func.max(EnergyRecord.date)).where(
-        *energy_filters
-    ) if energy_filters else select(func.max(EnergyRecord.date))
-
-    latest_record_date = db.session.execute(latest_date_stmt).scalar_one()
-
-    if latest_record_date is None:
-        return []
-
-    start_date = get_window_start_date(
-        normalized_window, latest_record_date
+    metrics = get_efficiency_metrics(
+        window=window,
+        neighborhood_id=neighborhood_id,
     )
-    if start_date is not None:
-        energy_filters.append(EnergyRecord.date >= start_date)
-
-    # Aggregate kWh per neighborhood, then compute kWh/household
-    metrics_stmt = (
-        select(
-            Neighborhood.neighborhood_id,
-            Neighborhood.neighborhood_name,
-            Neighborhood.households,
-            func.coalesce(
-                func.sum(EnergyRecord.total_kwh), 0
-            ).label("total_kwh"),
-        )
-        .select_from(Neighborhood)
-        .join(
-            EnergyRecord,
-            EnergyRecord.neighborhood_id == Neighborhood.neighborhood_id,
-        )
-        .group_by(
-            Neighborhood.neighborhood_id,
-            Neighborhood.neighborhood_name,
-            Neighborhood.households,
-        )
-    )
-    if energy_filters:
-        metrics_stmt = metrics_stmt.where(*energy_filters)
-
-    rows = db.session.execute(metrics_stmt).all()
 
     # Rule thresholds:
     # - low/efficient: efficiency_score <= threshold * 0.85
@@ -94,25 +45,22 @@ def get_recommendations(
     efficiency_cutoff = threshold * 0.85
 
     recommendations: list[dict[str, Any]] = []
-    for row in rows:
-        households = int(row.households or 0)
-        if households <= 0:
-            continue
-
-        efficiency_score = float(row.total_kwh) / households
+    for metric in metrics:
+        neighborhood_name = metric["neighborhood"]
+        efficiency_score = float(metric["efficiency_score"])
 
         if efficiency_score <= efficiency_cutoff:
             priority = "low"
             action = "Community Recognition"
             message = (
-                f"{row.neighborhood_name} is performing well! "
+                f"{neighborhood_name} is performing well! "
                 f"Efficiency score ({efficiency_score:.2f} kWh/household) "
                 f"is at or below the cutoff ({efficiency_cutoff:.2f}) "
                 "over the selected window."
             )
             recommendations.append(
                 {
-                    "neighborhood": row.neighborhood_name,
+                    "neighborhood": neighborhood_name,
                     "score": efficiency_score,
                     "message": message,
                     "action": action,
@@ -125,10 +73,10 @@ def get_recommendations(
             recommendations.extend(
                 [
                     {
-                        "neighborhood": row.neighborhood_name,
+                        "neighborhood": neighborhood_name,
                         "score": efficiency_score,
                         "message": (
-                            f"{row.neighborhood_name} uses more energy "
+                            f"{neighborhood_name} uses more energy "
                             "than the efficient baseline. "
                             f"Efficiency score ({efficiency_score:.2f} "
                             "kWh/household) is between "
@@ -139,11 +87,11 @@ def get_recommendations(
                         "priority": priority,
                     },
                     {
-                        "neighborhood": row.neighborhood_name,
+                        "neighborhood": neighborhood_name,
                         "score": efficiency_score,
                         "message": (
-                            f"Target efficiency improvements for "
-                            f"{row.neighborhood_name}. "
+                            "Target efficiency improvements for "
+                            f"{neighborhood_name}. "
                             "Suggested first step: insulation improvements "
                             "to reduce heating/cooling losses. "
                             f"(Efficiency: {efficiency_score:.2f} "
@@ -160,11 +108,11 @@ def get_recommendations(
             recommendations.extend(
                 [
                     {
-                        "neighborhood": row.neighborhood_name,
+                        "neighborhood": neighborhood_name,
                         "score": efficiency_score,
                         "message": (
                             f"High consumption detected in "
-                            f"{row.neighborhood_name}. "
+                            f"{neighborhood_name}. "
                             f"Efficiency score ({efficiency_score:.2f} "
                             "kWh/household) exceeds the threshold. "
                             f"Threshold: {threshold:.2f} over the selected "
@@ -174,11 +122,11 @@ def get_recommendations(
                         "priority": priority,
                     },
                     {
-                        "neighborhood": row.neighborhood_name,
+                        "neighborhood": neighborhood_name,
                         "score": efficiency_score,
                         "message": (
                             "Recommend HVAC upgrades and better climate "
-                            f"control for {row.neighborhood_name}. "
+                            f"control for {neighborhood_name}. "
                             f"(Efficiency: {efficiency_score:.2f} "
                             "kWh/household.)"
                         ),
@@ -186,11 +134,11 @@ def get_recommendations(
                         "priority": priority,
                     },
                     {
-                        "neighborhood": row.neighborhood_name,
+                        "neighborhood": neighborhood_name,
                         "score": efficiency_score,
                         "message": (
                             "Consider weatherization assistance for "
-                            f"{row.neighborhood_name} to reduce overall "
+                            f"{neighborhood_name} to reduce overall "
                             "loads. "
                             f"(Efficiency: {efficiency_score:.2f} "
                             "kWh/household.)"
