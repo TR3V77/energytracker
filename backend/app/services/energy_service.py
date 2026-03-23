@@ -38,8 +38,15 @@ def get_neighborhood_energy_metrics(
     neighborhood_id: int,
     time_window: TimeWindow = "30d",
 ) -> dict[str, Any]:
+    """Return aggregated energy metrics for a neighborhood and time window."""
 
-    # Determine time window
+    neighborhood = Neighborhood.query.filter(
+        Neighborhood.neighborhood_id == neighborhood_id
+    ).first()
+
+    if neighborhood is None:
+        raise ValueError(f"Neighborhood '{neighborhood_id}' not found.")
+
     end_date = datetime.utcnow().date()
     start_date = None
 
@@ -47,16 +54,18 @@ def get_neighborhood_energy_metrics(
         start_date = end_date - timedelta(days=30)
     elif time_window == "90d":
         start_date = end_date - timedelta(days=90)
+    elif time_window == "all":
+        start_date = None
+    else:
+        raise ValueError("time_window must be one of: '30d', '90d', 'all'")
 
-    # Base query
     query = EnergyRecord.query.filter(
         EnergyRecord.neighborhood_id == neighborhood_id
     )
 
-    if start_date:
+    if start_date is not None:
         query = query.filter(EnergyRecord.date >= start_date)
 
-    # Daily aggregation
     daily_results = (
         query.with_entities(
             EnergyRecord.date.label("day"),
@@ -71,14 +80,13 @@ def get_neighborhood_energy_metrics(
         .all()
     )
 
-    # Summary aggregation
     summary = (
         query.with_entities(
-            func.sum(EnergyRecord.total_kwh),
-            func.avg(EnergyRecord.total_kwh),
-            func.max(EnergyRecord.total_kwh),
-            func.min(EnergyRecord.total_kwh),
-            func.count(EnergyRecord.id),
+            func.sum(EnergyRecord.total_kwh).label("total_kwh"),
+            func.avg(EnergyRecord.total_kwh).label("avg_kwh"),
+            func.max(EnergyRecord.total_kwh).label("peak_kwh"),
+            func.min(EnergyRecord.total_kwh).label("min_kwh"),
+            func.count(EnergyRecord.id).label("reading_count"),
         )
         .first()
     )
@@ -95,21 +103,30 @@ def get_neighborhood_energy_metrics(
         for row in daily_results
     ]
 
-    total_kwh = float(summary[0] or 0)
-    avg_kwh = float(summary[1] or 0)
-    peak_kwh = float(summary[2] or 0)
-    min_kwh = float(summary[3] or 0)
-    reading_count = int(summary[4] or 0)
+    total_kwh = float(summary.total_kwh or 0)
+    avg_kwh = float(summary.avg_kwh or 0)
+    peak_kwh = float(summary.peak_kwh or 0)
+    min_kwh = float(summary.min_kwh or 0)
+    reading_count = int(summary.reading_count or 0)
+
+    avg_daily_kwh = round(total_kwh / len(daily_data), 2) if daily_data else 0
 
     return {
-        "neighborhood_id": neighborhood_id,
+        "neighborhood_id": neighborhood.neighborhood_id,
+        "neighborhood_name": neighborhood.neighborhood_name,
         "time_window": time_window,
+        "date_range": {
+            "start": start_date.isoformat() if start_date else None,
+            "end": end_date.isoformat(),
+        },
         "summary": {
             "total_kwh": total_kwh,
-            "avg_kwh": avg_kwh,
+            "avg_kwh_per_reading": round(avg_kwh, 2),
             "peak_kwh": peak_kwh,
             "min_kwh": min_kwh,
             "reading_count": reading_count,
+            "days_returned": len(daily_data),
+            "avg_daily_kwh": avg_daily_kwh,
         },
         "daily_data": daily_data,
     }
