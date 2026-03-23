@@ -45,7 +45,6 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 
 
 ## General Info
-![Project Logo](img/logo.png)
 
 ## Technologies
 - Tools: GitKraken, Jira, Slack, Bitbucket, VS Code
@@ -92,7 +91,6 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 
 ## Report
 
-![Burn Up Chart](img/burnupsprint1.png)
 
 #### CSV Upload & Data Validation
 - Upload energy consumption CSV files
