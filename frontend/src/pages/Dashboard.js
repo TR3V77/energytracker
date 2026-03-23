@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import KpiCard from "../components/KpiCard";
 import EnergyChart from "../components/EnergyChart";
-import { getEnergyData } from "../services/api";
+import { getEnergyData, getNeighborhoods } from "../services/api";
 import { Link } from "react-router-dom";
 
 // Reusable KPI Card Component with colors
@@ -66,6 +66,7 @@ const NoDataState = () => (
 
 export default function Dashboard() {
   const [data, setData] = useState([]);
+  const [households_by_neighborhood_id, set_households_by_neighborhood_id] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -73,8 +74,18 @@ export default function Dashboard() {
     setLoading(true);
     setError(null);
     try {
-      const response = await getEnergyData();
-      setData(Array.isArray(response.data) ? response.data : []);
+      const [energy_res, neighborhoods_res] = await Promise.all([
+        getEnergyData(),
+        getNeighborhoods(),
+      ]);
+      const rows = Array.isArray(energy_res.data) ? energy_res.data : [];
+      setData(rows);
+      const nh_list = Array.isArray(neighborhoods_res.data) ? neighborhoods_res.data : [];
+      const map = {};
+      for (const n of nh_list) {
+        map[n.neighborhood_id] = n.households;
+      }
+      set_households_by_neighborhood_id(map);
     } catch (error) {
       console.error("Error fetching data:", error);
       setError(error.response?.data?.message || 'Failed to load dashboard data');
@@ -87,43 +98,48 @@ export default function Dashboard() {
     fetchData();
   }, []);
 
-  // KPI Calculations
-  const totalKwh = data.reduce((sum, item) => sum + (item.consumption_kwh || 0), 0);
-  const averageKwh = data.length ? (totalKwh / data.length).toFixed(2) : 0;
-  const peakDay = data.length ? Math.max(...data.map(d => d.consumption_kwh || 0)) : 0;
-  
-  // Calculate efficiency if we have household data
-  const totalHouseholds = data.reduce((sum, item) => sum + (item.households || 0), 0);
-  const avgEfficiency = totalHouseholds ? (totalKwh / totalHouseholds).toFixed(2) : 320;
-  
-  // Get efficiency color and label
-  const getEfficiencyStyles = () => {
-    if (avgEfficiency < 380) {
-      return { 
-        gradient: 'linear-gradient(135deg, #28a745, #1e7b34)',
-        icon: '✅',
-        label: 'Efficient'
-      };
-    } else if (avgEfficiency < 430) {
-      return { 
-        gradient: 'linear-gradient(135deg, #ffc107, #d39e00)',
-        icon: '⚠️',
-        label: 'Average'
-      };
-    } else {
-      return { 
-        gradient: 'linear-gradient(135deg, #dc3545, #a71d2a)',
-        icon: '🔴',
-        label: 'Needs Improvement'
+  const row_kwh = (record) => Number(record.total_kwh ?? 0) || 0;
+  const total_kwh = data.reduce((sum, record) => sum + row_kwh(record), 0);
+  const average_kwh = data.length ? (total_kwh / data.length).toFixed(2) : 0;
+  const peak_kwh = data.length ? Math.max(...data.map(row_kwh)) : 0;
+
+  const neighborhood_ids_in_data = [...new Set(data.map((d) => d.neighborhood_id))];
+  const households_represented = neighborhood_ids_in_data.reduce(
+    (sum, id) => sum + (households_by_neighborhood_id[id] ?? 0),
+    0
+  );
+  const avg_efficiency_numeric =
+    households_represented > 0 ? total_kwh / households_represented : null;
+  const avg_efficiency_display =
+    avg_efficiency_numeric != null ? avg_efficiency_numeric.toFixed(2) : null;
+
+  const get_efficiency_styles = () => {
+    if (avg_efficiency_numeric == null || !Number.isFinite(avg_efficiency_numeric)) {
+      return {
+        gradient: 'linear-gradient(135deg, #6c757d, #495057)',
+        icon: '—',
+        label: 'No household data',
       };
     }
-  };
-
-  // Generate trend indicator based on efficiency
-  const getEfficiencyTrend = () => {
-    if (avgEfficiency < 380) return "✅ Efficient";
-    if (avgEfficiency < 430) return "⚠️ Average";
-    return "🔴 Needs improvement";
+    if (avg_efficiency_numeric < 380) {
+      return {
+        gradient: 'linear-gradient(135deg, #28a745, #1e7b34)',
+        icon: '✅',
+        label: 'Efficient',
+      };
+    }
+    if (avg_efficiency_numeric < 430) {
+      return {
+        gradient: 'linear-gradient(135deg, #ffc107, #d39e00)',
+        icon: '⚠️',
+        label: 'Average',
+      };
+    }
+    return {
+      gradient: 'linear-gradient(135deg, #dc3545, #a71d2a)',
+      icon: '🔴',
+      label: 'Needs Improvement',
+    };
   };
 
   // Loading State
@@ -161,7 +177,7 @@ export default function Dashboard() {
     );
   }
 
-  const efficiencyStyles = getEfficiencyStyles();
+  const efficiency_styles = get_efficiency_styles();
 
   return (
     <div className="dashboard">
@@ -177,7 +193,7 @@ export default function Dashboard() {
       <div className="row g-4 mb-4">
         <ColoredKpiCard 
           title="Total Consumption"
-          value={totalKwh}
+          value={total_kwh}
           unit="kWh"
           gradient="linear-gradient(135deg, #0066cc, #004999)"
           icon="⚡"
@@ -186,7 +202,7 @@ export default function Dashboard() {
         
         <ColoredKpiCard 
           title="Average Daily Usage"
-          value={averageKwh}
+          value={average_kwh}
           unit="kWh/day"
           gradient="linear-gradient(135deg, #28a745, #1e7b34)"
           icon="📅"
@@ -194,7 +210,7 @@ export default function Dashboard() {
         
         <ColoredKpiCard 
           title="Peak Day"
-          value={peakDay}
+          value={peak_kwh}
           unit="kWh"
           gradient="linear-gradient(135deg, #fd7e14, #dc3545)"
           icon="🔥"
@@ -202,11 +218,11 @@ export default function Dashboard() {
         
         <ColoredKpiCard 
           title="Neighborhood Efficiency"
-          value={avgEfficiency}
+          value={avg_efficiency_display ?? '—'}
           unit="kWh/house"
-          gradient={efficiencyStyles.gradient}
-          icon={efficiencyStyles.icon}
-          subtitle={efficiencyStyles.label}
+          gradient={efficiency_styles.gradient}
+          icon={efficiency_styles.icon}
+          subtitle={efficiency_styles.label}
         />
       </div>
 
@@ -238,7 +254,7 @@ export default function Dashboard() {
               </div>
               <div className="d-flex justify-content-between mt-2">
                 <span className="fw-bold">Neighborhoods:</span>
-                <span>{new Set(data.map(d => d.neighborhood)).size}</span>
+                <span>{new Set(data.map((d) => d.neighborhood_id)).size}</span>
               </div>
             </div>
           </div>
@@ -249,13 +265,23 @@ export default function Dashboard() {
               <h6 className="text-muted mb-3">Summary</h6>
               <div className="d-flex justify-content-between">
                 <span className="fw-bold">Avg Efficiency:</span>
-                <span className={avgEfficiency < 380 ? 'text-success' : avgEfficiency < 430 ? 'text-warning' : 'text-danger'}>
-                  {avgEfficiency} kWh/house
+                <span
+                  className={
+                    avg_efficiency_numeric == null
+                      ? 'text-muted'
+                      : avg_efficiency_numeric < 380
+                        ? 'text-success'
+                        : avg_efficiency_numeric < 430
+                          ? 'text-warning'
+                          : 'text-danger'
+                  }
+                >
+                  {avg_efficiency_display != null ? `${avg_efficiency_display} kWh/house` : '—'}
                 </span>
               </div>
               <div className="d-flex justify-content-between mt-2">
                 <span className="fw-bold">Peak Day:</span>
-                <span>{peakDay.toLocaleString()} kWh</span>
+                <span>{peak_kwh.toLocaleString()} kWh</span>
               </div>
             </div>
           </div>
