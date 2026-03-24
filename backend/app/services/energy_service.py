@@ -47,7 +47,34 @@ def get_neighborhood_energy_metrics(
     if neighborhood is None:
         raise ValueError(f"Neighborhood '{neighborhood_id}' not found.")
 
-    end_date = datetime.utcnow().date()
+    latest_record_date = (
+        EnergyRecord.query.with_entities(func.max(EnergyRecord.date))
+        .filter(EnergyRecord.neighborhood_id == neighborhood_id)
+        .scalar()
+    )
+
+    if latest_record_date is None:
+        return {
+            "neighborhood_id": neighborhood.neighborhood_id,
+            "neighborhood_name": neighborhood.neighborhood_name,
+            "time_window": time_window,
+            "date_range": {
+                "start": None,
+                "end": None,
+            },
+            "summary": {
+                "total_kwh": 0.0,
+                "avg_kwh_per_reading": 0.0,
+                "peak_kwh": 0.0,
+                "min_kwh": 0.0,
+                "reading_count": 0,
+                "days_returned": 0,
+                "avg_daily_kwh": 0,
+            },
+            "daily_data": [],
+        }
+
+    end_date = latest_record_date
     start_date = None
 
     if time_window == "30d":
