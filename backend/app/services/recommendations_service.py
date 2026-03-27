@@ -17,6 +17,7 @@ def get_recommendations(
     threshold: float = 400.0,
     window: str = "30d",
     neighborhood_id: Optional[int] = None,
+    anchor_date: Optional[str] = None,
 ) -> list[dict[str, Any]]:
     """
     Return recommendations grouped by evaluated neighborhood.
@@ -24,6 +25,7 @@ def get_recommendations(
     metrics = get_efficiency_metrics(
         window=window,
         neighborhood_id=neighborhood_id,
+        anchor_date=anchor_date,
     )
 
     return [
