@@ -1,18 +1,20 @@
 from __future__ import annotations
 
 from typing import Any, Optional
+from datetime import date
 
 from sqlalchemy import func, select
 
 from app.extensions import db
 from app.models.energy_record import EnergyRecord
 from app.models.neighborhood import Neighborhood
-from app.utils.date_window import VALID_WINDOWS, get_window_start_date
+from app.utils.date_window import VALID_WINDOWS, get_window_start_date, parse_iso_date
 
 
 def get_efficiency_metrics(
     window: str = "30d",
     neighborhood_id: Optional[int] = None,
+    anchor_date: Optional[str] = None,
 ) -> list[dict[str, Any]]:
     """
     Return aggregated metrics required by the recommendations rules engine.
@@ -30,25 +32,35 @@ def get_efficiency_metrics(
     if normalized_window not in VALID_WINDOWS:
         return []
 
+    parsed_anchor_date: Optional[date] = parse_iso_date(anchor_date)
+    if anchor_date and parsed_anchor_date is None:
+        return []
+
     energy_filters = []
     if neighborhood_id is not None:
         energy_filters.append(
             EnergyRecord.neighborhood_id == neighborhood_id
         )
 
-    latest_date_stmt = select(func.max(EnergyRecord.date))
-    if energy_filters:
-        latest_date_stmt = latest_date_stmt.where(*energy_filters)
+    if parsed_anchor_date is not None:
+        end_date = parsed_anchor_date
+    else:
+        latest_date_stmt = select(func.max(EnergyRecord.date))
+        if energy_filters:
+            latest_date_stmt = latest_date_stmt.where(*energy_filters)
 
-    latest_record_date = db.session.execute(latest_date_stmt).scalar_one()
-    if latest_record_date is None:
-        return []
+        end_date = db.session.execute(latest_date_stmt).scalar_one()
+        if end_date is None:
+            return []
 
-    start_date = get_window_start_date(
-        normalized_window, latest_record_date
-    )
-    if start_date is not None:
-        energy_filters.append(EnergyRecord.date >= start_date)
+    if normalized_window != "all":
+        start_date = get_window_start_date(
+            normalized_window, end_date
+        )
+        if start_date is not None:
+            energy_filters.append(EnergyRecord.date >= start_date)
+
+    energy_filters.append(EnergyRecord.date <= end_date)
 
     metrics_stmt = (
         select(
