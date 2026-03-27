@@ -121,14 +121,14 @@ export default function Dashboard() {
         label: 'No household data',
       };
     }
-    if (avg_efficiency_numeric < 380) {
+    if (avg_efficiency_numeric < 340) {
       return {
         gradient: 'linear-gradient(135deg, #28a745, #1e7b34)',
         icon: '✅',
         label: 'Efficient',
       };
     }
-    if (avg_efficiency_numeric < 430) {
+    if (avg_efficiency_numeric < 400) {
       return {
         gradient: 'linear-gradient(135deg, #ffc107, #d39e00)',
         icon: '⚠️',
@@ -269,9 +269,9 @@ export default function Dashboard() {
                   className={
                     avg_efficiency_numeric == null
                       ? 'text-muted'
-                      : avg_efficiency_numeric < 380
+                      : avg_efficiency_numeric < 340
                         ? 'text-success'
-                        : avg_efficiency_numeric < 430
+                        : avg_efficiency_numeric < 400
                           ? 'text-warning'
                           : 'text-danger'
                   }
