@@ -37,14 +37,15 @@ def recommendations():
     threshold = request.args.get(
         "threshold", default=400.0, type=float
     )
-
     window = request.args.get("window", default="30d")
     neighborhood_id = request.args.get("neighborhood_id", type=int)
+    anchor_date = request.args.get("anchor_date")
 
     recs = recommendations_service.get_recommendations(
         threshold=threshold,
         window=window,
         neighborhood_id=neighborhood_id,
+        anchor_date=anchor_date,
     )
 
     return jsonify({"recommendations": recs}), 200
