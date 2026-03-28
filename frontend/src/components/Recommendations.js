@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { getRecommendations } from "../services/api";
 
 const Recommendations = () => {
-   const [recommendations, setRecommendations] = useState([]);
+  const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
   // Filter and sort states
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState("priority"); // priority, neighborhood, score
+  const [sortBy, setSortBy] = useState("priority");
   const [sortOrder, setSortOrder] = useState("desc");
   const [expandedCard, setExpandedCard] = useState(null);
   const [implementationStatus, setImplementationStatus] = useState({});
@@ -24,7 +25,8 @@ const Recommendations = () => {
     setError(null);
     try {
       const response = await getRecommendations({});
-      const recs = response.data?.recommendations || [];
+      // Handle both response formats
+      const recs = response.data?.recommendations || response.data || [];
       setRecommendations(recs);
     } catch (err) {
       console.error("Error fetching recommendations:", err);
@@ -38,17 +40,20 @@ const Recommendations = () => {
   const filteredRecommendations = useMemo(() => {
     let filtered = [...recommendations];
     
-    // Apply priority filter
+    // Apply priority filter - handle both string and object formats
     if (priorityFilter !== "all") {
-      filtered = filtered.filter(rec => rec.priority === priorityFilter);
+      filtered = filtered.filter(rec => {
+        const recPriority = rec.priority?.toLowerCase() || "";
+        return recPriority === priorityFilter.toLowerCase();
+      });
     }
     
     // Apply search filter
     if (searchTerm) {
       filtered = filtered.filter(rec =>
-        rec.neighborhood?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        rec.message?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        rec.action?.toLowerCase().includes(searchTerm.toLowerCase())
+        (rec.neighborhood || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (rec.message || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (rec.action || "").toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
     
@@ -58,8 +63,8 @@ const Recommendations = () => {
       switch (sortBy) {
         case "priority":
           const priorityOrder = { high: 3, medium: 2, low: 1 };
-          aVal = priorityOrder[a.priority] || 0;
-          bVal = priorityOrder[b.priority] || 0;
+          aVal = priorityOrder[a.priority?.toLowerCase()] || 0;
+          bVal = priorityOrder[b.priority?.toLowerCase()] || 0;
           break;
         case "neighborhood":
           aVal = a.neighborhood || "";
@@ -70,8 +75,8 @@ const Recommendations = () => {
           bVal = b.score || 0;
           break;
         default:
-          aVal = a.priority;
-          bVal = b.priority;
+          aVal = a.priority || "";
+          bVal = b.priority || "";
       }
       if (sortOrder === "asc") {
         return aVal > bVal ? 1 : -1;
@@ -108,13 +113,16 @@ const Recommendations = () => {
   };
 
   const getPriorityStyles = (priority, status = null) => {
+    const priorityLower = priority?.toLowerCase() || "low";
+    
     if (status === "implemented") {
       return { badge: "bg-secondary", icon: "✅", text: "Implemented", border: "border-secondary", bg: "bg-secondary bg-opacity-10" };
     }
     if (status === "dismissed") {
       return { badge: "bg-light text-dark", icon: "❌", text: "Dismissed", border: "border-secondary", bg: "bg-light" };
     }
-    switch (priority?.toLowerCase()) {
+    
+    switch (priorityLower) {
       case "high":
         return { badge: "bg-danger", icon: "🔴", text: "High Priority", border: "border-danger", bg: "bg-danger bg-opacity-10" };
       case "medium":
@@ -132,9 +140,9 @@ const Recommendations = () => {
   // Stats calculations
   const stats = {
     total: recommendations.length,
-    high: recommendations.filter(r => r.priority === "high").length,
-    medium: recommendations.filter(r => r.priority === "medium").length,
-    low: recommendations.filter(r => r.priority === "low").length,
+    high: recommendations.filter(r => r.priority?.toLowerCase() === "high").length,
+    medium: recommendations.filter(r => r.priority?.toLowerCase() === "medium").length,
+    low: recommendations.filter(r => r.priority?.toLowerCase() === "low").length,
   };
 
   if (loading) {
@@ -226,26 +234,30 @@ const Recommendations = () => {
           <div className="row g-3">
             <div className="col-md-4">
               <label className="form-label small text-muted">Filter by Priority</label>
-              <div className="btn-group w-100">
+              <div className="btn-group w-100" role="group">
                 <button 
+                  type="button"
                   className={`btn ${priorityFilter === "all" ? "btn-primary" : "btn-outline-secondary"}`}
                   onClick={() => setPriorityFilter("all")}
                 >
                   All
                 </button>
                 <button 
+                  type="button"
                   className={`btn ${priorityFilter === "high" ? "btn-danger" : "btn-outline-danger"}`}
                   onClick={() => setPriorityFilter("high")}
                 >
                   🔴 High
                 </button>
                 <button 
+                  type="button"
                   className={`btn ${priorityFilter === "medium" ? "btn-warning" : "btn-outline-warning"}`}
                   onClick={() => setPriorityFilter("medium")}
                 >
                   🟡 Medium
                 </button>
                 <button 
+                  type="button"
                   className={`btn ${priorityFilter === "low" ? "btn-success" : "btn-outline-success"}`}
                   onClick={() => setPriorityFilter("low")}
                 >
@@ -265,7 +277,7 @@ const Recommendations = () => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
                 {searchTerm && (
-                  <button className="btn btn-outline-secondary" onClick={() => setSearchTerm("")}>
+                  <button className="btn btn-outline-secondary" type="button" onClick={() => setSearchTerm("")}>
                     ✕
                   </button>
                 )}
@@ -296,9 +308,9 @@ const Recommendations = () => {
             <div className="display-1 mb-4">💡</div>
             <h3 className="fw-bold mb-3">No Recommendations Found</h3>
             <p className="text-muted mb-4">
-              {searchTerm ? "Try adjusting your search or filters." : "Upload more data to get AI-powered insights."}
+              {searchTerm || priorityFilter !== "all" ? "Try adjusting your search or filters." : "Upload more data to get AI-powered insights."}
             </p>
-            {!searchTerm && (
+            {!searchTerm && priorityFilter === "all" && (
               <Link to="/upload" className="btn btn-primary px-4 py-2 rounded-pill">
                 Upload Data
               </Link>
@@ -312,19 +324,19 @@ const Recommendations = () => {
             const styles = getPriorityStyles(rec.priority, status);
             
             return (
-              <div className="col-12" key={index}>
+              <div className="col-12" key={rec.id || index}>
                 <div className={`card border-0 shadow-sm ${styles.bg}`}>
                   <div className="card-body">
                     <div className="d-flex justify-content-between align-items-start mb-3">
-                      <div>
-                        <div className="d-flex align-items-center gap-2 mb-2">
+                      <div className="flex-grow-1">
+                        <div className="d-flex align-items-center gap-2 mb-2 flex-wrap">
                           <h5 className="card-title fw-bold mb-0">{rec.neighborhood || 'General'}</h5>
                           <span className={`badge ${styles.badge} rounded-pill`}>
                             {styles.icon} {styles.text}
                           </span>
                           {rec.score && (
                             <span className="badge bg-light text-dark rounded-pill">
-                              Score: {rec.score.toFixed(1)} kWh/house
+                              Score: {typeof rec.score === 'number' ? rec.score.toFixed(1) : rec.score} kWh/house
                             </span>
                           )}
                         </div>
@@ -337,18 +349,19 @@ const Recommendations = () => {
                           </div>
                         )}
                       </div>
-                      {expandedCard === index && (
-                        <div className="ms-3 p-3 bg-light rounded">
-                          <h6 className="fw-bold mb-2">Implementation Steps:</h6>
-                          <ul className="small mb-0">
-                            <li>Review energy audit findings</li>
-                            <li>Schedule consultation with energy experts</li>
-                            <li>Apply for available rebates</li>
-                            <li>Track monthly consumption improvements</li>
-                          </ul>
-                        </div>
-                      )}
                     </div>
+                    
+                    {expandedCard === index && (
+                      <div className="mt-3 p-3 bg-light rounded">
+                        <h6 className="fw-bold mb-2">Implementation Steps:</h6>
+                        <ul className="small mb-0">
+                          <li>Review energy audit findings</li>
+                          <li>Schedule consultation with energy experts</li>
+                          <li>Apply for available rebates</li>
+                          <li>Track monthly consumption improvements</li>
+                        </ul>
+                      </div>
+                    )}
                     
                     <div className="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
                       <div className="d-flex gap-2">
@@ -359,7 +372,7 @@ const Recommendations = () => {
                         >
                           {status === "implemented" ? "✅ Implemented" : "Implement"}
                         </button>
-                        {status !== "implemented" && (
+                        {status !== "implemented" && status !== "dismissed" && (
                           <button 
                             className="btn btn-sm btn-outline-secondary rounded-pill"
                             onClick={() => handleDismiss(rec.id || index)}
