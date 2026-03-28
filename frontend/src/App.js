@@ -16,7 +16,6 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/upload" element={<Upload />} />
           <Route path="/compare" element={<Compare />} />
           <Route path="/rankings" element={<EfficiencyRankings />} />
           <Route path="/trends" element={<TrendAnalysis />} />
