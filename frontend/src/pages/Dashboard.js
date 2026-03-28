@@ -227,19 +227,27 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* Chart Section */}
-      <div className="card border-0 shadow-sm">
-        <div className="card-header bg-transparent border-0 pt-4 px-4">
-          <h5 className="mb-0">Energy Consumption Over Time</h5>
-        </div>
-        <div className="card-body">
-          {data.length > 0 ? (
-            <EnergyChart data={data} />
-          ) : (
-            <div className="text-center py-5 bg-light rounded-3">
-              <p className="text-muted mb-0">No data available. Please upload a file first.</p>
+      {/* Chart + Recommendations Panel - Two Column Layout */}
+      <div className="row g-4">
+        <div className="col-lg-8">
+          <div className="card border-0 shadow-sm">
+            <div className="card-header bg-transparent border-0 pt-4 px-4">
+              <h5 className="mb-0">Energy Consumption Over Time</h5>
             </div>
-          )}
+            <div className="card-body">
+              {data.length > 0 ? (
+                <EnergyChart data={data} />
+              ) : (
+                <div className="text-center py-5 bg-light rounded-3">
+                  <p className="text-muted mb-0">No data available. Please upload a file first.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="col-lg-4">
+          <RecommendationsPanel limit={3} />
         </div>
       </div>
 
