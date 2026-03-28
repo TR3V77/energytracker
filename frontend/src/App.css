@@ -116,3 +116,35 @@ nav a:hover {
     transform: translateY(0);
   }
 }
+
+.recommendations-list {
+  scrollbar-width: thin;
+}
+
+.recommendations-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.recommendations-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.recommendations-list::-webkit-scrollbar-thumb {
+  background: #2c3e50;
+  border-radius: 4px;
+}
+
+.recommendation-item {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.recommendation-item:hover {
+  transform: translateX(2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.recommendation-item .badge {
+  font-size: 0.7rem;
+}
