@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import KpiCard from "../components/KpiCard";
 import EnergyChart from "../components/EnergyChart";
+import RecommendationsPanel from "../components/RecommendationsPanel";
 import { getEnergyData, getNeighborhoods } from "../services/api";
 import { Link } from "react-router-dom";
 
