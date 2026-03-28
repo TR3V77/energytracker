@@ -2,91 +2,224 @@ import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { getRecommendations } from "../services/api";
 
+// ========== SEPARATE UTILITY FUNCTIONS ==========
+
+// Priority configuration (Single Responsibility: defines priority rules)
+const PRIORITY_CONFIG = {
+  high: { order: 3, badge: "bg-danger", icon: "🔴", label: "High Priority", border: "border-danger", bg: "bg-danger bg-opacity-10" },
+  medium: { order: 2, badge: "bg-warning text-dark", icon: "🟡", label: "Medium Priority", border: "border-warning", bg: "bg-warning bg-opacity-10" },
+  low: { order: 1, badge: "bg-success", icon: "🟢", label: "Low Priority", border: "border-success", bg: "bg-success bg-opacity-10" },
+};
+
+const STATUS_CONFIG = {
+  implemented: { badge: "bg-secondary", icon: "✅", label: "Implemented", border: "border-secondary", bg: "bg-secondary bg-opacity-10" },
+  dismissed: { badge: "bg-light text-dark", icon: "❌", label: "Dismissed", border: "border-secondary", bg: "bg-light" },
+};
+
+// Utility: Get priority value (Single Responsibility: priority extraction)
+const getPriorityValue = (priority) => PRIORITY_CONFIG[priority?.toLowerCase()]?.order || 0;
+
+// Utility: Get styles for priority/status (Single Responsibility: style mapping)
+const getItemStyles = (priority, status) => {
+  if (status && STATUS_CONFIG[status]) return STATUS_CONFIG[status];
+  return PRIORITY_CONFIG[priority?.toLowerCase()] || PRIORITY_CONFIG.low;
+};
+
+// Utility: Filter recommendations (Single Responsibility: filtering logic)
+const filterRecommendations = (items, priorityFilter, searchTerm) => {
+  let filtered = [...items];
+  
+  if (priorityFilter !== "all") {
+    filtered = filtered.filter(item => 
+      item.priority?.toLowerCase() === priorityFilter
+    );
+  }
+  
+  if (searchTerm) {
+    const term = searchTerm.toLowerCase();
+    filtered = filtered.filter(item =>
+      [item.neighborhood, item.message, item.action].some(field =>
+        field?.toLowerCase().includes(term)
+      )
+    );
+  }
+  
+  return filtered;
+};
+
+// Utility: Sort recommendations (Single Responsibility: sorting logic)
+const sortRecommendations = (items, sortBy, sortOrder) => {
+  const sorted = [...items];
+  const order = sortOrder === "asc" ? 1 : -1;
+  
+  sorted.sort((a, b) => {
+    let aVal, bVal;
+    switch (sortBy) {
+      case "priority":
+        aVal = getPriorityValue(a.priority);
+        bVal = getPriorityValue(b.priority);
+        break;
+      case "score":
+        aVal = a.score || 0;
+        bVal = b.score || 0;
+        break;
+      default:
+        aVal = a.neighborhood || "";
+        bVal = b.neighborhood || "";
+    }
+    return aVal > bVal ? order : aVal < bVal ? -order : 0;
+  });
+  
+  return sorted;
+};
+
+// Utility: Calculate stats (Single Responsibility: statistics calculation)
+const calculateStats = (items) => ({
+  total: items.length,
+  high: items.filter(i => i.priority?.toLowerCase() === "high").length,
+  medium: items.filter(i => i.priority?.toLowerCase() === "medium").length,
+  low: items.filter(i => i.priority?.toLowerCase() === "low").length,
+});
+
+// ========== REUSABLE COMPONENTS ==========
+
+// Stat Card Component (Single Responsibility: display single stat)
+const StatCard = ({ value, label, colorClass }) => (
+  <div className="col-md-3">
+    <div className="card border-0 shadow-sm text-center">
+      <div className="card-body">
+        <div className={`display-6 fw-bold ${colorClass}`}>{value}</div>
+        <div className="text-muted small">{label}</div>
+      </div>
+    </div>
+  </div>
+);
+
+// Filter Button Component (Single Responsibility: priority filter button)
+const FilterButton = ({ priority, label, icon, isActive, onClick }) => (
+  <button
+    type="button"
+    className={`btn ${isActive ? `btn-${priority === "all" ? "primary" : priority}` : "btn-outline-secondary"}`}
+    onClick={onClick}
+  >
+    {icon && <span className="me-1">{icon}</span>}{label}
+  </button>
+);
+
+// Recommendation Card Component (Single Responsibility: display single recommendation)
+const RecommendationCard = ({ recommendation, index, status, onImplement, onDismiss, onToggleExpand, isExpanded }) => {
+  const styles = getItemStyles(recommendation.priority, status);
+  
+  return (
+    <div className={`col-12`}>
+      <div className={`card border-0 shadow-sm ${styles.bg}`}>
+        <div className="card-body">
+          <div className="d-flex justify-content-between align-items-start mb-3">
+            <div className="flex-grow-1">
+              <div className="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                <h5 className="card-title fw-bold mb-0">{recommendation.neighborhood || 'General'}</h5>
+                <span className={`badge ${styles.badge} rounded-pill`}>
+                  {styles.icon} {styles.label}
+                </span>
+                {recommendation.score && (
+                  <span className="badge bg-light text-dark rounded-pill">
+                    Score: {recommendation.score.toFixed(1)} kWh/house
+                  </span>
+                )}
+              </div>
+              <p className="card-text text-muted mb-2">{recommendation.message}</p>
+              {recommendation.action && (
+                <div className="mt-2">
+                  <small className="text-muted">
+                    <span className="fw-bold">Recommended Action:</span> {recommendation.action}
+                  </small>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          {isExpanded && (
+            <div className="mt-3 p-3 bg-light rounded">
+              <h6 className="fw-bold mb-2">Implementation Steps:</h6>
+              <ul className="small mb-0">
+                <li>Review energy audit findings</li>
+                <li>Schedule consultation with energy experts</li>
+                <li>Apply for available rebates</li>
+                <li>Track monthly consumption improvements</li>
+              </ul>
+            </div>
+          )}
+          
+          <div className="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+            <div className="d-flex gap-2">
+              <button className="btn btn-sm btn-outline-primary rounded-pill" onClick={onImplement} disabled={status === "implemented"}>
+                {status === "implemented" ? "✅ Implemented" : "Implement"}
+              </button>
+              {!status && (
+                <button className="btn btn-sm btn-outline-secondary rounded-pill" onClick={onDismiss}>
+                  Dismiss
+                </button>
+              )}
+              <button className="btn btn-sm btn-link text-decoration-none" onClick={onToggleExpand}>
+                {isExpanded ? "Show Less ↑" : "Learn More ↓"}
+              </button>
+            </div>
+            <small className="text-muted">Estimated Savings: {recommendation.savings_potential || "Varies"}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Rebate Card Component (Single Responsibility: display rebate opportunity)
+const RebateCard = ({ icon, title, description, amount }) => (
+  <div className="col-md-4">
+    <div className="p-3 border rounded-3">
+      <div className="h2 mb-2">{icon}</div>
+      <h6 className="fw-bold">{title}</h6>
+      <p className="small text-muted">{description}</p>
+      <span className="badge bg-success">{amount}</span>
+    </div>
+  </div>
+);
+
+// ========== MAIN COMPONENT ==========
+
 const Recommendations = () => {
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
-  // Filter and sort states
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("priority");
   const [sortOrder, setSortOrder] = useState("desc");
-  const [expandedCard, setExpandedCard] = useState(null);
-  const [implementationStatus, setImplementationStatus] = useState({});
+  const [expandedId, setExpandedId] = useState(null);
+  const [implementedStatus, setImplementedStatus] = useState({});
 
-  // Fetch recommendations from backend
   useEffect(() => {
     fetchRecommendations();
   }, []);
 
   const fetchRecommendations = async () => {
     setLoading(true);
-    setError(null);
     try {
       const response = await getRecommendations({});
-      // Handle both response formats
-      const recs = response.data?.recommendations || response.data || [];
-      setRecommendations(recs);
+      setRecommendations(response.data?.recommendations || response.data || []);
     } catch (err) {
-      console.error("Error fetching recommendations:", err);
       setError(err.response?.data?.error || 'Failed to load recommendations');
     } finally {
       setLoading(false);
     }
   };
 
-  // Filter and sort recommendations
-  const filteredRecommendations = useMemo(() => {
-    let filtered = [...recommendations];
-    
-    // Apply priority filter - handle both string and object formats
-    if (priorityFilter !== "all") {
-      filtered = filtered.filter(rec => {
-        const recPriority = rec.priority?.toLowerCase() || "";
-        return recPriority === priorityFilter.toLowerCase();
-      });
-    }
-    
-    // Apply search filter
-    if (searchTerm) {
-      filtered = filtered.filter(rec =>
-        (rec.neighborhood || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (rec.message || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (rec.action || "").toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    
-    // Apply sorting
-    filtered.sort((a, b) => {
-      let aVal, bVal;
-      switch (sortBy) {
-        case "priority":
-          const priorityOrder = { high: 3, medium: 2, low: 1 };
-          aVal = priorityOrder[a.priority?.toLowerCase()] || 0;
-          bVal = priorityOrder[b.priority?.toLowerCase()] || 0;
-          break;
-        case "neighborhood":
-          aVal = a.neighborhood || "";
-          bVal = b.neighborhood || "";
-          break;
-        case "score":
-          aVal = a.score || 0;
-          bVal = b.score || 0;
-          break;
-        default:
-          aVal = a.priority || "";
-          bVal = b.priority || "";
-      }
-      if (sortOrder === "asc") {
-        return aVal > bVal ? 1 : -1;
-      } else {
-        return aVal < bVal ? 1 : -1;
-      }
-    });
-    
-    return filtered;
+  // Processed data using utility functions (Single Responsibility: data transformation)
+  const processedData = useMemo(() => {
+    const filtered = filterRecommendations(recommendations, priorityFilter, searchTerm);
+    return sortRecommendations(filtered, sortBy, sortOrder);
   }, [recommendations, priorityFilter, searchTerm, sortBy, sortOrder]);
+
+  const stats = useMemo(() => calculateStats(recommendations), [recommendations]);
 
   const handleSort = (column) => {
     if (sortBy === column) {
@@ -97,88 +230,42 @@ const Recommendations = () => {
     }
   };
 
-  const handleImplement = (id) => {
-    setImplementationStatus({
-      ...implementationStatus,
-      [id]: "implemented"
-    });
-    alert("Recommendation implementation started!");
-  };
-
-  const handleDismiss = (id) => {
-    setImplementationStatus({
-      ...implementationStatus,
-      [id]: "dismissed"
-    });
-  };
-
-  const getPriorityStyles = (priority, status = null) => {
-    const priorityLower = priority?.toLowerCase() || "low";
-    
-    if (status === "implemented") {
-      return { badge: "bg-secondary", icon: "✅", text: "Implemented", border: "border-secondary", bg: "bg-secondary bg-opacity-10" };
-    }
-    if (status === "dismissed") {
-      return { badge: "bg-light text-dark", icon: "❌", text: "Dismissed", border: "border-secondary", bg: "bg-light" };
-    }
-    
-    switch (priorityLower) {
-      case "high":
-        return { badge: "bg-danger", icon: "🔴", text: "High Priority", border: "border-danger", bg: "bg-danger bg-opacity-10" };
-      case "medium":
-        return { badge: "bg-warning text-dark", icon: "🟡", text: "Medium Priority", border: "border-warning", bg: "bg-warning bg-opacity-10" };
-      default:
-        return { badge: "bg-success", icon: "🟢", text: "Low Priority", border: "border-success", bg: "bg-success bg-opacity-10" };
-    }
-  };
-
   const getSortIcon = (column) => {
     if (sortBy !== column) return "↕️";
     return sortOrder === "asc" ? "↑" : "↓";
   };
 
-  // Stats calculations
-  const stats = {
-    total: recommendations.length,
-    high: recommendations.filter(r => r.priority?.toLowerCase() === "high").length,
-    medium: recommendations.filter(r => r.priority?.toLowerCase() === "medium").length,
-    low: recommendations.filter(r => r.priority?.toLowerCase() === "low").length,
-  };
+  if (loading) return (
+    <div className="recommendations-page">
+      <h2 className="mb-4">AI-Powered Recommendations</h2>
+      <div className="text-center py-5">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+        <p className="mt-3 text-muted">Loading recommendations...</p>
+      </div>
+    </div>
+  );
 
-  if (loading) {
-    return (
-      <div className="recommendations-page">
-        <h2 className="mb-4">AI-Powered Recommendations</h2>
-        <div className="text-center py-5">
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </div>
-          <p className="mt-3 text-muted">Loading recommendations...</p>
+  if (error) return (
+    <div className="recommendations-page">
+      <h2 className="mb-4">AI-Powered Recommendations</h2>
+      <div className="card border-0 shadow-sm">
+        <div className="card-body text-center py-5">
+          <div className="display-1 mb-4 text-danger">⚠️</div>
+          <h3 className="fw-bold mb-3">Oops! Something went wrong</h3>
+          <p className="text-muted mb-4">{error}</p>
+          <button className="btn btn-primary px-4 py-2 rounded-pill" onClick={fetchRecommendations}>
+            Try Again
+          </button>
         </div>
       </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="recommendations-page">
-        <h2 className="mb-4">AI-Powered Recommendations</h2>
-        <div className="card border-0 shadow-sm">
-          <div className="card-body text-center py-5">
-            <div className="display-1 mb-4 text-danger">⚠️</div>
-            <h3 className="fw-bold mb-3">Oops! Something went wrong</h3>
-            <p className="text-muted mb-4">{error}</p>
-            <button className="btn btn-primary px-4 py-2 rounded-pill" onClick={fetchRecommendations}>
-              Try Again
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+    </div>
+  );
 
   return (
     <div className="recommendations-page">
+      {/* Header */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="fw-bold mb-0">AI-Powered Recommendations</h2>
         <div className="dropdown">
@@ -192,109 +279,46 @@ const Recommendations = () => {
         </div>
       </div>
 
-      {/* Stats Summary Cards */}
+      {/* Stats Row */}
       <div className="row g-4 mb-4">
-        <div className="col-md-3">
-          <div className="card border-0 shadow-sm text-center">
-            <div className="card-body">
-              <div className="display-6 fw-bold text-primary">{stats.total}</div>
-              <div className="text-muted small">Total Recommendations</div>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-3">
-          <div className="card border-0 shadow-sm text-center">
-            <div className="card-body">
-              <div className="display-6 fw-bold text-danger">{stats.high}</div>
-              <div className="text-muted small">High Priority</div>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-3">
-          <div className="card border-0 shadow-sm text-center">
-            <div className="card-body">
-              <div className="display-6 fw-bold text-warning">{stats.medium}</div>
-              <div className="text-muted small">Medium Priority</div>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-3">
-          <div className="card border-0 shadow-sm text-center">
-            <div className="card-body">
-              <div className="display-6 fw-bold text-success">{stats.low}</div>
-              <div className="text-muted small">Low Priority</div>
-            </div>
-          </div>
-        </div>
+        <StatCard value={stats.total} label="Total Recommendations" colorClass="text-primary" />
+        <StatCard value={stats.high} label="High Priority" colorClass="text-danger" />
+        <StatCard value={stats.medium} label="Medium Priority" colorClass="text-warning" />
+        <StatCard value={stats.low} label="Low Priority" colorClass="text-success" />
       </div>
 
-      {/* Filters and Search Bar */}
+      {/* Filters */}
       <div className="card border-0 shadow-sm mb-4">
         <div className="card-body">
           <div className="row g-3">
             <div className="col-md-4">
               <label className="form-label small text-muted">Filter by Priority</label>
               <div className="btn-group w-100" role="group">
-                <button 
-                  type="button"
-                  className={`btn ${priorityFilter === "all" ? "btn-primary" : "btn-outline-secondary"}`}
-                  onClick={() => setPriorityFilter("all")}
-                >
-                  All
-                </button>
-                <button 
-                  type="button"
-                  className={`btn ${priorityFilter === "high" ? "btn-danger" : "btn-outline-danger"}`}
-                  onClick={() => setPriorityFilter("high")}
-                >
-                  🔴 High
-                </button>
-                <button 
-                  type="button"
-                  className={`btn ${priorityFilter === "medium" ? "btn-warning" : "btn-outline-warning"}`}
-                  onClick={() => setPriorityFilter("medium")}
-                >
-                  🟡 Medium
-                </button>
-                <button 
-                  type="button"
-                  className={`btn ${priorityFilter === "low" ? "btn-success" : "btn-outline-success"}`}
-                  onClick={() => setPriorityFilter("low")}
-                >
-                  🟢 Low
-                </button>
+                <FilterButton priority="all" label="All" isActive={priorityFilter === "all"} onClick={() => setPriorityFilter("all")} />
+                <FilterButton priority="high" label="High" icon="🔴" isActive={priorityFilter === "high"} onClick={() => setPriorityFilter("high")} />
+                <FilterButton priority="medium" label="Medium" icon="🟡" isActive={priorityFilter === "medium"} onClick={() => setPriorityFilter("medium")} />
+                <FilterButton priority="low" label="Low" icon="🟢" isActive={priorityFilter === "low"} onClick={() => setPriorityFilter("low")} />
               </div>
             </div>
             <div className="col-md-5">
               <label className="form-label small text-muted">Search</label>
               <div className="input-group">
                 <span className="input-group-text bg-white">🔍</span>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Search by neighborhood, message, or action..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
+                <input type="text" className="form-control" placeholder="Search by neighborhood, message, or action..."
+                  value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
                 {searchTerm && (
-                  <button className="btn btn-outline-secondary" type="button" onClick={() => setSearchTerm("")}>
-                    ✕
-                  </button>
+                  <button className="btn btn-outline-secondary" type="button" onClick={() => setSearchTerm("")}>✕</button>
                 )}
               </div>
             </div>
             <div className="col-md-3">
               <label className="form-label small text-muted">Sort by</label>
               <div className="d-flex gap-2">
-                <button className="btn btn-sm btn-outline-secondary" onClick={() => handleSort("priority")}>
-                  Priority {getSortIcon("priority")}
-                </button>
-                <button className="btn btn-sm btn-outline-secondary" onClick={() => handleSort("neighborhood")}>
-                  Neighborhood {getSortIcon("neighborhood")}
-                </button>
-                <button className="btn btn-sm btn-outline-secondary" onClick={() => handleSort("score")}>
-                  Score {getSortIcon("score")}
-                </button>
+                {["priority", "neighborhood", "score"].map(col => (
+                  <button key={col} className="btn btn-sm btn-outline-secondary" onClick={() => handleSort(col)}>
+                    {col.charAt(0).toUpperCase() + col.slice(1)} {getSortIcon(col)}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
@@ -302,7 +326,7 @@ const Recommendations = () => {
       </div>
 
       {/* Recommendations List */}
-      {filteredRecommendations.length === 0 ? (
+      {processedData.length === 0 ? (
         <div className="card border-0 shadow-sm">
           <div className="card-body text-center py-5">
             <div className="display-1 mb-4">💡</div>
@@ -311,95 +335,28 @@ const Recommendations = () => {
               {searchTerm || priorityFilter !== "all" ? "Try adjusting your search or filters." : "Upload more data to get AI-powered insights."}
             </p>
             {!searchTerm && priorityFilter === "all" && (
-              <Link to="/upload" className="btn btn-primary px-4 py-2 rounded-pill">
-                Upload Data
-              </Link>
+              <Link to="/upload" className="btn btn-primary px-4 py-2 rounded-pill">Upload Data</Link>
             )}
           </div>
         </div>
       ) : (
         <div className="row g-4">
-          {filteredRecommendations.map((rec, index) => {
-            const status = implementationStatus[rec.id || index];
-            const styles = getPriorityStyles(rec.priority, status);
-            
-            return (
-              <div className="col-12" key={rec.id || index}>
-                <div className={`card border-0 shadow-sm ${styles.bg}`}>
-                  <div className="card-body">
-                    <div className="d-flex justify-content-between align-items-start mb-3">
-                      <div className="flex-grow-1">
-                        <div className="d-flex align-items-center gap-2 mb-2 flex-wrap">
-                          <h5 className="card-title fw-bold mb-0">{rec.neighborhood || 'General'}</h5>
-                          <span className={`badge ${styles.badge} rounded-pill`}>
-                            {styles.icon} {styles.text}
-                          </span>
-                          {rec.score && (
-                            <span className="badge bg-light text-dark rounded-pill">
-                              Score: {typeof rec.score === 'number' ? rec.score.toFixed(1) : rec.score} kWh/house
-                            </span>
-                          )}
-                        </div>
-                        <p className="card-text text-muted mb-2">{rec.message}</p>
-                        {rec.action && (
-                          <div className="mt-2">
-                            <small className="text-muted">
-                              <span className="fw-bold">Recommended Action:</span> {rec.action}
-                            </small>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    
-                    {expandedCard === index && (
-                      <div className="mt-3 p-3 bg-light rounded">
-                        <h6 className="fw-bold mb-2">Implementation Steps:</h6>
-                        <ul className="small mb-0">
-                          <li>Review energy audit findings</li>
-                          <li>Schedule consultation with energy experts</li>
-                          <li>Apply for available rebates</li>
-                          <li>Track monthly consumption improvements</li>
-                        </ul>
-                      </div>
-                    )}
-                    
-                    <div className="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
-                      <div className="d-flex gap-2">
-                        <button 
-                          className="btn btn-sm btn-outline-primary rounded-pill"
-                          onClick={() => handleImplement(rec.id || index)}
-                          disabled={status === "implemented"}
-                        >
-                          {status === "implemented" ? "✅ Implemented" : "Implement"}
-                        </button>
-                        {status !== "implemented" && status !== "dismissed" && (
-                          <button 
-                            className="btn btn-sm btn-outline-secondary rounded-pill"
-                            onClick={() => handleDismiss(rec.id || index)}
-                          >
-                            Dismiss
-                          </button>
-                        )}
-                        <button 
-                          className="btn btn-sm btn-link text-decoration-none"
-                          onClick={() => setExpandedCard(expandedCard === index ? null : index)}
-                        >
-                          {expandedCard === index ? "Show Less ↑" : "Learn More ↓"}
-                        </button>
-                      </div>
-                      <small className="text-muted">
-                        Estimated Savings: {rec.savings_potential || "Varies"}
-                      </small>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          {processedData.map((rec, index) => (
+            <RecommendationCard
+              key={rec.id || index}
+              recommendation={rec}
+              index={index}
+              status={implementedStatus[rec.id || index]}
+              onImplement={() => setImplementedStatus(prev => ({ ...prev, [rec.id || index]: "implemented" }))}
+              onDismiss={() => setImplementedStatus(prev => ({ ...prev, [rec.id || index]: "dismissed" }))}
+              onToggleExpand={() => setExpandedId(expandedId === index ? null : index)}
+              isExpanded={expandedId === index}
+            />
+          ))}
         </div>
       )}
 
-      {/* Rebate Opportunities Section */}
+      {/* Rebate Opportunities */}
       {recommendations.length > 0 && (
         <div className="card border-0 shadow-sm mt-4">
           <div className="card-header bg-transparent border-0 pt-4 px-4">
@@ -407,30 +364,9 @@ const Recommendations = () => {
           </div>
           <div className="card-body">
             <div className="row g-3">
-              <div className="col-md-4">
-                <div className="p-3 border rounded-3">
-                  <div className="h2 mb-2">🏠</div>
-                  <h6 className="fw-bold">Weatherization Assistance</h6>
-                  <p className="small text-muted">Free home energy audits and upgrades for qualifying households</p>
-                  <span className="badge bg-success">Up to $5,000</span>
-                </div>
-              </div>
-              <div className="col-md-4">
-                <div className="p-3 border rounded-3">
-                  <div className="h2 mb-2">☀️</div>
-                  <h6 className="fw-bold">Solar Installation Credit</h6>
-                  <p className="small text-muted">Federal tax credit for solar panel installation</p>
-                  <span className="badge bg-success">26% Tax Credit</span>
-                </div>
-              </div>
-              <div className="col-md-4">
-                <div className="p-3 border rounded-3">
-                  <div className="h2 mb-2">🌡️</div>
-                  <h6 className="fw-bold">Smart Thermostat Rebate</h6>
-                  <p className="small text-muted">Rebate for installing energy-efficient smart thermostats</p>
-                  <span className="badge bg-success">Up to $100</span>
-                </div>
-              </div>
+              <RebateCard icon="🏠" title="Weatherization Assistance" description="Free home energy audits and upgrades for qualifying households" amount="Up to $5,000" />
+              <RebateCard icon="☀️" title="Solar Installation Credit" description="Federal tax credit for solar panel installation" amount="26% Tax Credit" />
+              <RebateCard icon="🌡️" title="Smart Thermostat Rebate" description="Rebate for installing energy-efficient smart thermostats" amount="Up to $100" />
             </div>
           </div>
         </div>
