@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import { getRecommendations } from "../services/api";
 
 const Recommendations = () => {
   const recommendations = [
