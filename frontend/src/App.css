@@ -44,3 +44,36 @@ nav a {
 nav a:hover {
   color: #ecf0f1;
 }
+
+.dashboard .card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 0.5rem;
+}
+
+.dashboard .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.dashboard .card-title {
+  color: #2c3e50;
+}
+
+/* Loading spinner */
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+  color: #2c3e50;
+}
+
+/* Chart empty state */
+.bg-light.rounded-3 {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 0.5rem;
+  padding: 3rem !important;
+}
+
+/* Grid layout - using Bootstrap's grid instead of custom grid */
+.row.g-4 {
+  margin-bottom: 1.5rem;
+}

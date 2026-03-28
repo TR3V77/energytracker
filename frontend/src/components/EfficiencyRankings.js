@@ -4,45 +4,45 @@ const EfficiencyRankings = () => {
   const rankings = [
     {
       rank: 1,
-      neighborhood: "Downtown",
+      neighborhood_name: "Downtown",
       efficiency: 320,
       households: 2450,
-      totalKwh: 784000,
+      total_kwh: 784000,
     },
     {
       rank: 2,
-      neighborhood: "Riverside",
+      neighborhood_name: "Riverside",
       efficiency: 355,
       households: 1890,
-      totalKwh: 670950,
+      total_kwh: 670950,
     },
     {
       rank: 3,
-      neighborhood: "North Hills",
+      neighborhood_name: "North Hills",
       efficiency: 378,
       households: 3200,
-      totalKwh: 1209600,
+      total_kwh: 1209600,
     },
     {
       rank: 4,
-      neighborhood: "Westside",
+      neighborhood_name: "Westside",
       efficiency: 412,
       households: 2800,
-      totalKwh: 1153600,
+      total_kwh: 1153600,
     },
     {
       rank: 5,
-      neighborhood: "East End",
+      neighborhood_name: "East End",
       efficiency: 445,
       households: 2100,
-      totalKwh: 934500,
+      total_kwh: 934500,
     },
     {
       rank: 6,
-      neighborhood: "South Park",
+      neighborhood_name: "South Park",
       efficiency: 489,
       households: 1950,
-      totalKwh: 953550,
+      total_kwh: 953550,
     },
   ];
 
@@ -73,7 +73,7 @@ const EfficiencyRankings = () => {
                     <strong>#{item.rank}</strong>
                     {item.rank === 1 && <span className="ms-2">🏆</span>}
                   </td>
-                  <td>{item.neighborhood}</td>
+                  <td>{item.neighborhood_name}</td>
                   <td>
                     <span
                       className={`badge ${item.efficiency < 380 ? "bg-success" : item.efficiency < 430 ? "bg-warning" : "bg-danger"}`}
@@ -82,7 +82,7 @@ const EfficiencyRankings = () => {
                     </span>
                   </td>
                   <td>{item.households.toLocaleString()}</td>
-                  <td>{item.totalKwh.toLocaleString()} kWh</td>
+                  <td>{item.total_kwh.toLocaleString()} kWh</td>
                   <td>
                     {item.efficiency < 380 ? (
                       <span className="text-success">✅ Efficient</span>
