@@ -77,3 +77,42 @@ nav a:hover {
 .row.g-4 {
   margin-bottom: 1.5rem;
 }
+
+.recommendations-page .card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 0.75rem;
+}
+
+.recommendations-page .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+}
+
+.recommendations-page .btn-group .btn {
+  transition: all 0.2s ease;
+}
+
+.recommendations-page .btn-group .btn:hover {
+  transform: translateY(-1px);
+}
+
+/* Stats cards animation */
+.recommendations-page .col-md-3 .card {
+  animation: fadeInUp 0.3s ease forwards;
+}
+
+.recommendations-page .col-md-3:nth-child(1) { animation-delay: 0.1s; }
+.recommendations-page .col-md-3:nth-child(2) { animation-delay: 0.2s; }
+.recommendations-page .col-md-3:nth-child(3) { animation-delay: 0.3s; }
+.recommendations-page .col-md-3:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
