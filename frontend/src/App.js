@@ -3,7 +3,6 @@ import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
-import Upload from './pages/Upload';
 import Compare from './pages/Compare';
 import EfficiencyRankings from './components/EfficiencyRankings';
 import TrendAnalysis from './components/TrendAnalysis';
