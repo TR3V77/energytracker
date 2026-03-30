@@ -30,6 +30,7 @@ def trends():
 
     return jsonify({"trends": trends_data}), 200
 
+
 @analytics_bp.route('/api/recommendations')
 @analytics_bp.route('/api/analytics/recommendations')
 def recommendations():
@@ -48,11 +49,7 @@ def recommendations():
         anchor_date=anchor_date,
     )
 
-    has_any_recommendations = any(
-        item.get("recommendations") for item in recs
-    )
-
-    if not has_any_recommendations:
+    if not recs:
         return jsonify({
             "recommendations": recs,
             "message": "No recommendations triggered for the selected filters."
