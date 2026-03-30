@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { getRecommendations } from "../services/api";
+import { RECOMMENDATION_STATUS, getStatusConfig } from "../constants/recommendationStatus";
+import { useImplementationTracker } from "../hooks/useImplementationTracker";
 
 // ========== SEPARATE UTILITY FUNCTIONS ==========
 
