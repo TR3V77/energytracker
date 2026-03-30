@@ -168,6 +168,9 @@ const RecommendationCard = ({ recommendation, index, status, implementationData,
                 <span className={`badge ${styles.badge} rounded-pill`}>
                   {styles.icon} {styles.label}
                 </span>
+                <span className={`badge ${statusConfig.badge} rounded-pill`}>
+                  {statusConfig.icon} {statusConfig.label}
+                </span>
                 {recommendation.score && (
                   <span className="badge bg-light text-dark rounded-pill">
                     Score: {recommendation.score.toFixed(1)} kWh/house
@@ -182,6 +185,16 @@ const RecommendationCard = ({ recommendation, index, status, implementationData,
                   </small>
                 </div>
               )}
+
+              {isStarted && implementationData?.notes && (
+                <div className="mt-2 p-2 bg-light rounded small">
+                  <span className="fw-bold text-success">{statusConfig.icon} {statusConfig.label}</span>
+                  {implementationData.implementationDate && <span className="ms-2">on {implementationData.implementationDate}</span>}
+                  {implementationData.estimatedImpact && <span className="ms-2 text-primary">| Save: {implementationData.estimatedImpact} kWh</span>}
+                  <div className="mt-1 text-muted">{implementationData.notes}</div>
+                </div>
+              )}
+
             </div>
           </div>
           
@@ -199,6 +212,7 @@ const RecommendationCard = ({ recommendation, index, status, implementationData,
           
           <div className="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
             <div className="d-flex gap-2">
+              {getActionButtons()}
               <button className="btn btn-sm btn-outline-primary rounded-pill" onClick={onImplement} disabled={status === "implemented"}>
                 {status === "implemented" ? "✅ Implemented" : "Implement"}
               </button>
@@ -242,7 +256,8 @@ const Recommendations = () => {
   const [sortBy, setSortBy] = useState("priority");
   const [sortOrder, setSortOrder] = useState("desc");
   const [expandedId, setExpandedId] = useState(null);
-  const [implementedStatus, setImplementedStatus] = useState({});
+
+  const { tracker, updateStatus, getDetails } = useImplementationTracker();
 
   useEffect(() => {
     fetchRecommendations();
@@ -266,7 +281,7 @@ const Recommendations = () => {
     return sortRecommendations(filtered, sortBy, sortOrder);
   }, [recommendations, priorityFilter, searchTerm, sortBy, sortOrder]);
 
-  const stats = useMemo(() => calculateStats(recommendations), [recommendations]);
+  const stats = useMemo(() => calculateStats(recommendations, tracker), [recommendations, tracker]);
 
   const handleSort = (column) => {
     if (sortBy === column) {
@@ -280,6 +295,33 @@ const Recommendations = () => {
   const getSortIcon = (column) => {
     if (sortBy !== column) return "↕️";
     return sortOrder === "asc" ? "↑" : "↓";
+  };
+
+  const exportImplementedReport = () => {
+    const implemented = Object.entries(tracker)
+      .filter(([_, data]) => data.status === "implemented")
+      .map(([id, data]) => {
+        const rec = recommendations.find(r => (r.id || r.neighborhood) === id);
+        return {
+          neighborhood: rec?.neighborhood || id,
+          action: rec?.action,
+          implementedDate: data.implementationDate,
+          estimatedImpact: data.estimatedImpact,
+          notes: data.notes,
+        };
+      });
+    
+    const blob = new Blob([JSON.stringify({
+      generatedAt: new Date().toISOString(),
+      totalImplemented: implemented.length,
+      recommendations: implemented
+    }, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `implemented_recommendations_${new Date().toISOString().split("T")[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   if (loading) return (
@@ -320,6 +362,7 @@ const Recommendations = () => {
             📄 Export
           </button>
           <ul className="dropdown-menu">
+            <li><a className="dropdown-item" href="#" onClick={exportImplementedReport}>📊 Export Implemented</a></li>
             <li><a className="dropdown-item" href="#">Export as PDF</a></li>
             <li><a className="dropdown-item" href="#">Export as CSV</a></li>
           </ul>
@@ -332,6 +375,28 @@ const Recommendations = () => {
         <StatCard value={stats.high} label="High Priority" colorClass="text-danger" />
         <StatCard value={stats.medium} label="Medium Priority" colorClass="text-warning" />
         <StatCard value={stats.low} label="Low Priority" colorClass="text-success" />
+        <StatCard value={stats.implemented} label="Implemented" colorClass="text-success" />
+        <StatCard value={stats.inProgress} label="In Progress" colorClass="text-info" />
+      </div>
+
+      {/* Progress Bar */}
+      <div className="card border-0 shadow-sm mb-4">
+        <div className="card-body">
+          <div className="d-flex justify-content-between align-items-center mb-2">
+            <small className="text-muted fw-bold">Implementation Progress</small>
+            <small className="text-muted">{stats.implemented}/{stats.total} completed ({Math.round((stats.implemented / stats.total) * 100) || 0}%)</small>
+          </div>
+          <div className="progress" style={{ height: "8px" }}>
+            <div 
+              className="progress-bar bg-success" 
+              style={{ width: `${(stats.implemented / stats.total) * 100 || 0}%` }}
+            ></div>
+            <div 
+              className="progress-bar bg-info" 
+              style={{ width: `${(stats.inProgress / stats.total) * 100 || 0}%` }}
+            ></div>
+          </div>
+        </div>
       </div>
 
       {/* Filters */}
