@@ -85,13 +85,16 @@ const calculateStats = (items) => ({
   high: items.filter(i => i.priority?.toLowerCase() === "high").length,
   medium: items.filter(i => i.priority?.toLowerCase() === "medium").length,
   low: items.filter(i => i.priority?.toLowerCase() === "low").length,
+  implemented: Object.values(tracker).filter(t => t.status === "implemented").length,
+  inProgress: Object.values(tracker).filter(t => t.status === "in_progress").length,
+  planned: Object.values(tracker).filter(t => t.status === "planned").length,
 });
 
 // ========== REUSABLE COMPONENTS ==========
 
 // Stat Card Component (Single Responsibility: display single stat)
 const StatCard = ({ value, label, colorClass }) => (
-  <div className="col-md-3">
+  <div className="col-md-2">
     <div className="card border-0 shadow-sm text-center">
       <div className="card-body">
         <div className={`display-6 fw-bold ${colorClass}`}>{value}</div>
