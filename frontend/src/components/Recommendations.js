@@ -18,7 +18,16 @@ const getPriorityValue = (priority) => PRIORITY_CONFIG[priority?.toLowerCase()]?
 
 // Utility: Get styles for priority/status (Single Responsibility: style mapping)
 const getItemStyles = (priority, status) => {
-  if (status && STATUS_CONFIG[status]) return STATUS_CONFIG[status];
+  if (status) {
+    const statusConfig = getStatusConfig(status);
+    return {
+      badge: statusConfig.badge,
+      icon: statusConfig.icon,
+      label: statusConfig.label,
+      border: `border-${statusConfig.badge.replace("bg-", "")}`,
+      bg: `${statusConfig.badge.replace("bg-", "bg-")}-opacity-10`,
+    };
+  }
   return PRIORITY_CONFIG[priority?.toLowerCase()] || PRIORITY_CONFIG.low;
 };
 
