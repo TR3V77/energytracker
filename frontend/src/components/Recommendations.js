@@ -116,8 +116,46 @@ const FilterButton = ({ priority, label, icon, isActive, onClick }) => (
 );
 
 // Recommendation Card Component (Single Responsibility: display single recommendation)
-const RecommendationCard = ({ recommendation, index, status, onImplement, onDismiss, onToggleExpand, isExpanded }) => {
+const RecommendationCard = ({ recommendation, index, status, implementationData, onUpdateStatus, onToggleExpand, isExpanded }) => {
+  const status = implementationData?.status || "not started";
   const styles = getItemStyles(recommendation.priority, status);
+  const statusConfig = getStatusConfig(status);
+  const isStarted = status !== "not_started" && status !== "dismissed";
+
+  const getActionButtons = () => {
+    const btnClass = "btn btn-sm rounded-pill";
+    
+    switch (status) {
+      case "not_started":
+        return (
+          <>
+            <button className={`${btnClass} btn-primary`} onClick={() => onUpdateStatus("planned")}>📅 Plan</button>
+            <button className={`${btnClass} btn-outline-primary`} onClick={() => onUpdateStatus("in_progress")}>🔄 Start</button>
+            <button className={`${btnClass} btn-outline-secondary`} onClick={() => onUpdateStatus("dismissed")}>Dismiss</button>
+          </>
+        );
+      case "planned":
+        return (
+          <>
+            <button className={`${btnClass} btn-primary`} onClick={() => onUpdateStatus("in_progress")}>🔄 Start Now</button>
+            <button className={`${btnClass} btn-outline-secondary`} onClick={() => onUpdateStatus("dismissed")}>Cancel</button>
+          </>
+        );
+      case "in_progress":
+        return (
+          <>
+            <button className={`${btnClass} btn-success`} onClick={() => onUpdateStatus("implemented")}>✅ Complete</button>
+            <button className={`${btnClass} btn-outline-secondary`} onClick={() => onUpdateStatus("dismissed")}>Cancel</button>
+          </>
+        );
+      case "implemented":
+        return (
+          <button className={`${btnClass} btn-outline-secondary`} disabled>✅ Completed</button>
+        );
+      default:
+        return null;
+    }
+  };
   
   return (
     <div className={`col-12`}>
