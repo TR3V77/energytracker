@@ -13,11 +13,6 @@ const PRIORITY_CONFIG = {
   low: { order: 1, badge: "bg-success", icon: "🟢", label: "Low Priority", border: "border-success", bg: "bg-success bg-opacity-10" },
 };
 
-const STATUS_CONFIG = {
-  implemented: { badge: "bg-secondary", icon: "✅", label: "Implemented", border: "border-secondary", bg: "bg-secondary bg-opacity-10" },
-  dismissed: { badge: "bg-light text-dark", icon: "❌", label: "Dismissed", border: "border-secondary", bg: "bg-light" },
-};
-
 // Utility: Get priority value (Single Responsibility: priority extraction)
 const getPriorityValue = (priority) => PRIORITY_CONFIG[priority?.toLowerCase()]?.order || 0;
 
