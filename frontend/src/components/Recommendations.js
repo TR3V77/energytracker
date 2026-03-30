@@ -1,8 +1,42 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { getRecommendations } from "../services/api";
-import { RECOMMENDATION_STATUS, getStatusConfig } from "../constants/recommendationStatus";
-import { useImplementationTracker } from "../hooks/useImplementationTracker";
+
+const RECOMMENDATION_STATUS = {
+  NOT_STARTED: "not_started",
+  PLANNED: "planned",
+  IN_PROGRESS: "in_progress",
+  IMPLEMENTED: "implemented",
+  DISMISSED: "dismissed",
+};
+
+const STATUS_CONFIG = {
+  [RECOMMENDATION_STATUS.NOT_STARTED]: { badge: "bg-secondary", icon: "⏳", label: "Not Started" },
+  [RECOMMENDATION_STATUS.PLANNED]: { badge: "bg-primary", icon: "📅", label: "Planned" },
+  [RECOMMENDATION_STATUS.IN_PROGRESS]: { badge: "bg-info", icon: "🔄", label: "In Progress" },
+  [RECOMMENDATION_STATUS.IMPLEMENTED]: { badge: "bg-success", icon: "✅", label: "Implemented" },
+  [RECOMMENDATION_STATUS.DISMISSED]: { badge: "bg-dark", icon: "🚫", label: "Dismissed" },
+};
+
+const getStatusConfig = (status) => STATUS_CONFIG[status] || STATUS_CONFIG[RECOMMENDATION_STATUS.NOT_STARTED];
+
+const useImplementationTracker = () => {
+  const [tracker, setTracker] = useState({});
+
+  const updateStatus = (id, status) => {
+    setTracker((prev) => ({
+      ...prev,
+      [id]: {
+        ...prev[id],
+        status,
+      },
+    }));
+  };
+
+  const getDetails = (id) => tracker[id] || { status: RECOMMENDATION_STATUS.NOT_STARTED };
+
+  return { tracker, updateStatus, getDetails };
+};
 
 // ========== SEPARATE UTILITY FUNCTIONS ==========
 
@@ -80,7 +114,7 @@ const sortRecommendations = (items, sortBy, sortOrder) => {
 };
 
 // Utility: Calculate stats (Single Responsibility: statistics calculation)
-const calculateStats = (items) => ({
+const calculateStats = (items, tracker) => ({
   total: items.length,
   high: items.filter(i => i.priority?.toLowerCase() === "high").length,
   medium: items.filter(i => i.priority?.toLowerCase() === "medium").length,
@@ -116,8 +150,8 @@ const FilterButton = ({ priority, label, icon, isActive, onClick }) => (
 );
 
 // Recommendation Card Component (Single Responsibility: display single recommendation)
-const RecommendationCard = ({ recommendation, index, status, implementationData, onUpdateStatus, onToggleExpand, isExpanded }) => {
-  const status = implementationData?.status || "not started";
+const RecommendationCard = ({ recommendation, implementationData, onUpdateStatus, onToggleExpand, isExpanded }) => {
+  const status = implementationData?.status || "not_started";
   const styles = getItemStyles(recommendation.priority, status);
   const statusConfig = getStatusConfig(status);
   const isStarted = status !== "not_started" && status !== "dismissed";
@@ -213,14 +247,6 @@ const RecommendationCard = ({ recommendation, index, status, implementationData,
           <div className="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
             <div className="d-flex gap-2">
               {getActionButtons()}
-              <button className="btn btn-sm btn-outline-primary rounded-pill" onClick={onImplement} disabled={status === "implemented"}>
-                {status === "implemented" ? "✅ Implemented" : "Implement"}
-              </button>
-              {!status && (
-                <button className="btn btn-sm btn-outline-secondary rounded-pill" onClick={onDismiss}>
-                  Dismiss
-                </button>
-              )}
               <button className="btn btn-sm btn-link text-decoration-none" onClick={onToggleExpand}>
                 {isExpanded ? "Show Less ↑" : "Learn More ↓"}
               </button>
@@ -457,10 +483,8 @@ const Recommendations = () => {
             <RecommendationCard
               key={rec.id || index}
               recommendation={rec}
-              index={index}
-              status={implementedStatus[rec.id || index]}
-              onImplement={() => setImplementedStatus(prev => ({ ...prev, [rec.id || index]: "implemented" }))}
-              onDismiss={() => setImplementedStatus(prev => ({ ...prev, [rec.id || index]: "dismissed" }))}
+              implementationData={getDetails(rec.id || rec.neighborhood || `${index}`)}
+              onUpdateStatus={(newStatus) => updateStatus(rec.id || rec.neighborhood || `${index}`, newStatus)}
               onToggleExpand={() => setExpandedId(expandedId === index ? null : index)}
               isExpanded={expandedId === index}
             />
