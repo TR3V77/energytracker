@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { getRecommendations } from "../services/api";
+import { flattenRecommendationsPayload } from "../utils/recommendations";
 
 const RECOMMENDATION_STATUS = {
   NOT_STARTED: "not_started",
@@ -50,20 +51,8 @@ const PRIORITY_CONFIG = {
 // Utility: Get priority value (Single Responsibility: priority extraction)
 const getPriorityValue = (priority) => PRIORITY_CONFIG[priority?.toLowerCase()]?.order || 0;
 
-// Utility: Get styles for priority/status (Single Responsibility: style mapping)
-const getItemStyles = (priority, status) => {
-  if (status) {
-    const statusConfig = getStatusConfig(status);
-    return {
-      badge: statusConfig.badge,
-      icon: statusConfig.icon,
-      label: statusConfig.label,
-      border: `border-${statusConfig.badge.replace("bg-", "")}`,
-      bg: `${statusConfig.badge.replace("bg-", "bg-")}-opacity-10`,
-    };
-  }
-  return PRIORITY_CONFIG[priority?.toLowerCase()] || PRIORITY_CONFIG.low;
-};
+const getPriorityStyles = (priority) =>
+  PRIORITY_CONFIG[priority?.toLowerCase()] || PRIORITY_CONFIG.low;
 
 // Utility: Filter recommendations (Single Responsibility: filtering logic)
 const filterRecommendations = (items, priorityFilter, searchTerm) => {
@@ -78,8 +67,8 @@ const filterRecommendations = (items, priorityFilter, searchTerm) => {
   if (searchTerm) {
     const term = searchTerm.toLowerCase();
     filtered = filtered.filter(item =>
-      [item.neighborhood, item.message, item.action].some(field =>
-        field?.toLowerCase().includes(term)
+      [item.neighborhood, item.message, item.reason, item.action, item.id].some(field =>
+        String(field ?? "").toLowerCase().includes(term)
       )
     );
   }
@@ -113,16 +102,28 @@ const sortRecommendations = (items, sortBy, sortOrder) => {
   return sorted;
 };
 
-// Utility: Calculate stats (Single Responsibility: statistics calculation)
-const calculateStats = (items, tracker) => ({
-  total: items.length,
-  high: items.filter(i => i.priority?.toLowerCase() === "high").length,
-  medium: items.filter(i => i.priority?.toLowerCase() === "medium").length,
-  low: items.filter(i => i.priority?.toLowerCase() === "low").length,
-  implemented: Object.values(tracker).filter(t => t.status === "implemented").length,
-  inProgress: Object.values(tracker).filter(t => t.status === "in_progress").length,
-  planned: Object.values(tracker).filter(t => t.status === "planned").length,
-});
+const getTrackedStatus = (rowKey, tracker) =>
+  tracker[rowKey]?.status || RECOMMENDATION_STATUS.NOT_STARTED;
+
+const isActiveRow = (rowKey, tracker) => {
+  const s = getTrackedStatus(rowKey, tracker);
+  return s !== RECOMMENDATION_STATUS.IMPLEMENTED && s !== RECOMMENDATION_STATUS.DISMISSED;
+};
+
+// totalIssued = rows from API; total (displayed as Remaining) excludes implemented/dismissed
+const calculateStats = (items, tracker) => {
+  const remaining = items.filter((i) => isActiveRow(i.rowKey, tracker));
+  return {
+    totalIssued: items.length,
+    total: remaining.length,
+    high: remaining.filter((i) => i.priority?.toLowerCase() === "high").length,
+    medium: remaining.filter((i) => i.priority?.toLowerCase() === "medium").length,
+    low: remaining.filter((i) => i.priority?.toLowerCase() === "low").length,
+    implemented: Object.values(tracker).filter((t) => t.status === RECOMMENDATION_STATUS.IMPLEMENTED).length,
+    inProgress: Object.values(tracker).filter((t) => t.status === RECOMMENDATION_STATUS.IN_PROGRESS).length,
+    planned: Object.values(tracker).filter((t) => t.status === RECOMMENDATION_STATUS.PLANNED).length,
+  };
+};
 
 // ========== REUSABLE COMPONENTS ==========
 
@@ -152,7 +153,7 @@ const FilterButton = ({ priority, label, icon, isActive, onClick }) => (
 // Recommendation Card Component (Single Responsibility: display single recommendation)
 const RecommendationCard = ({ recommendation, implementationData, onUpdateStatus, onToggleExpand, isExpanded }) => {
   const status = implementationData?.status || "not_started";
-  const styles = getItemStyles(recommendation.priority, status);
+  const priorityStyles = getPriorityStyles(recommendation.priority);
   const statusConfig = getStatusConfig(status);
   const isStarted = status !== "not_started" && status !== "dismissed";
 
@@ -193,14 +194,14 @@ const RecommendationCard = ({ recommendation, implementationData, onUpdateStatus
   
   return (
     <div className={`col-12`}>
-      <div className={`card border-0 shadow-sm ${styles.bg}`}>
+      <div className={`card border-0 shadow-sm ${priorityStyles.bg}`}>
         <div className="card-body">
           <div className="d-flex justify-content-between align-items-start mb-3">
             <div className="flex-grow-1">
               <div className="d-flex align-items-center gap-2 mb-2 flex-wrap">
                 <h5 className="card-title fw-bold mb-0">{recommendation.neighborhood || 'General'}</h5>
-                <span className={`badge ${styles.badge} rounded-pill`}>
-                  {styles.icon} {styles.label}
+                <span className={`badge ${priorityStyles.badge} rounded-pill`}>
+                  {priorityStyles.icon} {priorityStyles.label}
                 </span>
                 <span className={`badge ${statusConfig.badge} rounded-pill`}>
                   {statusConfig.icon} {statusConfig.label}
@@ -211,7 +212,7 @@ const RecommendationCard = ({ recommendation, implementationData, onUpdateStatus
                   </span>
                 )}
               </div>
-              <p className="card-text text-muted mb-2">{recommendation.message}</p>
+              <p className="card-text text-muted mb-2">{recommendation.message || recommendation.reason}</p>
               {recommendation.action && (
                 <div className="mt-2">
                   <small className="text-muted">
@@ -251,7 +252,12 @@ const RecommendationCard = ({ recommendation, implementationData, onUpdateStatus
                 {isExpanded ? "Show Less ↑" : "Learn More ↓"}
               </button>
             </div>
-            <small className="text-muted">Estimated Savings: {recommendation.savings_potential || "Varies"}</small>
+            <small className="text-muted">
+              Est. impact:{" "}
+              {recommendation.estimated_impact_pct != null
+                ? `${recommendation.estimated_impact_pct}%`
+                : "—"}
+            </small>
           </div>
         </div>
       </div>
@@ -281,7 +287,7 @@ const Recommendations = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("priority");
   const [sortOrder, setSortOrder] = useState("desc");
-  const [expandedId, setExpandedId] = useState(null);
+  const [expandedKey, setExpandedKey] = useState(null);
 
   const { tracker, updateStatus, getDetails } = useImplementationTracker();
 
@@ -293,7 +299,8 @@ const Recommendations = () => {
     setLoading(true);
     try {
       const response = await getRecommendations({});
-      setRecommendations(response.data?.recommendations || response.data || []);
+      const raw = response.data?.recommendations ?? response.data ?? [];
+      setRecommendations(flattenRecommendationsPayload(raw));
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to load recommendations');
     } finally {
@@ -301,11 +308,11 @@ const Recommendations = () => {
     }
   };
 
-  // Processed data using utility functions (Single Responsibility: data transformation)
   const processedData = useMemo(() => {
-    const filtered = filterRecommendations(recommendations, priorityFilter, searchTerm);
+    const active = recommendations.filter((r) => isActiveRow(r.rowKey, tracker));
+    const filtered = filterRecommendations(active, priorityFilter, searchTerm);
     return sortRecommendations(filtered, sortBy, sortOrder);
-  }, [recommendations, priorityFilter, searchTerm, sortBy, sortOrder]);
+  }, [recommendations, priorityFilter, searchTerm, sortBy, sortOrder, tracker]);
 
   const stats = useMemo(() => calculateStats(recommendations, tracker), [recommendations, tracker]);
 
@@ -327,7 +334,7 @@ const Recommendations = () => {
     const implemented = Object.entries(tracker)
       .filter(([_, data]) => data.status === "implemented")
       .map(([id, data]) => {
-        const rec = recommendations.find(r => (r.id || r.neighborhood) === id);
+        const rec = recommendations.find((r) => r.rowKey === id);
         return {
           neighborhood: rec?.neighborhood || id,
           action: rec?.action,
@@ -397,7 +404,7 @@ const Recommendations = () => {
 
       {/* Stats Row */}
       <div className="row g-4 mb-4">
-        <StatCard value={stats.total} label="Total Recommendations" colorClass="text-primary" />
+        <StatCard value={stats.total} label="Remaining" colorClass="text-primary" />
         <StatCard value={stats.high} label="High Priority" colorClass="text-danger" />
         <StatCard value={stats.medium} label="Medium Priority" colorClass="text-warning" />
         <StatCard value={stats.low} label="Low Priority" colorClass="text-success" />
@@ -410,16 +417,20 @@ const Recommendations = () => {
         <div className="card-body">
           <div className="d-flex justify-content-between align-items-center mb-2">
             <small className="text-muted fw-bold">Implementation Progress</small>
-            <small className="text-muted">{stats.implemented}/{stats.total} completed ({Math.round((stats.implemented / stats.total) * 100) || 0}%)</small>
+            <small className="text-muted">
+              {stats.implemented}/{stats.totalIssued || 0} completed (
+              {stats.totalIssued ? Math.round((stats.implemented / stats.totalIssued) * 100) : 0}
+              %)
+            </small>
           </div>
           <div className="progress" style={{ height: "8px" }}>
             <div 
               className="progress-bar bg-success" 
-              style={{ width: `${(stats.implemented / stats.total) * 100 || 0}%` }}
+              style={{ width: `${stats.totalIssued ? (stats.implemented / stats.totalIssued) * 100 : 0}%` }}
             ></div>
             <div 
               className="progress-bar bg-info" 
-              style={{ width: `${(stats.inProgress / stats.total) * 100 || 0}%` }}
+              style={{ width: `${stats.totalIssued ? (stats.inProgress / stats.totalIssued) * 100 : 0}%` }}
             ></div>
           </div>
         </div>
@@ -470,30 +481,34 @@ const Recommendations = () => {
             <div className="display-1 mb-4">💡</div>
             <h3 className="fw-bold mb-3">No Recommendations Found</h3>
             <p className="text-muted mb-4">
-              {searchTerm || priorityFilter !== "all" ? "Try adjusting your search or filters." : "Upload more data to get AI-powered insights."}
+              {searchTerm || priorityFilter !== "all"
+                ? "Try adjusting your search or filters."
+                : stats.totalIssued > 0 && stats.total === 0
+                  ? "All current recommendations are completed or dismissed."
+                  : "Upload more data to get AI-powered insights."}
             </p>
-            {!searchTerm && priorityFilter === "all" && (
+            {!searchTerm && priorityFilter === "all" && stats.totalIssued === 0 && (
               <Link to="/upload" className="btn btn-primary px-4 py-2 rounded-pill">Upload Data</Link>
             )}
           </div>
         </div>
       ) : (
         <div className="row g-4">
-          {processedData.map((rec, index) => (
+          {processedData.map((rec) => (
             <RecommendationCard
-              key={rec.id || index}
+              key={rec.rowKey}
               recommendation={rec}
-              implementationData={getDetails(rec.id || rec.neighborhood || `${index}`)}
-              onUpdateStatus={(newStatus) => updateStatus(rec.id || rec.neighborhood || `${index}`, newStatus)}
-              onToggleExpand={() => setExpandedId(expandedId === index ? null : index)}
-              isExpanded={expandedId === index}
+              implementationData={getDetails(rec.rowKey)}
+              onUpdateStatus={(newStatus) => updateStatus(rec.rowKey, newStatus)}
+              onToggleExpand={() => setExpandedKey(expandedKey === rec.rowKey ? null : rec.rowKey)}
+              isExpanded={expandedKey === rec.rowKey}
             />
           ))}
         </div>
       )}
 
       {/* Rebate Opportunities */}
-      {recommendations.length > 0 && (
+      {stats.totalIssued > 0 && (
         <div className="card border-0 shadow-sm mt-4">
           <div className="card-header bg-transparent border-0 pt-4 px-4">
             <h5 className="fw-bold mb-0">💰 Available Rebate Opportunities</h5>

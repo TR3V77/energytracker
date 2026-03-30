@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getRecommendations } from "../services/api";
+import { flattenRecommendationsPayload } from "../utils/recommendations";
 
 const RecommendationsPanel = ({ limit = 3 }) => {
   const [recommendations, setRecommendations] = useState([]);
@@ -15,8 +16,9 @@ const RecommendationsPanel = ({ limit = 3 }) => {
     setLoading(true);
     try {
       const response = await getRecommendations({});
-      const recs = response.data?.recommendations || response.data || [];
-      setRecommendations(recs.slice(0, limit));
+      const raw = response.data?.recommendations ?? response.data ?? [];
+      const flat = flattenRecommendationsPayload(raw);
+      setRecommendations(flat.slice(0, limit));
     } catch (err) {
       console.error("Error fetching recommendations:", err);
       setError(err.response?.data?.error || "Failed to load recommendations");
@@ -88,11 +90,14 @@ const RecommendationsPanel = ({ limit = 3 }) => {
       </div>
       <div className="card-body p-3">
         <div className="recommendations-list" style={{ maxHeight: "380px", overflowY: "auto" }}>
-          {recommendations.map((rec, idx) => {
+          {recommendations.map((rec) => {
             const styles = getPriorityStyles(rec.priority);
+            const preview = (rec.message || rec.reason || "").trim();
+            const previewText =
+              preview.length > 100 ? `${preview.slice(0, 100)}…` : preview || "—";
             return (
               <div
-                key={idx}
+                key={rec.rowKey}
                 className={`recommendation-item p-2 mb-2 rounded-2 border-start border-3 ${styles.border} ${styles.bg}`}
                 style={{ borderLeftWidth: "3px" }}
               >
@@ -102,7 +107,7 @@ const RecommendationsPanel = ({ limit = 3 }) => {
                     {styles.icon} {styles.text.split(" ")[0]}
                   </span>
                 </div>
-                <p className="mb-1 small text-muted">{rec.message?.substring(0, 100)}...</p>
+                <p className="mb-1 small text-muted">{previewText}</p>
                 {rec.action && (
                   <div className="mt-1">
                     <small className="text-muted">
