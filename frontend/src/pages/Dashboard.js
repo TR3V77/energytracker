@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import KpiCard from "../components/KpiCard";
 import EnergyChart from "../components/EnergyChart";
+import RecommendationsPanel from "../components/RecommendationsPanel";
 import { getEnergyData, getNeighborhoods } from "../services/api";
 import { Link } from "react-router-dom";
 
@@ -66,6 +67,8 @@ const NoDataState = () => (
 
 export default function Dashboard() {
   const [data, setData] = useState([]);
+  const [neighborhoods, setNeighborhoods] = useState([]);
+  const [selectedNeighborhoodId, setSelectedNeighborhoodId] = useState("all");
   const [households_by_neighborhood_id, set_households_by_neighborhood_id] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -81,6 +84,7 @@ export default function Dashboard() {
       const rows = Array.isArray(energy_res.data) ? energy_res.data : [];
       setData(rows);
       const nh_list = Array.isArray(neighborhoods_res.data) ? neighborhoods_res.data : [];
+      setNeighborhoods(nh_list);
       const map = {};
       for (const n of nh_list) {
         map[n.neighborhood_id] = n.households;
@@ -98,12 +102,30 @@ export default function Dashboard() {
     fetchData();
   }, []);
 
-  const row_kwh = (record) => Number(record.total_kwh ?? 0) || 0;
-  const total_kwh = data.reduce((sum, record) => sum + row_kwh(record), 0);
-  const average_kwh = data.length ? (total_kwh / data.length).toFixed(2) : 0;
-  const peak_kwh = data.length ? Math.max(...data.map(row_kwh)) : 0;
+  const selectedNeighborhoodNumericId =
+    selectedNeighborhoodId === "all" ? null : Number(selectedNeighborhoodId);
+  const filteredData =
+    selectedNeighborhoodNumericId == null
+      ? data
+      : data.filter((d) => Number(d.neighborhood_id) === selectedNeighborhoodNumericId);
 
-  const neighborhood_ids_in_data = [...new Set(data.map((d) => d.neighborhood_id))];
+  const sortedNeighborhoods = React.useMemo(() => {
+    const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
+    return [...neighborhoods].sort((a, b) => {
+      const aName = a?.neighborhood_name ?? "";
+      const bName = b?.neighborhood_name ?? "";
+      const byName = collator.compare(aName, bName);
+      if (byName !== 0) return byName;
+      return Number(a?.neighborhood_id ?? 0) - Number(b?.neighborhood_id ?? 0);
+    });
+  }, [neighborhoods]);
+
+  const row_kwh = (record) => Number(record.total_kwh ?? 0) || 0;
+  const total_kwh = filteredData.reduce((sum, record) => sum + row_kwh(record), 0);
+  const average_kwh = filteredData.length ? (total_kwh / filteredData.length).toFixed(2) : 0;
+  const peak_kwh = filteredData.length ? Math.max(...filteredData.map(row_kwh)) : 0;
+
+  const neighborhood_ids_in_data = [...new Set(filteredData.map((d) => d.neighborhood_id))];
   const households_represented = neighborhood_ids_in_data.reduce(
     (sum, id) => sum + (households_by_neighborhood_id[id] ?? 0),
     0
@@ -197,7 +219,7 @@ export default function Dashboard() {
           unit="kWh"
           gradient="linear-gradient(135deg, #0066cc, #004999)"
           icon="⚡"
-          subtitle={`${data.length} records`}
+          subtitle={`${filteredData.length} records`}
         />
         
         <ColoredKpiCard 
@@ -226,19 +248,43 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* Chart Section */}
-      <div className="card border-0 shadow-sm">
-        <div className="card-header bg-transparent border-0 pt-4 px-4">
-          <h5 className="mb-0">Energy Consumption Over Time</h5>
-        </div>
-        <div className="card-body">
-          {data.length > 0 ? (
-            <EnergyChart data={data} />
-          ) : (
-            <div className="text-center py-5 bg-light rounded-3">
-              <p className="text-muted mb-0">No data available. Please upload a file first.</p>
+      {/* Chart + Recommendations Panel - Two Column Layout */}
+      <div className="row g-4">
+        <div className="col-lg-8">
+          <div className="card border-0 shadow-sm">
+            <div className="card-header bg-transparent border-0 pt-4 px-4">
+              <div className="d-flex justify-content-between align-items-center gap-3 flex-wrap">
+                <h5 className="mb-0">Energy Consumption Over Time</h5>
+                <select
+                  className="form-select form-select-sm"
+                  style={{ maxWidth: "260px" }}
+                  value={selectedNeighborhoodId}
+                  onChange={(e) => setSelectedNeighborhoodId(e.target.value)}
+                  aria-label="Filter by neighborhood"
+                >
+                  <option value="all">All neighborhoods</option>
+                  {sortedNeighborhoods.map((n) => (
+                    <option key={n.neighborhood_id} value={String(n.neighborhood_id)}>
+                      {n.neighborhood_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
-          )}
+            <div className="card-body">
+              {filteredData.length > 0 ? (
+                <EnergyChart data={filteredData} />
+              ) : (
+                <div className="text-center py-5 bg-light rounded-3">
+                  <p className="text-muted mb-0">No data available for the selected neighborhood.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="col-lg-4">
+          <RecommendationsPanel limit={3} />
         </div>
       </div>
 
@@ -250,11 +296,11 @@ export default function Dashboard() {
               <h6 className="text-muted mb-3">Date Range</h6>
               <div className="d-flex justify-content-between">
                 <span className="fw-bold">Records:</span>
-                <span>{data.length} entries</span>
+                <span>{filteredData.length} entries</span>
               </div>
               <div className="d-flex justify-content-between mt-2">
                 <span className="fw-bold">Neighborhoods:</span>
-                <span>{new Set(data.map((d) => d.neighborhood_id)).size}</span>
+                <span>{new Set(filteredData.map((d) => d.neighborhood_id)).size}</span>
               </div>
             </div>
           </div>

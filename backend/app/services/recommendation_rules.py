@@ -104,7 +104,8 @@ def evaluate_recommendation_rules(
             deduped_recommendations[recommendation_id] = candidate
             return
 
-        if priority_rank[candidate["priority"]] > priority_rank[existing["priority"]]:
+        if (priority_rank[candidate["priority"]]
+                > priority_rank[existing["priority"]]):
             deduped_recommendations[recommendation_id] = candidate
 
     # Rule 1: strong performance
@@ -116,14 +117,18 @@ def evaluate_recommendation_rules(
             message=(
                 f"{neighborhood} is performing efficiently. "
                 f"Efficiency score ({efficiency_score:.2f} kWh/household) "
-                f"is at or below the efficient cutoff ({efficient_cutoff:.2f})."
+                f"is at or below the efficient cutoff "
+                f"({efficient_cutoff:.2f})."
             ),
         )
         add_recommendation(
             recommendation_id="community_recognition",
             action="Community Recognition",
             priority="low",
-            reason="Neighborhood is already operating below the efficient usage cutoff.",
+            reason=(
+                "Neighborhood is already operating "
+                "below the efficient usage cutoff."
+            ),
             estimated_impact_pct=0.0,
         )
 
@@ -136,21 +141,28 @@ def evaluate_recommendation_rules(
             message=(
                 f"{neighborhood} is above the efficient baseline. "
                 f"Efficiency score ({efficiency_score:.2f} kWh/household) "
-                f"is between {efficient_cutoff:.2f} and {high_cutoff:.2f}."
+                f"is between {efficient_cutoff:.2f} "
+                f"and {high_cutoff:.2f}."
             ),
         )
         add_recommendation(
             recommendation_id="energy_audit",
             action="Schedule Energy Audit",
             priority="medium",
-            reason="Consumption is above the efficient baseline and should be reviewed.",
+            reason=(
+                "Consumption is above the efficient "
+                "baseline and should be reviewed."
+            ),
             estimated_impact_pct=8.0,
         )
         add_recommendation(
             recommendation_id="insulation_improvements",
             action="Insulation Improvements",
             priority="medium",
-            reason="Moderate inefficiency often points to building envelope losses.",
+            reason=(
+                "Moderate inefficiency often points "
+                "to building envelope losses."
+            ),
             estimated_impact_pct=10.0,
         )
 
@@ -177,7 +189,10 @@ def evaluate_recommendation_rules(
             recommendation_id="hvac_upgrades",
             action="HVAC Upgrades",
             priority="high",
-            reason="HVAC improvements are common for high household energy intensity.",
+            reason=(
+                "HVAC improvements are common for "
+                "high household energy intensity."
+            ),
             estimated_impact_pct=15.0,
         )
         add_recommendation(
@@ -204,19 +219,26 @@ def evaluate_recommendation_rules(
             recommendation_id="hvac_upgrades",
             action="HVAC Upgrades",
             priority="high",
-            reason="Critical overuse strengthens the case for HVAC modernization.",
+            reason=(
+                "Critical overuse strengthens the "
+                "case for HVAC modernization."
+            ),
             estimated_impact_pct=18.0,
         )
         add_recommendation(
             recommendation_id="insulation_improvements",
             action="Insulation Improvements",
             priority="high",
-            reason="Critical overuse may also reflect major envelope inefficiencies.",
+            reason=(
+                "Critical overuse may also reflect "
+                "major envelope inefficiencies."
+            ),
             estimated_impact_pct=14.0,
         )
 
     # Rule 5: unusually high total usage for the population size
-    if households > 0 and avg_kwh_per_household_total >= threshold * 1.10:
+    if (households > 0
+            and avg_kwh_per_household_total >= threshold * 1.10):
         add_condition(
             condition_id="high_per_household_load",
             name="High Per-Household Load",
@@ -230,7 +252,10 @@ def evaluate_recommendation_rules(
             recommendation_id="demand_response_outreach",
             action="Demand Response Outreach",
             priority="medium",
-            reason="High household load may benefit from peak-reduction participation.",
+            reason=(
+                "High household load may benefit from "
+                "peak-reduction participation."
+            ),
             estimated_impact_pct=6.0,
         )
 
