@@ -26,7 +26,9 @@ def test_invalid_neighborhood(client):
     assert response.status_code == 404
 
 
-@pytest.mark.skip(reason="date_trunc requires PostgreSQL, not available in SQLite test DB")
+@pytest.mark.skip(
+    reason="date_trunc requires PostgreSQL, not available in SQLite test DB"
+)
 def test_valid_granularity(client):
     response = client.get("/api/dashboard?granularity=week")
     assert response.status_code == 200
