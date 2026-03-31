@@ -71,7 +71,7 @@ const RecommendationsPanel = ({ limit = 3 }) => {
         <div className="card-body text-center py-4">
           <div className="display-6 mb-2">💡</div>
           <h6 className="fw-bold mb-1">No Recommendations</h6>
-          <p className="text-muted small mb-0">Upload data to get AI-powered insights.</p>
+          <p className="text-muted small mb-0">Upload data to get recommendations.</p>
           <Link to="/upload" className="btn btn-sm btn-outline-primary mt-3 rounded-pill">
             Upload Data
           </Link>
@@ -84,7 +84,7 @@ const RecommendationsPanel = ({ limit = 3 }) => {
     <div className="card border-0 shadow-sm h-100">
       <div className="card-header bg-transparent border-0 pt-3 px-3 d-flex justify-content-between align-items-center">
         <h6 className="fw-bold mb-0">
-          <span className="me-1">💡</span> AI Recommendations
+          <span className="me-1">💡</span> Recommendations
         </h6>
         <span className="badge bg-primary rounded-pill small">{recommendations.length}</span>
       </div>

@@ -359,7 +359,7 @@ const Recommendations = () => {
 
   if (loading) return (
     <div className="recommendations-page">
-      <h2 className="mb-4">AI-Powered Recommendations</h2>
+      <h2 className="mb-4">Recommendations</h2>
       <div className="text-center py-5">
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
@@ -371,7 +371,7 @@ const Recommendations = () => {
 
   if (error) return (
     <div className="recommendations-page">
-      <h2 className="mb-4">AI-Powered Recommendations</h2>
+      <h2 className="mb-4">Recommendations</h2>
       <div className="card border-0 shadow-sm">
         <div className="card-body text-center py-5">
           <div className="display-1 mb-4 text-danger">⚠️</div>
@@ -389,7 +389,7 @@ const Recommendations = () => {
     <div className="recommendations-page">
       {/* Header */}
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="fw-bold mb-0">AI-Powered Recommendations</h2>
+        <h2 className="fw-bold mb-0">Recommendations</h2>
         <div className="dropdown">
           <button className="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
             📄 Export
