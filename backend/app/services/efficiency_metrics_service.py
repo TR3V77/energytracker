@@ -8,7 +8,9 @@ from sqlalchemy import func, select
 from app.extensions import db
 from app.models.energy_record import EnergyRecord
 from app.models.neighborhood import Neighborhood
-from app.utils.date_window import VALID_WINDOWS, get_window_start_date, parse_iso_date
+from app.utils.date_window import (
+    VALID_WINDOWS, get_window_start_date, parse_iso_date,
+)
 
 
 def get_efficiency_metrics(
