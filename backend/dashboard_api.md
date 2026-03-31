@@ -122,7 +122,7 @@ All successful responses include:
   "has_data": false,
   "generated_at": "2026-02-26T18:05:12Z",
   "unit": "kwh",
-  "message": "Upload data to view your dashboard.",
+  "message": "No dashboard data found for the selected filters.",
   "filters": {
     "window": "90d",
     "neighborhood_id": "all",
