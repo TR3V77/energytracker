@@ -5,10 +5,6 @@ from app.services.recommendations_service import get_recommendations
 
 @pytest.fixture
 def mock_metrics(monkeypatch):
-    """
-    Allows us to fake the metrics returned from get_efficiency_metrics
-    so we can test deterministic rule behavior.
-    """
     def _mock(data):
         monkeypatch.setattr(
             "app.services.recommendations_service.get_efficiency_metrics",
@@ -74,7 +70,6 @@ def test_recommendation_count_range(mock_metrics):
 
     results = get_recommendations(threshold=400)
 
-    # high band must return 3
     assert 1 <= len(results) <= 3
 
 
@@ -87,7 +82,7 @@ def test_multiple_neighborhoods(mock_metrics):
 
     results = get_recommendations(threshold=400)
 
-    # 1 + 2 + 3 = 6 total recommendations
+    # 1 + 2 + 3 = 6
     assert len(results) == 6
 
 
@@ -100,7 +95,6 @@ def test_actions_match_correct_trigger(mock_metrics):
 
     actions = {r["action"] for r in results}
 
-    # medium triggers only these two
     assert actions == {
         "Schedule Energy Audit",
         "Insulation Improvements"
