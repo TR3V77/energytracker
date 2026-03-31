@@ -31,6 +31,7 @@ def trends():
     return jsonify({"trends": trends_data}), 200
 
 
+@analytics_bp.route('/api/recommendations')
 @analytics_bp.route('/api/analytics/recommendations')
 def recommendations():
     """Get rule-based energy recommendations."""
@@ -48,4 +49,13 @@ def recommendations():
         anchor_date=anchor_date,
     )
 
-    return jsonify({"recommendations": recs}), 200
+    if not recs:
+        return jsonify({
+            "recommendations": recs,
+            "message": "No recommendations triggered for the selected filters."
+        }), 200
+
+    return jsonify({
+        "recommendations": recs,
+        "message": "Recommendations generated successfully."
+    }), 200
