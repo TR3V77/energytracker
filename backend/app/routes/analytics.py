@@ -31,20 +31,31 @@ def trends():
     return jsonify({"trends": trends_data}), 200
 
 
+@analytics_bp.route('/api/recommendations')
 @analytics_bp.route('/api/analytics/recommendations')
 def recommendations():
     """Get rule-based energy recommendations."""
     threshold = request.args.get(
         "threshold", default=400.0, type=float
     )
-
     window = request.args.get("window", default="30d")
     neighborhood_id = request.args.get("neighborhood_id", type=int)
+    anchor_date = request.args.get("anchor_date")
 
     recs = recommendations_service.get_recommendations(
         threshold=threshold,
         window=window,
         neighborhood_id=neighborhood_id,
+        anchor_date=anchor_date,
     )
 
-    return jsonify({"recommendations": recs}), 200
+    if not recs:
+        return jsonify({
+            "recommendations": recs,
+            "message": "No recommendations triggered for the selected filters."
+        }), 200
+
+    return jsonify({
+        "recommendations": recs,
+        "message": "Recommendations generated successfully."
+    }), 200

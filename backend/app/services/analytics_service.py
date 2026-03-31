@@ -60,24 +60,3 @@ def get_trends(
     """
     # TODO: Implement trend calculation
     return []
-
-
-def get_recommendations(
-    threshold: float = 400.0
-) -> List[Dict[str, float | int | str]]:
-    """Generate rule-based recommendations.
-
-    If efficiency_score > threshold, recommend energy reduction.
-    Each recommendation should include estimated_impact_pct.
-
-    Expected return shape per item:
-        {
-            "neighborhood_id": int,
-            "neighborhood": str,
-            "efficiency_score": float,
-            "estimated_impact_pct": float,
-            "recommendation": str,
-        }
-    """
-    # TODO: Implement recommendation logic
-    return []

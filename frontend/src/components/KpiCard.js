@@ -2,17 +2,32 @@
 import React from "react";
 
 export default function KpiCard({ title, value, unit, trend }) {
+  const getTrendClass = () => {
+    if (!trend) return "";
+    if (trend.includes('✅')) return "text-success";
+    if (trend.includes('⚠️')) return "text-warning";
+    if (trend.includes('🔴')) return "text-danger";
+    return "text-muted";
+  };
+
   return (
-    <div className="p-4 bg-white rounded shadow border">
-      <div className="text-gray-500 text-sm">{title}</div>
-      <div className="text-2xl font-bold my-2">
-        {value} {unit}
-      </div>
-      {trend && (
-        <div className="text-sm text-gray-400">
-          {trend}
+    <div className="card h-100 border-0 shadow-sm">
+      <div className="card-body">
+        <h6 className="card-subtitle mb-2 text-muted text-uppercase small">
+          {title}
+        </h6>
+        <div className="d-flex align-items-baseline mb-2">
+          <h2 className="card-title mb-0 display-6 fw-bold">
+            {typeof value === 'number' ? value.toLocaleString() : value}
+          </h2>
+          <span className="ms-2 text-muted small">{unit}</span>
         </div>
-      )}
+        {trend && (
+          <div className={`small fw-medium ${getTrendClass()}`}>
+            {trend}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
