@@ -109,6 +109,17 @@ export default function Dashboard() {
       ? data
       : data.filter((d) => Number(d.neighborhood_id) === selectedNeighborhoodNumericId);
 
+  const sortedNeighborhoods = React.useMemo(() => {
+    const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
+    return [...neighborhoods].sort((a, b) => {
+      const aName = a?.neighborhood_name ?? "";
+      const bName = b?.neighborhood_name ?? "";
+      const byName = collator.compare(aName, bName);
+      if (byName !== 0) return byName;
+      return Number(a?.neighborhood_id ?? 0) - Number(b?.neighborhood_id ?? 0);
+    });
+  }, [neighborhoods]);
+
   const row_kwh = (record) => Number(record.total_kwh ?? 0) || 0;
   const total_kwh = filteredData.reduce((sum, record) => sum + row_kwh(record), 0);
   const average_kwh = filteredData.length ? (total_kwh / filteredData.length).toFixed(2) : 0;
@@ -252,7 +263,7 @@ export default function Dashboard() {
                   aria-label="Filter by neighborhood"
                 >
                   <option value="all">All neighborhoods</option>
-                  {neighborhoods.map((n) => (
+                  {sortedNeighborhoods.map((n) => (
                     <option key={n.neighborhood_id} value={String(n.neighborhood_id)}>
                       {n.neighborhood_name}
                     </option>
