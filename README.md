@@ -142,7 +142,28 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 - **Jira Task:** Tobi - Test recommendations refresh on selection change
 - [PROJ-78](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-78), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/44/overview)
 
+**Davos:** "Served as a cross-functional support role throughout Sprint 2 — helped unblock teammates by reviewing and fixing PRs, resolving merge conflicts, and ensuring CI stayed green. Documented the database schema, enforced code quality standards with flake8 cleanup across the entire backend, fixed broken tests, removed non-production files from main, and prototyped a frontend recommendations display (superseded by PROJ-72). Much of this sprint was spent on support work: helping teammates debug integration issues, getting their branches merge-ready, and keeping the codebase stable as features landed."
 
+- **Jira Task:** Davos - Document DB schema in DBML
+  - [PROJ-64](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-64), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/23)
+
+- **Jira Task:** Davos - Schema validation tests and fix failing tests on main
+  - [PROJ-66](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-66), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/22)
+
+- **Jira Task:** Davos - Frontend: Display recommendations (superseded by PROJ-72, not merged)
+  - [PROJ-73](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-73), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/branch/feature/PROJ-73-frontend-display-recommendations)
+
+- **Jira Task:** Davos - Backend: Flake8 cleanup across codebase
+  - [PROJ-79](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-79), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/43)
+
+- **Jira Task:** Davos - Remove non-production files from main
+  - [PROJ-80](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-80), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/26)
+
+### Davos - Next Steps (Sprint 3)
+- Research Supabase for backend-as-a-service / database hosting
+- Research Redis for caching and data layer performance
+- Research Nginx for reverse proxy and deployment networking
+- Complete PROJ-82: Improve landing page (carried over from Sprint 2)
 
 ## Next Steps
 
