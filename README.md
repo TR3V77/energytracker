@@ -106,6 +106,21 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 - **Jira Task:** Daniel - Backend: Return structured metrics object for rule engine
   - [PROJ-69](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-69), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/32)
 
+
+**Trevor:** "Built the backend metrics service, recommendation rules engine, API endpoint, and unit tests for trigger-based energy recommendations."
+
+- **Jira Task:** Trevor - Implemented backend energy metrics service using SQLAlchemy and PostgreSQL.  
+  - [PROJ-67](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-67), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/31)
+
+- **Jira Task:** Trevor - Built deterministic backend recommendation rules engine.
+  - [PROJ-70](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-70), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/34)
+
+- **Jira Task:** Trevor - Added /api/recommendations endpoint with trigger-based responses. 
+  - [PROJ-71](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-71), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/41)
+
+  - **Jira Task:** Trevor - Added pytest unit tests for recommendation rules engine. 
+  - [PROJ-75](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-75), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/42)
+
 ## Report
 
 ![Burn Up Chart](img/burnupsprint2.png)
