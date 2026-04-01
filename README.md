@@ -75,16 +75,6 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 - **Jira Task:** Daniel - Research: Find Real Dataset
   - [PROJ-54](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-54), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/src/RESEARCH/research/)
 
-**Bruce:** "Cleaned up the visual appeal of the Energy Tracker dashboard and recommendation features. Configured the frontend UI to communicate properly with our backend to populate the dashboard and recommendation features accordingly"
-
-- **Jira Task:** Bruce - Frontend: Dashboard page UI skeleton + data fetch (Implementation)
-  - [PROJ-19](https://bitbucket.org/%7B8cba037a-27d0-4b3a-b3aa-b5f9a5440dca%7D/%7B9caf0e2d-495a-4ee6-bd00-a9ef30cc9c07%7D/pull-requests/28), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/28)
-
-- **Jira Task:** Bruce - Frontend: Create Recommendations Panel component
-  - [PROJ-72](https://bitbucket.org/%7B8cba037a-27d0-4b3a-b3aa-b5f9a5440dca%7D/%7B9caf0e2d-495a-4ee6-bd00-a9ef30cc9c07%7D/pull-requests/39), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/39)
-
-- **Jira Task:** Bruce - Frontend: Remove the upload feature on the frontend tabs.
-  - [PROJ-81](https://bitbucket.org/%7B8cba037a-27d0-4b3a-b3aa-b5f9a5440dca%7D/%7B9caf0e2d-495a-4ee6-bd00-a9ef30cc9c07%7D/pull-requests/38), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/38)
 
 **Trevor:** "provied the database and the data in the database for the dashboard"
 
@@ -116,6 +106,16 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 - **Jira Task:** Daniel - Backend: Return structured metrics object for rule engine
   - [PROJ-69](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-69), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/32)
 
+**Bruce:** "Cleaned up the visual appeal of the Energy Tracker dashboard and recommendation features. Configured the frontend UI to communicate properly with our backend to populate the dashboard and recommendation features accordingly"
+
+- **Jira Task:** Bruce - Frontend: Dashboard page UI skeleton + data fetch (Implementation)
+  - [PROJ-19](https://bitbucket.org/%7B8cba037a-27d0-4b3a-b3aa-b5f9a5440dca%7D/%7B9caf0e2d-495a-4ee6-bd00-a9ef30cc9c07%7D/pull-requests/28), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/28)
+
+- **Jira Task:** Bruce - Frontend: Create Recommendations Panel component
+  - [PROJ-72](https://bitbucket.org/%7B8cba037a-27d0-4b3a-b3aa-b5f9a5440dca%7D/%7B9caf0e2d-495a-4ee6-bd00-a9ef30cc9c07%7D/pull-requests/39), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/39)
+
+- **Jira Task:** Bruce - Frontend: Remove the upload feature on the frontend tabs.
+  - [PROJ-81](https://bitbucket.org/%7B8cba037a-27d0-4b3a-b3aa-b5f9a5440dca%7D/%7B9caf0e2d-495a-4ee6-bd00-a9ef30cc9c07%7D/pull-requests/38), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/38)
 
 **Trevor:** "Built the backend metrics service, recommendation rules engine, API endpoint, and unit tests for trigger-based energy recommendations."
 
