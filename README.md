@@ -121,10 +121,6 @@ Cities are increasingly focused on sustainability and reducing environmental imp
   - **Jira Task:** Trevor - Added pytest unit tests for recommendation rules engine. 
   - [PROJ-75](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-75), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/42)
 
-## Report
-
-![Burn Up Chart](img/burnupsprint2.png)
-
 ## Next Steps
 
 - **1.** Connect frontend to new endpoints
@@ -132,6 +128,10 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 - **2.** Add endpoint integration tests
 
 - **3.** Finalize UI display logic
+
+## Report
+
+![Burn Up Chart](img/burnupsprint2.png)
 
 #### CSV Upload & Data Validation
 - Upload energy consumption CSV files
