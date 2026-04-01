@@ -75,9 +75,6 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 - **Jira Task:** Daniel - Research: Find Real Dataset
   - [PROJ-54](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-54), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/src/RESEARCH/research/)
   
-- **Jira Task:** Daniel - Backend: Integrate DB layer into existing endpoints
-  - [PROJ-53](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-53), [Bitbucket *NOT MERGED*]()
-  
 
 **Trevor:** "provied the database and the data in the database for the dashboard"
 
@@ -93,6 +90,25 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 ## Report
 
 ![Burn Up Chart](img/burnupsprint1.png)
+
+## Sprint 2
+
+### Contributions
+
+**Daniel:** "Provided backend implementation for recommendations engine. Wrapped up dashboard integration for API endpoints for dashboad. Assisted teammates with ensuring backend & frontend communicating properly"
+
+- **Jira Task:** Daniel - Backend: Integrate DB layer into existing endpoints
+  - [PROJ-53](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-53), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/21)
+
+- **Jira Task:** Daniel - Backend: Calculate rule-driven energy metrics
+  - [PROJ-68](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-68), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/24)
+
+- **Jira Task:** Daniel - Backend: Return structured metrics object for rule engine
+  - [PROJ-69](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-69), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/32)
+
+## Report
+
+![Burn Up Chart]()
 
 #### CSV Upload & Data Validation
 - Upload energy consumption CSV files
