@@ -125,6 +125,14 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 
 ![Burn Up Chart](img/burnupsprint2.png)
 
+## Next Steps
+
+- **1.** Connect frontend to new endpoints
+
+- **2.** Add endpoint integration tests
+
+- **3.** Finalize UI display logic
+
 #### CSV Upload & Data Validation
 - Upload energy consumption CSV files
 - Validate schema (columns, types, missing values)
