@@ -74,10 +74,7 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 
 - **Jira Task:** Daniel - Research: Find Real Dataset
   - [PROJ-54](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-54), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/src/RESEARCH/research/)
-  
-- **Jira Task:** Daniel - Backend: Integrate DB layer into existing endpoints
-  - [PROJ-53](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-53), [Bitbucket *NOT MERGED*]()
-  
+
 
 **Trevor:** "provied the database and the data in the database for the dashboard"
 
@@ -93,6 +90,71 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 ## Report
 
 ![Burn Up Chart](img/burnupsprint1.png)
+
+## Sprint 2
+
+### Contributions
+
+**Daniel:** "Provided backend implementation for recommendations engine. Wrapped up dashboard integration for API endpoints for dashboad. Assisted teammates with ensuring backend & frontend communicating properly"
+
+- **Jira Task:** Daniel - Backend: Integrate DB layer into existing endpoints
+  - [PROJ-53](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-53), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/21)
+
+- **Jira Task:** Daniel - Backend: Calculate rule-driven energy metrics
+  - [PROJ-68](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-68), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/24)
+
+- **Jira Task:** Daniel - Backend: Return structured metrics object for rule engine
+  - [PROJ-69](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-69), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/32)
+
+**Bruce:** "Cleaned up the visual appeal of the Energy Tracker dashboard and recommendation features. Configured the frontend UI to communicate properly with our backend to populate the dashboard and recommendation features accordingly"
+
+- **Jira Task:** Bruce - Frontend: Dashboard page UI skeleton + data fetch (Implementation)
+  - [PROJ-19](https://bitbucket.org/%7B8cba037a-27d0-4b3a-b3aa-b5f9a5440dca%7D/%7B9caf0e2d-495a-4ee6-bd00-a9ef30cc9c07%7D/pull-requests/28), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/28)
+
+- **Jira Task:** Bruce - Frontend: Create Recommendations Panel component
+  - [PROJ-72](https://bitbucket.org/%7B8cba037a-27d0-4b3a-b3aa-b5f9a5440dca%7D/%7B9caf0e2d-495a-4ee6-bd00-a9ef30cc9c07%7D/pull-requests/39), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/39)
+
+- **Jira Task:** Bruce - Frontend: Remove the upload feature on the frontend tabs.
+  - [PROJ-81](https://bitbucket.org/%7B8cba037a-27d0-4b3a-b3aa-b5f9a5440dca%7D/%7B9caf0e2d-495a-4ee6-bd00-a9ef30cc9c07%7D/pull-requests/38), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/38)
+
+**Trevor:** "Built the backend metrics service, recommendation rules engine, API endpoint, and unit tests for trigger-based energy recommendations."
+
+- **Jira Task:** Trevor - Implemented backend energy metrics service using SQLAlchemy and PostgreSQL.  
+  - [PROJ-67](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-67), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/31)
+
+- **Jira Task:** Trevor - Built deterministic backend recommendation rules engine.
+  - [PROJ-70](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-70), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/34)
+
+- **Jira Task:** Trevor - Added /api/recommendations endpoint with trigger-based responses. 
+  - [PROJ-71](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-71), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/41)
+
+  - **Jira Task:** Trevor - Added pytest unit tests for recommendation rules engine. 
+  - [PROJ-75](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-75), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/42)
+
+**Tobi:** "Worked on backend/API testing and frontend unit tests for the Recommendations feature, including setting up Jest, validating UI rendering, and handling API mismatch and merge conflicts while integrating with the main branch."
+
+- **Jira Task:** Tobi - Write integration tests for GET /api/recommendations using minimal seeded database data
+- [PROJ-76](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-76), [Bitbucket](https://bitbucket.org/%7B8cba037a-27d0-4b3a-b3aa-b5f9a5440dca%7D/%7B9caf0e2d-495a-4ee6-bd00-a9ef30cc9c07%7D/pull-requests/27)
+
+- **Jira Task:** Tobi -Write Vitest and React Testing Library tests for the Recommendations Panel component using mocked API responses.
+- [PROJ-77](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1/backlog?selectedIssue=PROJ-77), [Bitbucket](https://bitbucket.org/%7B8cba037a-27d0-4b3a-b3aa-b5f9a5440dca%7D/%7B9caf0e2d-495a-4ee6-bd00-a9ef30cc9c07%7D/pull-requests/37)
+
+- **Jira Task:** Tobi - Test recommendations refresh on selection change
+- [PROJ-78](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-78), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/44/overview)
+
+
+
+## Next Steps
+
+- **1.** Connect frontend to new endpoints
+
+- **2.** Add endpoint integration tests
+
+- **3.** Finalize UI display logic
+
+## Report
+
+![Burn Up Chart](img/burnupsprint2.png)
 
 #### CSV Upload & Data Validation
 - Upload energy consumption CSV files
