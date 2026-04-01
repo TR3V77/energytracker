@@ -108,7 +108,7 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 
 ## Report
 
-![Burn Up Chart]()
+![Burn Up Chart](img/burnupsprint2.png)
 
 #### CSV Upload & Data Validation
 - Upload energy consumption CSV files
