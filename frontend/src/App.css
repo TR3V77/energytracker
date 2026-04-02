@@ -148,3 +148,74 @@ nav a:hover {
 .recommendation-item .badge {
   font-size: 0.7rem;
 }
+
+/* Home page */
+.home-page .hero {
+  background: linear-gradient(135deg, #2c3e50 0%, #004999 100%);
+  border-radius: 1rem;
+  color: #fff;
+  padding: 3.5rem 2rem;
+}
+
+.home-page .hero p {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.home-page .feature-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  opacity: 0;
+  animation: fadeInUp 0.4s ease forwards;
+}
+
+.home-page .feature-card:nth-child(1) { animation-delay: 0.1s; }
+.home-page .feature-card:nth-child(2) { animation-delay: 0.2s; }
+.home-page .feature-card:nth-child(3) { animation-delay: 0.3s; }
+
+.home-page .feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.12) !important;
+}
+
+.home-page .feature-card .accent {
+  height: 4px;
+}
+
+.home-page .info-card {
+  border-radius: 0.75rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  opacity: 0;
+  animation: fadeInUp 0.4s ease forwards;
+  animation-delay: 0.35s;
+}
+
+.home-page .info-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+}
+
+.home-page .step-number {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0066cc, #004999);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.home-page .tech-item {
+  padding: 0.5rem 0.75rem;
+  background: #f8f9fa;
+  border-radius: 0.5rem;
+  transition: background 0.2s ease;
+}
+
+.home-page .tech-item:hover {
+  background: #e9ecef;
+}
