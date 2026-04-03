@@ -1,45 +1,17 @@
-from datetime import date
-from typing import Optional, List, Dict, Any
-
 """Analytics services for rankings, trends, and recommendations."""
+
+from datetime import date
+from typing import Any, Dict, List, Optional
+
+from app.services.efficiency_metrics_service import list_efficiency_rankings
 
 
 def get_efficiency_rankings(
     date_from: Optional[date] = None,
     date_to: Optional[date] = None,
 ) -> Dict[str, List[Dict[str, Any]]]:
-    """Compute efficiency rankings for neighborhoods.
-
-    Returns:
-        {
-            "rankings": [
-                {
-                    "neighborhood_id": int,
-                    "name": str,
-                    "efficiency": float,
-                    "score": float
-                },
-                ...
-            ]
-        }
-    """
-    # TODO: Implement aggregation query
-    # **TEMP MOCK DATA WHILE AWAITING DB QUERY**
-    rankings: List[Dict[str, Any]] = [
-        {
-            "neighborhood_id": 1,
-            "name": "Downtown",
-            "efficiency": 435.3,
-            "score": 435.3,
-        },
-        {
-            "neighborhood_id": 2,
-            "name": "Southside",
-            "efficiency": 390.1,
-            "score": 390.1,
-        },
-    ]
-
+    """Compute efficiency rankings for neighborhoods from stored readings."""
+    rankings = list_efficiency_rankings(date_from=date_from, date_to=date_to)
     return {"rankings": rankings}
 
 
