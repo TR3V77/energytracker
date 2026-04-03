@@ -1,5 +1,6 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify, request
 
+from app.exceptions import ServiceError
 from app.services import dashboard_service
 
 dashboard_bp = Blueprint("dashboard", __name__)
@@ -12,10 +13,13 @@ def dashboard_overview():
     neighborhood_id = request.args.get("neighborhood_id", default="1")
     granularity = request.args.get("granularity", default="day")
 
-    response_body, status_code = dashboard_service.get_dashboard_overview(
-        window=window,
-        neighborhood_id_raw=neighborhood_id,
-        granularity=granularity,
-    )
+    try:
+        response_body = dashboard_service.get_dashboard_overview(
+            window=window,
+            neighborhood_id_raw=neighborhood_id,
+            granularity=granularity,
+        )
+    except ServiceError as err:
+        return jsonify({"error": err.message}), err.status_code
 
-    return jsonify(response_body), status_code
+    return jsonify(response_body), 200
