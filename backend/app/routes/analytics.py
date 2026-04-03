@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 
+from app.exceptions import ServiceError
 from app.services import analytics_service
 from app.services import recommendations_service
 from app.utils.date_window import parse_iso_date
@@ -42,12 +43,15 @@ def recommendations():
     neighborhood_id = request.args.get("neighborhood_id", type=int)
     anchor_date = request.args.get("anchor_date")
 
-    recs = recommendations_service.get_recommendations(
-        threshold=threshold,
-        window=window,
-        neighborhood_id=neighborhood_id,
-        anchor_date=anchor_date,
-    )
+    try:
+        recs = recommendations_service.get_recommendations(
+            threshold=threshold,
+            window=window,
+            neighborhood_id=neighborhood_id,
+            anchor_date=anchor_date,
+        )
+    except ServiceError as err:
+        return jsonify({"error": err.message}), err.status_code
 
     if not recs:
         return jsonify({

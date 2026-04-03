@@ -5,6 +5,7 @@ from datetime import date
 
 from sqlalchemy import func, select
 
+from app.exceptions import ServiceError
 from app.extensions import db
 from app.models.energy_record import EnergyRecord
 from app.models.neighborhood import Neighborhood
@@ -29,14 +30,24 @@ def get_efficiency_metrics(
             "total_kwh": float,
             "efficiency_score": float,  # total_kwh / households
         }
+
+    Raises:
+        ServiceError: 400 if ``window`` or ``anchor_date`` is invalid.
+        Valid filters with no matching readings return an empty list.
     """
     normalized_window = window.strip().lower()
     if normalized_window not in VALID_WINDOWS:
-        return []
+        raise ServiceError(
+            "invalid window; expected: '30d', '90d', or 'all'",
+            status_code=400,
+        )
 
     parsed_anchor_date: Optional[date] = parse_iso_date(anchor_date)
     if anchor_date and parsed_anchor_date is None:
-        return []
+        raise ServiceError(
+            "anchor_date must be YYYY-MM-DD",
+            status_code=400,
+        )
 
     energy_filters = []
     if neighborhood_id is not None:
