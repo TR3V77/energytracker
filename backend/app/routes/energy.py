@@ -28,7 +28,11 @@ def get_energy_records():
 def get_energy_metrics():
     """Get aggregated energy metrics for recommendation system."""
     neighborhood_id = request.args.get("neighborhood_id", type=int)
-    time_window = request.args.get("time_window", default="30d")
+    time_window = (
+        request.args.get("time_window")
+        or request.args.get("window")
+        or "30d"
+    )
     anchor_date = request.args.get("anchor_date")
 
     if neighborhood_id is None:
