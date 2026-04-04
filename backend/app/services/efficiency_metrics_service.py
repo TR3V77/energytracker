@@ -5,6 +5,7 @@ from datetime import date
 
 from sqlalchemy import func, select
 
+from app.exceptions import ServiceError
 from app.extensions import db
 from app.models.energy_record import EnergyRecord
 from app.models.neighborhood import Neighborhood
@@ -29,14 +30,24 @@ def get_efficiency_metrics(
             "total_kwh": float,
             "efficiency_score": float,  # total_kwh / households
         }
+
+    Raises:
+        ServiceError: 400 if ``window`` or ``anchor_date`` is invalid.
+        Valid filters with no matching readings return an empty list.
     """
     normalized_window = window.strip().lower()
     if normalized_window not in VALID_WINDOWS:
-        return []
+        raise ServiceError(
+            "invalid window; expected: '30d', '90d', or 'all'",
+            status_code=400,
+        )
 
     parsed_anchor_date: Optional[date] = parse_iso_date(anchor_date)
     if anchor_date and parsed_anchor_date is None:
-        return []
+        raise ServiceError(
+            "anchor_date must be YYYY-MM-DD",
+            status_code=400,
+        )
 
     energy_filters = []
     if neighborhood_id is not None:
@@ -108,3 +119,63 @@ def get_efficiency_metrics(
         )
 
     return metrics
+
+
+def list_efficiency_rankings(
+    date_from: date | None = None,
+    date_to: date | None = None,
+) -> list[dict[str, Any]]:
+    """Aggregate kWh per neighborhood and rank by kWh per household (desc).
+
+    Uses the same join and efficiency definition as ``get_efficiency_metrics``.
+    Optional ``date_from`` / ``date_to`` bound ``EnergyRecord.date`` (inclusive).
+    """
+    energy_filters: list[Any] = []
+    if date_from is not None:
+        energy_filters.append(EnergyRecord.date >= date_from)
+    if date_to is not None:
+        energy_filters.append(EnergyRecord.date <= date_to)
+
+    total_kwh_expr = func.coalesce(
+        func.sum(EnergyRecord.total_kwh), 0
+    ).label("total_kwh")
+
+    stmt = (
+        select(
+            Neighborhood.neighborhood_id,
+            Neighborhood.neighborhood_name,
+            Neighborhood.households,
+            total_kwh_expr,
+        )
+        .select_from(Neighborhood)
+        .join(
+            EnergyRecord,
+            EnergyRecord.neighborhood_id == Neighborhood.neighborhood_id,
+        )
+    )
+    if energy_filters:
+        stmt = stmt.where(*energy_filters)
+    stmt = stmt.group_by(
+        Neighborhood.neighborhood_id,
+        Neighborhood.neighborhood_name,
+        Neighborhood.households,
+    ).having(Neighborhood.households > 0)
+
+    rows = db.session.execute(stmt).all()
+
+    rankings: list[dict[str, Any]] = []
+    for row in rows:
+        households = int(row.households or 0)
+        total_kwh = float(row.total_kwh or 0)
+        score = total_kwh / households
+        rankings.append(
+            {
+                "neighborhood_id": int(row.neighborhood_id),
+                "name": row.neighborhood_name,
+                "efficiency": score,
+                "score": score,
+            }
+        )
+
+    rankings.sort(key=lambda r: r["score"], reverse=True)
+    return rankings

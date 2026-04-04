@@ -1,39 +1,52 @@
-from datetime import datetime, timedelta
-from typing import Literal, Any
+from __future__ import annotations
 
-from sqlalchemy import func
+from typing import Any, Literal
 
+from sqlalchemy import func, select
+
+from app.extensions import db
 from app.models.energy_record import EnergyRecord
 from app.models.neighborhood import Neighborhood
+from app.utils.date_window import (
+    VALID_WINDOWS,
+    get_window_start_date,
+    normalize_window,
+    parse_iso_date,
+)
 
 TimeWindow = Literal["30d", "90d", "all"]
 
 
 def get_all_neighborhoods():
     """Return all neighborhoods ordered by name."""
-    return Neighborhood.query.order_by(Neighborhood.neighborhood_name).all()
+    stmt = select(Neighborhood).order_by(Neighborhood.neighborhood_name)
+    return db.session.scalars(stmt).all()
 
 
 def get_energy_data(
-        neighborhood_id=None,
-        start_date=None,
-        end_date=None,
+    neighborhood_id=None,
+    start_date=None,
+    end_date=None,
 ):
     """Query energy records with optional filters."""
-    query = EnergyRecord.query
+    stmt = select(EnergyRecord).order_by(EnergyRecord.date.asc())
 
     if neighborhood_id is not None:
-        query = query.filter(EnergyRecord.neighborhood_id == neighborhood_id)
+        stmt = stmt.where(EnergyRecord.neighborhood_id == neighborhood_id)
 
     if start_date:
-        parsed_start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
-        query = query.filter(EnergyRecord.date >= parsed_start_date)
+        parsed_start = parse_iso_date(start_date)
+        if parsed_start is None:
+            raise ValueError("start_date must be YYYY-MM-DD")
+        stmt = stmt.where(EnergyRecord.date >= parsed_start)
 
     if end_date:
-        parsed_end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
-        query = query.filter(EnergyRecord.date <= parsed_end_date)
+        parsed_end = parse_iso_date(end_date)
+        if parsed_end is None:
+            raise ValueError("end_date must be YYYY-MM-DD")
+        stmt = stmt.where(EnergyRecord.date <= parsed_end)
 
-    return query.order_by(EnergyRecord.date.asc()).all()
+    return db.session.scalars(stmt).all()
 
 
 def get_neighborhood_energy_metrics(
@@ -41,32 +54,43 @@ def get_neighborhood_energy_metrics(
     time_window: TimeWindow = "30d",
     anchor_date: str | None = None,
 ) -> dict[str, Any]:
-    """Return aggregated energy metrics for a neighborhood and time window."""
+    """Return aggregated energy metrics for a neighborhood and time window.
 
-    neighborhood = Neighborhood.query.filter(
-        Neighborhood.neighborhood_id == neighborhood_id
-    ).first()
+    Window and anchor semantics match ``efficiency_metrics_service`` and
+    ``dashboard_service``: ``all`` means from earliest data up to and including
+    the resolved end date (anchor or latest reading).
+    """
+    normalized_window = normalize_window(time_window)
+    if normalized_window not in VALID_WINDOWS:
+        raise ValueError("time_window must be one of: '30d', '90d', 'all'")
+
+    neighborhood = db.session.execute(
+        select(Neighborhood).where(
+            Neighborhood.neighborhood_id == neighborhood_id
+        )
+    ).scalar_one_or_none()
 
     if neighborhood is None:
         raise ValueError(f"Neighborhood '{neighborhood_id}' not found.")
 
-    if anchor_date:
-        try:
-            end_date = datetime.strptime(anchor_date, "%Y-%m-%d").date()
-        except ValueError:
-            raise ValueError("anchor_date must be in YYYY-MM-DD format")
-    else:
-        latest_record_date = (
-            EnergyRecord.query.with_entities(func.max(EnergyRecord.date))
-            .filter(EnergyRecord.neighborhood_id == neighborhood_id)
-            .scalar()
-        )
+    parsed_anchor = parse_iso_date(anchor_date) if anchor_date else None
+    if anchor_date and parsed_anchor is None:
+        raise ValueError("anchor_date must be in YYYY-MM-DD format")
 
-        if latest_record_date is None:
+    if parsed_anchor is not None:
+        end_date = parsed_anchor
+    else:
+        end_date = db.session.execute(
+            select(func.max(EnergyRecord.date)).where(
+                EnergyRecord.neighborhood_id == neighborhood_id
+            )
+        ).scalar_one()
+
+        if end_date is None:
             return {
                 "neighborhood_id": neighborhood.neighborhood_id,
                 "neighborhood_name": neighborhood.neighborhood_name,
-                "time_window": time_window,
+                "time_window": normalized_window,
                 "anchor_date": anchor_date,
                 "date_range": {
                     "start": None,
@@ -84,31 +108,19 @@ def get_neighborhood_energy_metrics(
                 "daily_data": [],
             }
 
-        end_date = latest_record_date
+    filters = [
+        EnergyRecord.neighborhood_id == neighborhood_id,
+        EnergyRecord.date <= end_date,
+    ]
 
-    start_date = None
+    window_start = None
+    if normalized_window != "all":
+        window_start = get_window_start_date(normalized_window, end_date)
+        if window_start is not None:
+            filters.append(EnergyRecord.date >= window_start)
 
-    if time_window == "30d":
-        start_date = end_date - timedelta(days=30)
-    elif time_window == "90d":
-        start_date = end_date - timedelta(days=90)
-    elif time_window == "all":
-        start_date = None
-    else:
-        raise ValueError("time_window must be one of: '30d', '90d', 'all'")
-
-    query = EnergyRecord.query.filter(
-        EnergyRecord.neighborhood_id == neighborhood_id
-    )
-
-    if start_date is not None:
-        query = query.filter(EnergyRecord.date >= start_date)
-
-    if time_window != "all":
-        query = query.filter(EnergyRecord.date <= end_date)
-
-    daily_results = (
-        query.with_entities(
+    daily_stmt = (
+        select(
             EnergyRecord.date.label("day"),
             func.sum(EnergyRecord.total_kwh).label("total_kwh"),
             func.avg(EnergyRecord.total_kwh).label("avg_kwh"),
@@ -116,21 +128,20 @@ def get_neighborhood_energy_metrics(
             func.min(EnergyRecord.total_kwh).label("min_kwh"),
             func.count(EnergyRecord.id).label("reading_count"),
         )
+        .where(*filters)
         .group_by(EnergyRecord.date)
         .order_by(EnergyRecord.date)
-        .all()
     )
+    daily_results = db.session.execute(daily_stmt).all()
 
-    summary = (
-        query.with_entities(
-            func.sum(EnergyRecord.total_kwh).label("total_kwh"),
-            func.avg(EnergyRecord.total_kwh).label("avg_kwh"),
-            func.max(EnergyRecord.total_kwh).label("peak_kwh"),
-            func.min(EnergyRecord.total_kwh).label("min_kwh"),
-            func.count(EnergyRecord.id).label("reading_count"),
-        )
-        .first()
-    )
+    summary_stmt = select(
+        func.coalesce(func.sum(EnergyRecord.total_kwh), 0).label("total_kwh"),
+        func.avg(EnergyRecord.total_kwh).label("avg_kwh"),
+        func.max(EnergyRecord.total_kwh).label("peak_kwh"),
+        func.min(EnergyRecord.total_kwh).label("min_kwh"),
+        func.count(EnergyRecord.id).label("reading_count"),
+    ).where(*filters)
+    summary = db.session.execute(summary_stmt).one()
 
     daily_data = [
         {
@@ -155,10 +166,10 @@ def get_neighborhood_energy_metrics(
     return {
         "neighborhood_id": neighborhood.neighborhood_id,
         "neighborhood_name": neighborhood.neighborhood_name,
-        "time_window": time_window,
+        "time_window": normalized_window,
         "anchor_date": anchor_date if anchor_date else end_date.isoformat(),
         "date_range": {
-            "start": start_date.isoformat() if start_date else None,
+            "start": window_start.isoformat() if window_start else None,
             "end": end_date.isoformat(),
         },
         "summary": {

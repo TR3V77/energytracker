@@ -1,14 +1,14 @@
+"""Service-layer logic for the dashboard overview endpoint (/api/dashboard)."""
+
 from typing import Any
 
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 
+from app.exceptions import ServiceError
 from app.extensions import db
 from app.models.energy_record import EnergyRecord
 from app.models.neighborhood import Neighborhood
 from app.utils.date_window import VALID_WINDOWS, get_window_start_date
-
-
-"""Service-layer logic for the dashboard overview endpoint (/api/dashboard)."""
 
 
 VALID_GRANULARITIES = {"day", "week"}
@@ -18,27 +18,30 @@ def get_dashboard_overview(
     window: str = "30d",
     neighborhood_id_raw: str = "1",
     granularity: str = "day",
-) -> tuple[dict[str, Any], int]:
+) -> dict[str, Any]:
     """Return dashboard KPI and time series data for request filters."""
     normalized_window = window.strip().lower()
     normalized_granularity = granularity.strip().lower()
 
     if normalized_window not in VALID_WINDOWS:
-        return {
-            "error": "invalid window; expected: '30d', '90d', or 'all'"
-        }, 400
+        raise ServiceError(
+            "invalid window; expected: '30d', '90d', or 'all'",
+            status_code=400,
+        )
 
     if normalized_granularity not in VALID_GRANULARITIES:
-        return {
-            "error": "invalid granularity; expected: 'day' or 'week'"
-        }, 400
+        raise ServiceError(
+            "invalid granularity; expected: 'day' or 'week'",
+            status_code=400,
+        )
 
     try:
         neighborhood_id = int(neighborhood_id_raw)
-    except (TypeError, ValueError):
-        return {
-            "error": "invalid neighborhood_id; expected an integer"
-        }, 400
+    except (TypeError, ValueError) as exc:
+        raise ServiceError(
+            "invalid neighborhood_id; expected an integer",
+            status_code=400,
+        ) from exc
 
     neighborhood_exists = db.session.execute(
         select(func.count())
@@ -47,7 +50,7 @@ def get_dashboard_overview(
     ).scalar_one()
 
     if neighborhood_exists == 0:
-        return {"error": "neighborhood not found"}, 404
+        raise ServiceError("neighborhood not found", status_code=404)
 
     latest_record_date = db.session.execute(
         select(func.max(EnergyRecord.date))
@@ -66,9 +69,12 @@ def get_dashboard_overview(
             "message": "no dashboard data found for the selected filters",
             "kpis": None,
             "time_series": [],
-        }, 200
+        }
 
-    filter_conditions = [EnergyRecord.neighborhood_id == neighborhood_id]
+    filter_conditions = [
+        EnergyRecord.neighborhood_id == neighborhood_id,
+        EnergyRecord.date <= latest_record_date,
+    ]
 
     start_date = get_window_start_date(
         normalized_window, latest_record_date
@@ -98,7 +104,7 @@ def get_dashboard_overview(
             "message": "no dashboard data found for the selected filters",
             "kpis": None,
             "time_series": [],
-        }, 200
+        }
 
     total_kwh = float(
         db.session.execute(
@@ -155,7 +161,7 @@ def get_dashboard_overview(
             },
         },
         "time_series": time_series,
-    }, 200
+    }
 
 
 def _get_period_expression(granularity: str):
