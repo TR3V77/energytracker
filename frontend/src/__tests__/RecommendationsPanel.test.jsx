@@ -1,14 +1,8 @@
-import "@testing-library/jest-dom";
-import { render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { render, screen, waitFor } from "@testing-library/react";
+import { describe, test, expect } from "@jest/globals";
 import RecommendationsPanel from "../components/RecommendationsPanel";
-import * as api from "../services/api";
 
-jest.mock("../services/api");
-
-jest.mock("../utils/recommendations", () => ({
-  flattenRecommendationsPayload: (data) => data,
-}));
+global.fetch = jest.fn();
 
 describe("RecommendationsPanel", () => {
   afterEach(() => {
@@ -16,40 +10,38 @@ describe("RecommendationsPanel", () => {
   });
 
   test("renders recommendations when data exists", async () => {
-    api.getRecommendations.mockResolvedValue({
-      data: [
+    fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => [
         {
-          rowKey: "1",
-          message: "High energy usage",
-          priority: "high",
+          trigger: "High kWh usage",
+          actions: ["Improve insulation", "Upgrade HVAC"],
         },
       ],
     });
 
-    render(
-      <MemoryRouter>
-        <RecommendationsPanel />
-      </MemoryRouter>
-    );
+    render(<RecommendationsPanel neighborhood="Downtown" />);
 
-    expect(
-      await screen.findByText(/high energy usage/i)
-    ).toBeInTheDocument();
-  });
-
-  test("renders empty state when no data", async () => {
-    api.getRecommendations.mockResolvedValue({
-      data: [],
+    await waitFor(() => {
+      expect(screen.getByText("High kWh usage")).toBeInTheDocument();
     });
 
-    render(
-      <MemoryRouter>
-        <RecommendationsPanel />
-      </MemoryRouter>
-    );
+    expect(screen.getByText("Improve insulation")).toBeInTheDocument();
+    expect(screen.getByText("Upgrade HVAC")).toBeInTheDocument();
+  });
 
-    expect(
-      await screen.findByText(/no recommendations/i)
-    ).toBeInTheDocument();
+  test("renders empty state when no recommendations", async () => {
+    fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => [],
+    });
+
+    render(<RecommendationsPanel neighborhood="Downtown" />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("No recommendations for this selection.")
+      ).toBeInTheDocument();
+    });
   });
 });

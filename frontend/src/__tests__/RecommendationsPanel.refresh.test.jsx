@@ -1,14 +1,10 @@
+<<<<<<< HEAD
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
 import RecommendationsPanel from "../components/RecommendationsPanel";
 import * as api from "../services/api";
 
 jest.mock("../services/api");
-
-jest.mock("../utils/recommendations", () => ({
-  flattenRecommendationsPayload: (data) => data,
-}));
 
 describe("RecommendationsPanel - refresh behavior", () => {
   afterEach(() => {
@@ -16,45 +12,74 @@ describe("RecommendationsPanel - refresh behavior", () => {
   });
 
   test("re-fetches and updates when neighborhood changes", async () => {
-    // First API response
+    // First response
     api.getRecommendations.mockResolvedValueOnce({
       data: [
         {
-          rowKey: "1",
           message: "Old Data",
           priority: "low",
         },
       ],
+=======
+import { render, screen, waitFor } from "@testing-library/react";
+import { describe, test, expect } from "@jest/globals";
+import RecommendationsPanel from "../components/RecommendationsPanel";
+
+global.fetch = vi.fn();
+
+describe("RecommendationsPanel - refresh on prop change", () => {
+
+  test("re-fetches and updates when neighborhood changes", async () => {
+    
+    // 🥇 First API response (Downtown)
+    fetch.mockResolvedValueOnce({
+      json: async () => [
+        { trigger: "Old Data", actions: ["Action A"] }
+      ]
+>>>>>>> origin/main
     });
 
     const { rerender } = render(
-      <MemoryRouter>
-        <RecommendationsPanel neighborhood="Downtown" />
-      </MemoryRouter>
+      <RecommendationsPanel neighborhood="Downtown" />
     );
 
+<<<<<<< HEAD
     // Wait for first render
     expect(await screen.findByText("Old Data")).toBeInTheDocument();
 
-    // Second API response
+    // Second response
     api.getRecommendations.mockResolvedValueOnce({
       data: [
         {
-          rowKey: "2",
           message: "New Data",
           priority: "high",
         },
       ],
     });
 
-    // Trigger re-fetch by changing prop
-    rerender(
-      <MemoryRouter>
-        <RecommendationsPanel neighborhood="Riverside" />
-      </MemoryRouter>
-    );
+    // Change prop → triggers useEffect again
+    rerender(<RecommendationsPanel neighborhood="Riverside" />);
 
     // Wait for updated UI
     expect(await screen.findByText("New Data")).toBeInTheDocument();
   });
+=======
+    // ✅ Wait for first render
+    expect(await screen.findByText("Old Data")).toBeInTheDocument();
+
+    // 🥈 Second API response (Riverside)
+    fetch.mockResolvedValueOnce({
+      json: async () => [
+        { trigger: "New Data", actions: ["Action B"] }
+      ]
+    });
+
+    // 🔁 Change prop (THIS is the key part)
+    rerender(<RecommendationsPanel neighborhood="Riverside" />);
+
+    // ✅ Wait for updated UI
+    expect(await screen.findByText("New Data")).toBeInTheDocument();
+  });
+
+>>>>>>> origin/main
 });
