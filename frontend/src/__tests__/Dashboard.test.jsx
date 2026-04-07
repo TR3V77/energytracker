@@ -1,66 +1,89 @@
-import { render, screen, waitFor } from "@testing-library/react";
-import Dashboard from "../pages/Dashboard";
-import * as api from "../services/api";
+import { render, screen, waitFor } from '@testing-library/react';
+import Dashboard from '../pages/Dashboard';
+import * as api from '../services/api';
+import { MemoryRouter } from 'react-router-dom';
 
-// Helper to mock API
-const mockApi = (mockResponse) => {
-  jest.spyOn(api, "getEnergyData").mockResolvedValue(mockResponse);
-};
+// ✅ Mock API layer (correct level)
+jest.mock('../services/api');
 
-describe("Dashboard Component", () => {
+// ✅ Mock RecommendationsPanel to prevent extra API noise
+jest.mock('../components/RecommendationsPanel', () => () => (
+  <div>Mock Recommendations</div>
+));
+
+describe('Dashboard Component', () => {
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    jest.clearAllMocks();
   });
 
-  // ✅ 1. No Data Test
-  test("renders upload prompt when no data exists", async () => {
-    mockApi({
-      hasData: false,
-      message: "No data available"
-    });
+  // ✅ 1. Error state
+  test('renders error message when API fails', async () => {
+    api.getEnergyData.mockRejectedValueOnce(new Error('Network Error'));
+    api.getNeighborhoods.mockResolvedValueOnce({ data: [] });
 
-    render(<Dashboard />);
+    render(
+      <MemoryRouter>
+        <Dashboard />
+      </MemoryRouter>
+    );
 
-    const message = await screen.findByText(/no data/i);
-    expect(message).toBeInTheDocument();
+    const errorMessage = await screen.findByText(/failed to load dashboard data/i);
+    expect(errorMessage).toBeTruthy();
   });
 
-  // ✅ 2. Data Exists Test
-  test("renders KPI cards and chart when data exists", async () => {
-    mockApi({
-      hasData: true,
-      kpis: {
-        total_kwh: 318.8,
-        avg_kwh_per_household: 2.12,
-        neighborhood_count: 3
-      },
-      timeseries: [
-        { date: "2025-01-01", kwh: 100 },
-        { date: "2025-01-02", kwh: 120 }
+  // ✅ 2. No data state
+  test('renders no data state', async () => {
+    api.getEnergyData.mockResolvedValueOnce({ data: [] });
+    api.getNeighborhoods.mockResolvedValueOnce({ data: [] });
+
+    render(
+      <MemoryRouter>
+        <Dashboard />
+      </MemoryRouter>
+    );
+
+    const message = await screen.findByText(/no data available/i);
+    expect(message).toBeTruthy();
+  });
+
+  // ✅ 3. Data exists
+  test('renders KPI cards when data exists', async () => {
+    api.getEnergyData.mockResolvedValueOnce({
+      data: [
+        { total_kwh: 100, neighborhood_id: 1 },
+        { total_kwh: 218, neighborhood_id: 1 }
       ]
     });
 
-    render(<Dashboard />);
-
-    const totalKwh = await screen.findByText(/318/i);
-    expect(totalKwh).toBeInTheDocument();
-
-    await waitFor(() => {
-      const chartContainer = document.querySelector(".recharts-responsive-container");
-      expect(chartContainer).toBeTruthy();
+    api.getNeighborhoods.mockResolvedValueOnce({
+      data: [
+        { neighborhood_id: 1, households: 10, neighborhood_name: 'Downtown' }
+      ]
     });
-  });
 
-  // ✅ 3. Loading State Test (adjusted to match your UI)
-  test("renders default state while fetching data", () => {
-    jest.spyOn(api, "getEnergyData").mockImplementation(
-      () => new Promise(() => {})
+    render(
+      <MemoryRouter>
+        <Dashboard />
+      </MemoryRouter>
     );
 
-    render(<Dashboard />);
+    const totalKwh = await screen.findByText(/318/i);
+    expect(totalKwh).toBeTruthy();
+  });
 
-    expect(screen.getByText(/total consumption/i)).toBeInTheDocument();
+  // ✅ 4. Loading state
+  test('renders loading state initially', () => {
+    api.getEnergyData.mockImplementation(() => new Promise(() => {}));
+    api.getNeighborhoods.mockImplementation(() => new Promise(() => {}));
+
+    render(
+      <MemoryRouter>
+        <Dashboard />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText(/loading dashboard/i)).toBeTruthy();
   });
 
 });
