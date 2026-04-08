@@ -171,11 +171,14 @@ def list_efficiency_rankings(
         rankings.append(
             {
                 "neighborhood_id": int(row.neighborhood_id),
-                "name": row.neighborhood_name,
+                "neighborhood_name": row.neighborhood_name,
                 "efficiency": score,
-                "score": score,
+                "households": households,
+                "total_kwh": total_kwh,
             }
         )
 
-    rankings.sort(key=lambda r: r["score"], reverse=True)
+    rankings.sort(key=lambda r: r["efficiency"])
+    for i, entry in enumerate(rankings, start=1):
+        entry["rank"] = i
     return rankings
