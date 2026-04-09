@@ -124,8 +124,8 @@ def get_efficiency_metrics(
 def list_efficiency_rankings(
     date_from: date | None = None,
     date_to: date | None = None,
-) -> list[dict[str, Any]]:
-    """Aggregate kWh per neighborhood and rank by kWh per household (desc).
+) -> dict[str, list[dict[str, Any]]]:
+    """Aggregate kWh per neighborhood and rank by kWh per household (asc).
 
     Uses the same join and efficiency definition as ``get_efficiency_metrics``.
     Optional ``date_from`` / ``date_to`` bound ``EnergyRecord.date`` (inclusive).
@@ -159,26 +159,49 @@ def list_efficiency_rankings(
         Neighborhood.neighborhood_id,
         Neighborhood.neighborhood_name,
         Neighborhood.households,
-    ).having(Neighborhood.households > 0)
+    )
 
     rows = db.session.execute(stmt).all()
+    return _build_ranked_efficiency_list(rows)
 
+
+def _build_ranked_efficiency_list(rows: list[Any]) -> dict[str, list[dict[str, Any]]]:
+    """Build deterministic rankings and capture excluded-row warnings."""
     rankings: list[dict[str, Any]] = []
+    warnings: list[dict[str, Any]] = []
+
     for row in rows:
         households = int(row.households or 0)
+        if households <= 0:
+            warnings.append(
+                {
+                    "neighborhood_id": int(row.neighborhood_id),
+                    "neighborhood_name": row.neighborhood_name,
+                    "reason": "excluded due to non-positive households",
+                }
+            )
+            continue
+
         total_kwh = float(row.total_kwh or 0)
-        score = total_kwh / households
+        efficiency = total_kwh / households
         rankings.append(
             {
                 "neighborhood_id": int(row.neighborhood_id),
                 "neighborhood_name": row.neighborhood_name,
-                "efficiency": score,
+                "efficiency": efficiency,
                 "households": households,
                 "total_kwh": total_kwh,
             }
         )
 
-    rankings.sort(key=lambda r: r["efficiency"])
-    for i, entry in enumerate(rankings, start=1):
-        entry["rank"] = i
-    return rankings
+    rankings.sort(
+        key=lambda r: (
+            r["efficiency"],
+            r["neighborhood_name"],
+            r["neighborhood_id"],
+        )
+    )
+    for idx, row in enumerate(rankings, start=1):
+        row["rank"] = idx
+
+    return {"rankings": rankings, "warnings": warnings}
