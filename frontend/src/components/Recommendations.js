@@ -297,6 +297,7 @@ const Recommendations = () => {
 
   const fetchRecommendations = async () => {
     setLoading(true);
+     setError(null); 
     try {
       const response = await getRecommendations({});
       const raw = response.data?.recommendations ?? response.data ?? [];
