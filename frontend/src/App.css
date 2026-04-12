@@ -16,35 +16,7 @@ body {
   padding: 2rem;
 }
 
-nav {
-  background-color: #2c3e50;
-  padding: 1rem 2rem;
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-}
-
-nav h1 {
-  color: #ecf0f1;
-  font-size: 1.4rem;
-}
-
-nav ul {
-  list-style: none;
-  display: flex;
-  gap: 1.5rem;
-}
-
-nav a {
-  color: #bdc3c7;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-nav a:hover {
-  color: #ecf0f1;
-}
-
+/* Dashboard styles */
 .dashboard .card {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   border-radius: 0.5rem;
@@ -53,10 +25,6 @@ nav a:hover {
 .dashboard .card:hover {
   transform: translateY(-2px);
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-}
-
-.dashboard .card-title {
-  color: #2c3e50;
 }
 
 /* Loading spinner */
@@ -73,11 +41,7 @@ nav a:hover {
   padding: 3rem !important;
 }
 
-/* Grid layout - using Bootstrap's grid instead of custom grid */
-.row.g-4 {
-  margin-bottom: 1.5rem;
-}
-
+/* Recommendations page */
 .recommendations-page .card {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   border-radius: 0.75rem;
@@ -117,6 +81,7 @@ nav a:hover {
   }
 }
 
+/* Recommendations list scrollbar */
 .recommendations-list {
   scrollbar-width: thin;
 }
@@ -149,7 +114,7 @@ nav a:hover {
   font-size: 0.7rem;
 }
 
-/* Home page */
+/* Home page styles */
 .home-page .hero {
   background: linear-gradient(135deg, #2c3e50 0%, #004999 100%);
   border-radius: 1rem;
@@ -218,4 +183,35 @@ nav a:hover {
 
 .home-page .tech-item:hover {
   background: #e9ecef;
+}
+
+/* Trends page styles */
+.trends-page .card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.trends-page .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Rankings page styles */
+.rankings-page .card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.rankings-page .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Upload page styles */
+.upload-page pre {
+  font-size: 0.75rem;
+  overflow-x: auto;
+}
+
+/* Compare page styles */
+.compare-page .card {
+  min-height: 400px;
 }

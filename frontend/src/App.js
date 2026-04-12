@@ -1,25 +1,25 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import Home from './pages/Home';
-import Dashboard from './pages/Dashboard';
-import Compare from './pages/Compare';
-import EfficiencyRankings from './components/EfficiencyRankings';
-import TrendAnalysis from './components/TrendAnalysis';
-import Recommendations from './components/Recommendations';
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import Navbar from "./navigation/components/Navbar";
+import { HomePage } from "./features/home/components/HomePage";
+import { DashboardPage } from "./features/dashboard/components/DashboardPage";
+import { RankingsPage } from "./features/rankings/components/RankingsPage";
+import { TrendsPage } from "./features/trends/components/TrendsPage";
+import { RecommendationsPage } from "./features/recommendations/components/RecommendationsPage";
+import { ComparePage } from "./features/compare/components/ComparePage";
 
 function App() {
   return (
     <div className="App">
       <Navbar />
-      <main className="container">
+      <main className="container py-4">
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/compare" element={<Compare />} />
-          <Route path="/rankings" element={<EfficiencyRankings />} />
-          <Route path="/trends" element={<TrendAnalysis />} />
-          <Route path="/recommendations" element={<Recommendations />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/rankings" element={<RankingsPage />} />
+          <Route path="/trends" element={<TrendsPage />} />
+          <Route path="/recommendations" element={<RecommendationsPage />} />
+          <Route path="/compare" element={<ComparePage />} />
         </Routes>
       </main>
     </div>
