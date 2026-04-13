@@ -9,7 +9,7 @@ export const RankingsTableRow = ({ rank, neighborhoodName, efficiency, household
     <td>{neighborhoodName}</td>
     <td>
       <span className={`badge ${status.badgeClass}`}>
-        {efficiency.toLocaleString()} kWh/household
+        {typeof efficiency === 'number' ? efficiency.toLocaleString() : efficiency} kWh/household
       </span>
     </td>
     <td>{households.toLocaleString()}</td>

@@ -1,14 +1,12 @@
 import { useState, useEffect, useMemo } from "react";
 import { getEfficiencyRankings } from "../../../services/api";
-import { DEFAULT_RANKINGS } from "../constants/rankingsConfig";
-import { calculateEfficiencyScore } from "../services/efficiencyCalculatorService";
 import { getEfficiencyStatus } from "../services/efficiencyStatusService";
-import { sortByEfficiencyAscending } from "../services/efficiencyCalculatorService";
 
 export const useRankingsData = () => {
   const [rankings, setRankings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [warnings, setWarnings] = useState([]);
   const [usingMockData, setUsingMockData] = useState(false);
 
   useEffect(() => {
@@ -18,24 +16,22 @@ export const useRankingsData = () => {
       try {
         const response = await getEfficiencyRankings({});
         
-        if (response.data && Array.isArray(response.data) && response.data.length > 0) {
-          const transformed = response.data.map((item) => ({
-            neighborhood_name: item.neighborhood_name || item.neighborhood || "Unknown",
-            households: item.households || 0,
-            total_kwh: item.total_kwh || 0,
-            efficiency: calculateEfficiencyScore(item.total_kwh, item.households),
-          }));
-          setRankings(transformed);
+        // Direct consumption of backend response
+        if (response.data && response.data.rankings && Array.isArray(response.data.rankings) && response.data.rankings.length > 0) {
+          // Backend already provides rank, neighborhood_name, efficiency, households, total_kwh
+          setRankings(response.data.rankings);
+          setWarnings(response.data.warnings || []);
           setUsingMockData(false);
         } else {
-          setRankings(DEFAULT_RANKINGS);
-          setUsingMockData(true);
+          // No data case - but keep structure consistent
+          setRankings([]);
+          setWarnings([]);
+          setUsingMockData(false);
         }
       } catch (err) {
         console.error("Error fetching rankings:", err);
-        setRankings(DEFAULT_RANKINGS);
-        setUsingMockData(true);
-        setError(null);
+        setError(err.message || "Failed to load rankings");
+        setUsingMockData(false);
       } finally {
         setLoading(false);
       }
@@ -44,14 +40,20 @@ export const useRankingsData = () => {
     fetchRankings();
   }, []);
 
+  // Only add status enrichment - no transformation needed
   const enrichedRankings = useMemo(() => {
-    const sorted = sortByEfficiencyAscending(rankings);
-    return sorted.map((item, index) => ({
-      ...item,
-      rank: index + 1,
+    return rankings.map((item) => ({
+      ...item,  // Keep all original fields: rank, neighborhood_name, efficiency, households, total_kwh
       status: getEfficiencyStatus(item.efficiency),
     }));
   }, [rankings]);
 
-  return { rankings: enrichedRankings, loading, error, usingMockData, refetch: () => window.location.reload() };
+  return { 
+    rankings: enrichedRankings, 
+    warnings,
+    loading, 
+    error, 
+    usingMockData, 
+    refetch: () => window.location.reload() 
+  };
 };

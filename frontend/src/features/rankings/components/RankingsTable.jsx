@@ -21,10 +21,10 @@ export const RankingsTable = ({ rankings }) => (
               <RankingsTableRow
                 key={item.rank}
                 rank={item.rank}
-                neighborhoodName={item.neighborhood_name}
-                efficiency={item.efficiency}
+                neighborhoodName={item.neighborhood_name}  // snake_case from backend
+                efficiency={item.efficiency}               // directly from backend
                 households={item.households}
-                totalKwh={item.total_kwh}
+                totalKwh={item.total_kwh}                  // snake_case from backend
                 status={item.status}
               />
             ))}
