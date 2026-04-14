@@ -45,11 +45,13 @@ def test_low_priority_recommendation(mock_metrics):
 
     results = get_recommendations(threshold=400)
     flat = _flatten_by_neighborhood(results)
+    rec_ids = [r["id"] for r in flat]
 
     assert len(results) == 1
-    assert len(flat) == 1
-    assert flat[0]["priority"] == "low"
-    assert flat[0]["action"] == "Community Recognition"
+    assert rec_ids == [
+        "community_recognition",
+        "demand_response_outreach",
+    ]
     assert flat[0]["neighborhood"] == "TestVille"
 
 
@@ -58,17 +60,10 @@ def test_medium_priority_returns_two_recommendations(mock_metrics):
 
     results = get_recommendations(threshold=400)
     flat = _flatten_by_neighborhood(results)
+    rec_ids = [r["id"] for r in flat]
 
     assert len(results) == 1
-    assert len(flat) == 2
-
-    for r in flat:
-        assert r["priority"] == "medium"
-
-    actions = {r["action"] for r in flat}
-
-    assert "Schedule Energy Audit" in actions
-    assert "Insulation Improvements" in actions
+    assert rec_ids == ["energy_audit", "insulation_improvements"]
 
 
 def test_high_priority_recommendations(mock_metrics):
@@ -76,24 +71,26 @@ def test_high_priority_recommendations(mock_metrics):
 
     results = get_recommendations(threshold=400)
     flat = _flatten_by_neighborhood(results)
+    rec_ids = [r["id"] for r in flat]
 
     assert len(results) == 1
-    assert len(flat) >= 3
+    assert rec_ids == [
+        "efficiency_upgrade",
+        "hvac_upgrades",
+        "weatherization_assistance",
+        "insulation_improvements",
+        "demand_response_outreach",
+        "energy_audit",
+    ]
 
-    actions = {r["action"] for r in flat}
 
-    assert "Efficiency Upgrade" in actions
-    assert "HVAC Upgrades" in actions
-    assert "Weatherization Assistance" in actions
-
-
-def test_recommendation_count_range(mock_metrics):
+def test_recommendations_are_deterministic(mock_metrics):
     mock_metrics([_sample_metric(name="Test", efficiency_score=500)])
 
-    results = get_recommendations(threshold=400)
-    flat = _flatten_by_neighborhood(results)
+    first = get_recommendations(threshold=400)
+    second = get_recommendations(threshold=400)
 
-    assert 1 <= len(flat) <= 8
+    assert first == second
 
 
 def test_multiple_neighborhoods(mock_metrics):
@@ -115,8 +112,7 @@ def test_multiple_neighborhoods(mock_metrics):
     flat = _flatten_by_neighborhood(results)
 
     assert len(results) == 3
-    high_count = len(_flatten_by_neighborhood([results[2]]))
-    assert len(flat) == 1 + 2 + high_count
+    assert len(flat) == 10
 
 
 def test_actions_match_correct_trigger(mock_metrics):
@@ -124,10 +120,16 @@ def test_actions_match_correct_trigger(mock_metrics):
 
     results = get_recommendations(threshold=400)
     flat = _flatten_by_neighborhood(results)
+    rec_ids = [r["id"] for r in flat]
+    assert rec_ids == ["energy_audit", "insulation_improvements"]
 
-    actions = {r["action"] for r in flat}
 
-    assert actions == {
-        "Schedule Energy Audit",
-        "Insulation Improvements",
-    }
+def test_estimated_impact_is_consistently_rounded(mock_metrics):
+    mock_metrics([_sample_metric(name="HighCity", efficiency_score=500)])
+
+    results = get_recommendations(threshold=400)
+    flat = _flatten_by_neighborhood(results)
+
+    for recommendation in flat:
+        rounded = round(float(recommendation["estimated_impact_pct"]), 1)
+        assert recommendation["estimated_impact_pct"] == rounded

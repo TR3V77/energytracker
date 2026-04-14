@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from typing import Any
 
+from app.services.recommendation_mapping import get_recommendation_ids_for_triggers
+from app.services.recommendations_catalog import get_catalog_recommendation
+
 
 def _safe_divide(numerator: float, denominator: float) -> float:
     """Return numerator / denominator, protecting against division by zero."""
@@ -44,7 +47,7 @@ def evaluate_recommendation_rules(
 
     Rules are deterministic:
     - Same input metrics -> same outputs
-    - Recommendation duplicates are removed by recommendation id
+    - Recommendation output is catalog-backed and deduplicated by id
     """
 
     neighborhood_id = int(metrics.get("neighborhood_id", 0))
@@ -60,7 +63,7 @@ def evaluate_recommendation_rules(
     avg_kwh_per_household_total = _safe_divide(total_kwh, households)
 
     triggered_conditions: list[dict[str, Any]] = []
-    deduped_recommendations: dict[str, dict[str, Any]] = {}
+    triggered_ids: list[str] = []
 
     def add_condition(
         condition_id: str,
@@ -77,36 +80,8 @@ def evaluate_recommendation_rules(
             }
         )
 
-    def add_recommendation(
-        recommendation_id: str,
-        action: str,
-        priority: str,
-        reason: str,
-        estimated_impact_pct: float,
-    ) -> None:
-        """
-        Deduplicate by recommendation id.
-        If the same recommendation is triggered by multiple rules,
-        keep the highest-priority version.
-        """
-        priority_rank = {"low": 1, "medium": 2, "high": 3}
-
-        candidate = {
-            "id": recommendation_id,
-            "action": action,
-            "priority": priority,
-            "reason": reason,
-            "estimated_impact_pct": round(float(estimated_impact_pct), 1),
-        }
-
-        existing = deduped_recommendations.get(recommendation_id)
-        if existing is None:
-            deduped_recommendations[recommendation_id] = candidate
-            return
-
-        if (priority_rank[candidate["priority"]]
-                > priority_rank[existing["priority"]]):
-            deduped_recommendations[recommendation_id] = candidate
+    def add_trigger(trigger_id: str) -> None:
+        triggered_ids.append(trigger_id)
 
     # Rule 1: strong performance
     if efficiency_score <= efficient_cutoff:
@@ -121,16 +96,7 @@ def evaluate_recommendation_rules(
                 f"({efficient_cutoff:.2f})."
             ),
         )
-        add_recommendation(
-            recommendation_id="community_recognition",
-            action="Community Recognition",
-            priority="low",
-            reason=(
-                "Neighborhood is already operating "
-                "below the efficient usage cutoff."
-            ),
-            estimated_impact_pct=0.0,
-        )
+        add_trigger("efficient_usage")
 
     # Rule 2: moderate inefficiency
     if efficient_cutoff < efficiency_score < high_cutoff:
@@ -145,26 +111,7 @@ def evaluate_recommendation_rules(
                 f"and {high_cutoff:.2f}."
             ),
         )
-        add_recommendation(
-            recommendation_id="energy_audit",
-            action="Schedule Energy Audit",
-            priority="medium",
-            reason=(
-                "Consumption is above the efficient "
-                "baseline and should be reviewed."
-            ),
-            estimated_impact_pct=8.0,
-        )
-        add_recommendation(
-            recommendation_id="insulation_improvements",
-            action="Insulation Improvements",
-            priority="medium",
-            reason=(
-                "Moderate inefficiency often points "
-                "to building envelope losses."
-            ),
-            estimated_impact_pct=10.0,
-        )
+        add_trigger("moderate_inefficiency")
 
     # Rule 3: high inefficiency
     if efficiency_score >= high_cutoff:
@@ -178,30 +125,7 @@ def evaluate_recommendation_rules(
                 f"is above {high_cutoff:.2f}."
             ),
         )
-        add_recommendation(
-            recommendation_id="efficiency_upgrade",
-            action="Efficiency Upgrade",
-            priority="high",
-            reason="Consumption is above the configured threshold.",
-            estimated_impact_pct=12.0,
-        )
-        add_recommendation(
-            recommendation_id="hvac_upgrades",
-            action="HVAC Upgrades",
-            priority="high",
-            reason=(
-                "HVAC improvements are common for "
-                "high household energy intensity."
-            ),
-            estimated_impact_pct=15.0,
-        )
-        add_recommendation(
-            recommendation_id="weatherization_assistance",
-            action="Weatherization Assistance",
-            priority="high",
-            reason="High usage suggests weatherization opportunities.",
-            estimated_impact_pct=9.0,
-        )
+        add_trigger("high_consumption")
 
     # Rule 4: very high inefficiency
     if efficiency_score >= very_high_cutoff:
@@ -215,26 +139,7 @@ def evaluate_recommendation_rules(
                 f"exceeds the critical cutoff ({very_high_cutoff:.2f})."
             ),
         )
-        add_recommendation(
-            recommendation_id="hvac_upgrades",
-            action="HVAC Upgrades",
-            priority="high",
-            reason=(
-                "Critical overuse strengthens the "
-                "case for HVAC modernization."
-            ),
-            estimated_impact_pct=18.0,
-        )
-        add_recommendation(
-            recommendation_id="insulation_improvements",
-            action="Insulation Improvements",
-            priority="high",
-            reason=(
-                "Critical overuse may also reflect "
-                "major envelope inefficiencies."
-            ),
-            estimated_impact_pct=14.0,
-        )
+        add_trigger("critical_consumption")
 
     # Rule 5: unusually high total usage for the population size
     if (households > 0
@@ -248,24 +153,21 @@ def evaluate_recommendation_rules(
                 f"({avg_kwh_per_household_total:.2f} kWh/household)."
             ),
         )
-        add_recommendation(
-            recommendation_id="demand_response_outreach",
-            action="Demand Response Outreach",
-            priority="medium",
-            reason=(
-                "High household load may benefit from "
-                "peak-reduction participation."
-            ),
-            estimated_impact_pct=6.0,
-        )
+        add_trigger("high_per_household_load")
 
-    recommendations = sorted(
-        deduped_recommendations.values(),
-        key=lambda rec: (
-            {"high": 0, "medium": 1, "low": 2}[rec["priority"]],
-            rec["action"],
-        ),
-    )
+    recommendation_ids = get_recommendation_ids_for_triggers(triggered_ids)
+    recommendations = [
+        {
+            **get_catalog_recommendation(recommendation_id),
+            "estimated_impact_pct": round(
+                float(get_catalog_recommendation(recommendation_id)[
+                    "estimated_impact_pct"
+                ]),
+                1,
+            ),
+        }
+        for recommendation_id in recommendation_ids
+    ]
 
     return {
         "neighborhood_id": neighborhood_id,
