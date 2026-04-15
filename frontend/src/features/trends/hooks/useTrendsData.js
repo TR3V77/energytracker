@@ -1,53 +1,57 @@
-import { useState, useEffect, useMemo } from "react";
-import { getTrends } from "../../../services/api";
-
-const DEFAULT_TRENDS = [
-  { neighborhood: "Downtown", previousValue: 12000, currentValue: 11000, change: -8.3, trend: "down" },
-  { neighborhood: "Riverside", previousValue: 8900, currentValue: 9200, change: 3.4, trend: "up" },
-  { neighborhood: "North Hills", previousValue: 15600, currentValue: 14900, change: -4.5, trend: "down" },
-  { neighborhood: "Westside", previousValue: 14300, currentValue: 15100, change: 5.6, trend: "up" },
-];
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { getTrends, getNeighborhoods } from "../../../services/api";
 
 export const useTrendsData = () => {
   const [trends, setTrends] = useState([]);
+  const [neighborhoods, setNeighborhoods] = useState([]);
+  const [selectedNeighborhood, setSelectedNeighborhood] = useState("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchTrends = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await getTrends({});
-        if (response.data && Array.isArray(response.data) && response.data.length > 0) {
-          setTrends(response.data);
-        } else {
-          setTrends(DEFAULT_TRENDS);
-        }
-      } catch (err) {
-        console.error("Error fetching trends:", err);
-        // Use default trends instead of showing error
-        setTrends(DEFAULT_TRENDS);
-        setError(null);
-      } finally {
-        setLoading(false);
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const params = {};
+      if (selectedNeighborhood !== "all") {
+        params.neighborhood_id = selectedNeighborhood;
       }
-    };
-    fetchTrends();
-  }, []);
+      const [trendsRes, neighborhoodsRes] = await Promise.all([
+        getTrends(params),
+        getNeighborhoods(),
+      ]);
+      const data = trendsRes.data?.trends ?? trendsRes.data ?? [];
+      setTrends(data);
+      const nhList = Array.isArray(neighborhoodsRes.data) ? neighborhoodsRes.data : [];
+      setNeighborhoods(nhList);
+    } catch (err) {
+      console.error("Error fetching trends:", err);
+      setError("Failed to load trend data");
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedNeighborhood]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const summary = useMemo(() => {
     if (trends.length === 0) return null;
 
-    const increasing = trends.filter(t => t.trend === "up");
-    const decreasing = trends.filter(t => t.trend === "down");
-    const increasingPercentage = Math.round((increasing.length / trends.length) * 100);
-    const decreasingPercentage = Math.round((decreasing.length / trends.length) * 100);
-    
-    const averageChange = trends.reduce((sum, t) => sum + t.change, 0) / trends.length;
-    
-    const mostImproved = [...trends].sort((a, b) => a.change - b.change)[0];
-    const needsAttention = [...trends].sort((a, b) => b.change - a.change)[0];
+    const withChange = trends.filter(t => t.pct_change !== null);
+    const increasing = withChange.filter(t => t.pct_change > 0);
+    const decreasing = withChange.filter(t => t.pct_change < 0);
+    const total = increasing.length + decreasing.length;
+    const increasingPercentage = total > 0 ? Math.round((increasing.length / total) * 100) : 0;
+    const decreasingPercentage = total > 0 ? 100 - increasingPercentage : 0;
+
+    const averageChange = withChange.length > 0
+      ? withChange.reduce((sum, t) => sum + t.pct_change, 0) / withChange.length
+      : 0;
+
+    const mostImproved = [...withChange].sort((a, b) => a.pct_change - b.pct_change)[0];
+    const needsAttention = [...withChange].sort((a, b) => b.pct_change - a.pct_change)[0];
 
     return {
       increasingCount: increasing.length,
@@ -55,18 +59,21 @@ export const useTrendsData = () => {
       increasingPercentage,
       decreasingPercentage,
       averageChange,
-      mostImproved: mostImproved?.neighborhood,
-      mostImprovedChange: mostImproved?.change,
-      needsAttention: needsAttention?.neighborhood,
-      needsAttentionChange: needsAttention?.change,
+      mostImproved: mostImproved?.period,
+      mostImprovedChange: mostImproved?.pct_change,
+      needsAttention: needsAttention?.period,
+      needsAttentionChange: needsAttention?.pct_change,
     };
   }, [trends]);
 
-  return { 
-    trends, 
-    summary, 
-    loading, 
-    error, 
-    refetch: () => window.location.reload() 
+  return {
+    trends,
+    neighborhoods,
+    selectedNeighborhood,
+    setSelectedNeighborhood,
+    summary,
+    loading,
+    error,
+    refetch: fetchData,
   };
 };
