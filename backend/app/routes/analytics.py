@@ -21,6 +21,7 @@ def efficiency_rankings():
     return jsonify(data), 200
 
 
+
 @analytics_bp.route('/api/analytics/trends')
 def trends():
     """Get month-over-month consumption trends."""

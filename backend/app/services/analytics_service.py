@@ -16,10 +16,11 @@ def get_efficiency_rankings(
 ) -> Dict[str, List[Dict[str, Any]]]:
     """Compute efficiency rankings for neighborhoods from stored readings."""
     result = list_efficiency_rankings(date_from=date_from, date_to=date_to)
+    
     return {
-        "rankings": result["rankings"],
-        "warnings": result["warnings"],
-    }
+    "rankings": result["rankings"],
+    "warnings": result["warnings"],
+}
 
 
 def get_trends(

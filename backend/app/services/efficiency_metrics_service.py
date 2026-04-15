@@ -124,45 +124,90 @@ def get_efficiency_metrics(
 def list_efficiency_rankings(
     date_from: date | None = None,
     date_to: date | None = None,
-) -> dict[str, list[dict[str, Any]]]:
-    """Aggregate kWh per neighborhood and rank by kWh per household (asc).
-
-    Uses the same join and efficiency definition as ``get_efficiency_metrics``.
-    Optional ``date_from`` / ``date_to`` bound ``EnergyRecord.date`` (inclusive).
-    """
+) -> list[dict[str, Any]]:
+    
     energy_filters: list[Any] = []
     if date_from is not None:
         energy_filters.append(EnergyRecord.date >= date_from)
     if date_to is not None:
         energy_filters.append(EnergyRecord.date <= date_to)
-
+ 
+    # ------------------------------------------------------------------
+    # Core leaderboard query
+    #
+    # SELECT
+    #     n.neighborhood_id,
+    #     n.neighborhood_name,
+    #     n.households,
+    #     COALESCE(SUM(e.total_kwh), 0)           AS total_kwh,
+    #     COALESCE(SUM(e.total_kwh), 0) / n.households AS efficiency_score
+    # FROM neighborhood n
+    # JOIN energy_record e USING (neighborhood_id)
+    # [WHERE e.date BETWEEN :date_from AND :date_to]
+    # GROUP BY n.neighborhood_id, n.neighborhood_name, n.households
+    # HAVING n.households > 0
+    # ORDER BY efficiency_score DESC
+    # ------------------------------------------------------------------
     total_kwh_expr = func.coalesce(
         func.sum(EnergyRecord.total_kwh), 0
-    ).label("total_kwh")
+    )
 
+    efficiency_expr = (
+        total_kwh_expr / func.nullif(Neighborhood.households, 0)
+    )
+ 
     stmt = (
         select(
             Neighborhood.neighborhood_id,
             Neighborhood.neighborhood_name,
             Neighborhood.households,
-            total_kwh_expr,
+            total_kwh_expr.label("total_kwh"),
+            efficiency_expr.label("efficiency_score"),
         )
         .select_from(Neighborhood)
         .join(
             EnergyRecord,
             EnergyRecord.neighborhood_id == Neighborhood.neighborhood_id,
         )
+        .group_by(
+            # Group by PK; name and households are functionally dependent
+            # on it, so PostgreSQL accepts them here without extra aggregation.
+            Neighborhood.neighborhood_id,
+            Neighborhood.neighborhood_name,
+            Neighborhood.households,
+        )
+        # Exclude degenerate rows that would produce a division-by-zero.
+        .having(Neighborhood.households > 0)
+        .order_by(efficiency_expr.asc())
     )
+ 
     if energy_filters:
         stmt = stmt.where(*energy_filters)
-    stmt = stmt.group_by(
-        Neighborhood.neighborhood_id,
-        Neighborhood.neighborhood_name,
-        Neighborhood.households,
-    )
 
     rows = db.session.execute(stmt).all()
-    return _build_ranked_efficiency_list(rows)
+
+    rankings = []
+    warnings = []
+    for row in rows:
+        if int(row.households or 0) <= 0:
+            warnings.append({
+                "neighborhood_id": int(row.neighborhood_id),
+                "neighborhood_name": row.neighborhood_name,
+                "reason": "excluded due to non-positive households",
+            })
+            continue
+        rankings.append({
+            "neighborhood_id": int(row.neighborhood_id),
+            "neighborhood_name": row.neighborhood_name,
+            "total_kwh": float(row.total_kwh),
+            "households": int(row.households),
+            "efficiency": round(float(row.efficiency_score or 0), 4),
+        })
+
+    for idx, entry in enumerate(rankings, start=1):
+        entry["rank"] = idx
+
+    return {"rankings": rankings, "warnings": warnings}
 
 
 def _build_ranked_efficiency_list(rows: list[Any]) -> dict[str, list[dict[str, Any]]]:
