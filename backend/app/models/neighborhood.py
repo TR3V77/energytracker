@@ -7,6 +7,9 @@ class Neighborhood(db.Model):
     neighborhood_id = db.Column(db.Integer, primary_key=True)
     neighborhood_name = db.Column(db.Text, nullable=False)
     households = db.Column(db.Integer, nullable=False)
+    zip_code = db.Column(db.Text, nullable=True)
+    latitude = db.Column(db.Float, nullable=True)
+    longitude = db.Column(db.Float, nullable=True)
 
     energy_records = db.relationship(
         "EnergyRecord",
@@ -27,4 +30,7 @@ class Neighborhood(db.Model):
             "neighborhood_id": self.neighborhood_id,
             "neighborhood_name": self.neighborhood_name,
             "households": self.households,
+            "zip_code": self.zip_code,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
         }

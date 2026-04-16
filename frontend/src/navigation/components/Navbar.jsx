@@ -6,6 +6,7 @@ const NAV_ITEMS = [
   { path: "/rankings", label: "Rankings", icon: "🏆" },
   { path: "/trends", label: "Trends", icon: "📈" },
   { path: "/recommendations", label: "Recommendations", icon: "💡" },
+  { path: "/map", label: "Map", icon: "🗺️" },
 ];
 
 const NavLink = ({ to, label, icon, isActive }) => (

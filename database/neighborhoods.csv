@@ -1,11 +1,11 @@
-neighborhood_id,neighborhood_name,households
-1,Neighborhood_1,302
-2,Neighborhood_2,635
-3,Neighborhood_3,470
-4,Neighborhood_4,306
-5,Neighborhood_5,271
-6,Neighborhood_6,220
-7,Neighborhood_7,321
-8,Neighborhood_8,666
-9,Neighborhood_9,414
-10,Neighborhood_10,530
+neighborhood_id,neighborhood_name,households,zip_code,latitude,longitude
+1,Downtown San Marcos,302,78666,29.8833,-97.9414
+2,Riverside,635,78666,29.8750,-97.9300
+3,Blanco Gardens,470,78666,29.8950,-97.9450
+4,Uhland,306,78640,29.9650,-97.7850
+5,Kyle,414,78640,29.9888,-97.8772
+6,Wimberley,220,78676,29.9974,-98.0986
+7,Buda,321,78610,30.0852,-97.8419
+8,New Braunfels,666,78130,29.7030,-98.1245
+9,Martindale,271,78655,29.8463,-97.8408
+10,Lockhart,530,78644,29.8849,-97.6700

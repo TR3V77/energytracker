@@ -7,7 +7,10 @@
 CREATE TABLE IF NOT EXISTS neighborhoods (
   neighborhood_id INT PRIMARY KEY,
   neighborhood_name TEXT NOT NULL,
-  households INT NOT NULL CHECK (households > 0)
+  households INT NOT NULL CHECK (households > 0),
+  zip_code TEXT,
+  latitude DOUBLE PRECISION,
+  longitude DOUBLE PRECISION
 );
 
 

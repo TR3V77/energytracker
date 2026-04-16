@@ -7,6 +7,7 @@ import { RankingsPage } from "./features/rankings/components/RankingsPage";
 import { TrendsPage } from "./features/trends/components/TrendsPage";
 import { RecommendationsPage } from "./features/recommendations/components/RecommendationsPage";
 import { ComparePage } from "./features/compare/components/ComparePage";
+import { EnergyMapPage } from "./features/map";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/trends" element={<TrendsPage />} />
           <Route path="/recommendations" element={<RecommendationsPage />} />
           <Route path="/compare" element={<ComparePage />} />
+          <Route path="/map" element={<EnergyMapPage />} />
         </Routes>
       </main>
     </div>
