@@ -17,6 +17,7 @@ import { DashboardRecommendationsPanel } from "./DashboardRecommendationsPanel";
 import { LoadingSpinner } from "../../../shared/components/LoadingSpinner";
 import { ErrorDisplay } from "../../../shared/components/ErrorDisplay";
 import { DashboardEmptyState } from "./DashboardEmptyState";
+import Leaderboard from "./Leaderboard";
 
 export const DashboardPage = () => {
   const { energyData, householdsByNeighborhoodId, sortedNeighborhoods, loading, error, refetch } = useDashboardData();
@@ -63,9 +64,14 @@ export const DashboardPage = () => {
         peakKwh={peakKwh}
         efficiencyScore={efficiencyScore}
         efficiencyRating={efficiencyRating}
-      />
-    </div>
-  );
+/>
+
+<div className="mt-5">
+  <h4>Leaderboard</h4>
+  <Leaderboard />
+  </div>
+ </div>
+);
 };
 
 export default DashboardPage;

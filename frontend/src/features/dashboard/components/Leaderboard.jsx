@@ -1,22 +1,15 @@
 import { useEffect, useState } from "react";
-import Leaderboard from "./components/Leaderboard";
-console.log("Leaderboard mounted");
+import { getEfficiencyRankings } from "../../../services/api";
 
 function Leaderboard() {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState([]);   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch("/api/analytics/rankings")
-    .then(res => {
-  if (!res.ok) throw new Error("Failed to fetch");
-  return res.json();
-})
-
-  
-      .then(data => {
-        setData(data.rankings);
+    getEfficiencyRankings()
+      .then(res => {
+        setData(res.data.rankings);  
         setLoading(false);
       })
       .catch(() => {
@@ -28,7 +21,6 @@ function Leaderboard() {
   if (loading) return <p>Loading leaderboard...</p>;
   if (error) return <p>{error}</p>;
   if (data.length === 0) return <p>No leaderboard data</p>;
-
 
   return (
     <table>
