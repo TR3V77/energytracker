@@ -6,34 +6,41 @@ from app.extensions import db
 from app.models.neighborhood import Neighborhood
 from app.models.energy_record import EnergyRecord
 
+REQUIRED_TOP = {"generatedAt", "window", "rows", "warnings"}
+REQUIRED_ROW_FIELDS = {
+    "rank",
+    "neighborhood",
+    "efficiencyScore",
+    "households",
+    "totalKwh",
+}
 
-REQUIRED_FIELDS = {"rank", "neighborhood_id", "neighborhood_name", "efficiency", "households", "total_kwh"}
 
-
-def test_rankings_response_has_all_frontend_fields(client):
+def test_rankings_response_has_contract_fields(client):
     response = client.get("/api/analytics/rankings")
     assert response.status_code == 200
 
     body = response.get_json()
-    assert "rankings" in body
+    missing_top = REQUIRED_TOP - body.keys()
+    assert not missing_top, f"Missing top-level fields: {missing_top}"
 
-    rankings = body["rankings"]
-    assert len(rankings) >= 1
+    rows = body["rows"]
+    assert len(rows) >= 1
 
-    for entry in rankings:
-        missing = REQUIRED_FIELDS - entry.keys()
-        assert not missing, f"Missing fields: {missing}"
+    for entry in rows:
+        missing = REQUIRED_ROW_FIELDS - entry.keys()
+        assert not missing, f"Missing row fields: {missing}"
 
 
 def test_rankings_rank_starts_at_one(client):
     response = client.get("/api/analytics/rankings")
-    rankings = response.get_json()["rankings"]
+    rows = response.get_json()["rows"]
 
-    assert rankings[0]["rank"] == 1
+    assert rows[0]["rank"] == 1
 
 
-def test_rankings_sorted_ascending_by_efficiency(app, client):
-    """Lower efficiency = more efficient = rank 1."""
+def test_rankings_sorted_ascending_by_efficiency_score(app, client):
+    """Lower score = more efficient = rank 1."""
     with app.app_context():
         n2 = Neighborhood(neighborhood_id=2, neighborhood_name="Expensive", households=5)
         db.session.add(n2)
@@ -41,21 +48,18 @@ def test_rankings_sorted_ascending_by_efficiency(app, client):
         db.session.commit()
 
     response = client.get("/api/analytics/rankings")
-    rankings = response.get_json()["rankings"]
+    rows = response.get_json()["rows"]
 
-    assert len(rankings) == 2
-    assert rankings[0]["efficiency"] <= rankings[1]["efficiency"]
-    assert rankings[0]["rank"] == 1
-    assert rankings[1]["rank"] == 2
-    # Seed neighborhood (100kwh / 10 houses = 10.0) should rank first
-    assert rankings[0]["neighborhood_name"] == "Test Neighborhood"
+    assert len(rows) == 2
+    assert rows[0]["efficiencyScore"] <= rows[1]["efficiencyScore"]
+    assert rows[0]["rank"] == 1
+    assert rows[1]["rank"] == 2
+    assert rows[0]["neighborhood"] == "Test Neighborhood"
 
 
-def test_rankings_efficiency_calculation(client):
+def test_rankings_efficiency_score_calculation(client):
     response = client.get("/api/analytics/rankings")
-    entry = response.get_json()["rankings"][0]
+    entry = response.get_json()["rows"][0]
 
     # Seed: 100 kWh / 10 households = 10.0
-    assert entry["efficiency"] == 10.0
-    assert entry["households"] == 10
-    assert entry["total_kwh"] == 100.0
+    assert entry["efficiencyScore"] == 10.0

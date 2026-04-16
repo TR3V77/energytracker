@@ -10,7 +10,7 @@ analytics_bp = Blueprint('analytics', __name__)
 
 @analytics_bp.route('/api/analytics/rankings')
 def efficiency_rankings():
-    """Get neighborhoods ranked by efficiency score."""
+    """Leaderboard JSON: generatedAt, window, rows[{rank, neighborhood, efficiencyScore}]."""
     date_from = parse_iso_date(request.args.get("date_from"))
     date_to = parse_iso_date(request.args.get("date_to"))
 

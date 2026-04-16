@@ -12,8 +12,10 @@ export const RankingsTableRow = ({ rank, neighborhoodName, efficiency, household
         {typeof efficiency === 'number' ? efficiency.toLocaleString() : efficiency} kWh/household
       </span>
     </td>
-    <td>{households.toLocaleString()}</td>
-    <td>{totalKwh.toLocaleString()} kWh</td>
+    <td>{households == null ? "—" : households.toLocaleString()}</td>
+    <td>
+      {totalKwh == null ? "—" : `${totalKwh.toLocaleString()} kWh`}
+    </td>
     <td className={status.textClass}>
       {status.icon} {status.label}
     </td>

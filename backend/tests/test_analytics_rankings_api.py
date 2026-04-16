@@ -5,23 +5,28 @@ from app.models.energy_record import EnergyRecord
 from app.models.neighborhood import Neighborhood
 
 
-def test_rankings_use_frontend_contract_fields(client):
+def test_rankings_use_leaderboard_contract_fields(client):
     response = client.get("/api/analytics/rankings")
     assert response.status_code == 200
 
     payload = response.get_json()
-    assert "rankings" in payload
-    assert payload["rankings"]
-    first = payload["rankings"][0]
-    assert "neighborhood_name" in first
-    assert "efficiency" in first  # your code uses efficiency_score
+    assert "generatedAt" in payload
+    assert "window" in payload
+    assert "rows" in payload
+    assert payload["rows"]
+    first = payload["rows"][0]
+    assert "rank" in first
+    assert "neighborhood" in first
+    assert "efficiencyScore" in first
     assert "households" in first
-    assert "total_kwh" in first
-    assert "rank" in first    # not in your code
-    assert "warnings" in payload    # you removed warnings
+    assert "totalKwh" in first
+    assert "warnings" in payload
+    assert "neighborhood_name" not in first
+    assert "efficiency" not in first
+    assert "rankings" not in payload
 
 
-def test_rankings_no_sequential_rank_values(client, app):
+def test_rankings_assign_sequential_rank_values(client, app):
     with app.app_context():
         _db.session.add(
             Neighborhood(
@@ -41,12 +46,11 @@ def test_rankings_no_sequential_rank_values(client, app):
 
     response = client.get("/api/analytics/rankings")
     assert response.status_code == 200
-    rankings = response.get_json()["rankings"]
-    assert rankings[0]["rank"] == 1     # rank starts at 1
-    assert rankings[1]["rank"] == 2     # rank is sequential
+    rows = response.get_json()["rows"]
+    assert [entry["rank"] for entry in rows] == list(range(1, len(rows) + 1))
 
 
-def test_rankings_exclude_zero_households_no_warning(client, app):
+def test_rankings_exclude_zero_households_not_in_rows(client, app):
     with app.app_context():
         _db.session.add(
             Neighborhood(
@@ -68,6 +72,12 @@ def test_rankings_exclude_zero_households_no_warning(client, app):
     assert response.status_code == 200
 
     payload = response.get_json()
-    names = [row["neighborhood_name"] for row in payload["rankings"]]
-    assert "ZeroHouseholds" not in names  # excluded due to zero households
-    assert "warnings" in payload          # warnings key is returned
+    names = [row["neighborhood"] for row in payload["rows"]]
+    assert "ZeroHouseholds" not in names
+    assert payload["warnings"] == [
+        {
+            "neighborhood_id": 3,
+            "neighborhood_name": "ZeroHouseholds",
+            "reason": "excluded due to non-positive households",
+        }
+    ]

@@ -145,8 +145,7 @@ def list_efficiency_rankings(
     # JOIN energy_record e USING (neighborhood_id)
     # [WHERE e.date BETWEEN :date_from AND :date_to]
     # GROUP BY n.neighborhood_id, n.neighborhood_name, n.households
-    # HAVING n.households > 0
-    # ORDER BY efficiency_score DESC
+    # ORDER BY efficiency_score ASC
     # ------------------------------------------------------------------
     total_kwh_expr = func.coalesce(
         func.sum(EnergyRecord.total_kwh), 0
@@ -176,8 +175,6 @@ def list_efficiency_rankings(
             Neighborhood.neighborhood_name,
             Neighborhood.households,
         )
-        # Exclude degenerate rows that would produce a division-by-zero.
-        .having(Neighborhood.households > 0)
         .order_by(efficiency_expr.asc())
     )
  

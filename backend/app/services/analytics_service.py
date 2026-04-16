@@ -1,6 +1,6 @@
 """Analytics services for rankings, trends, and recommendations."""
 
-from datetime import date
+from datetime import date, datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from sqlalchemy import func, select, extract
@@ -13,14 +13,29 @@ from app.services.efficiency_metrics_service import list_efficiency_rankings
 def get_efficiency_rankings(
     date_from: Optional[date] = None,
     date_to: Optional[date] = None,
-) -> Dict[str, List[Dict[str, Any]]]:
-    """Compute efficiency rankings for neighborhoods from stored readings."""
+) -> Dict[str, Any]:
+    """Build leaderboard JSON: generatedAt, window, rows, and warnings."""
     result = list_efficiency_rankings(date_from=date_from, date_to=date_to)
-    
+    rows: List[Dict[str, Any]] = [
+        {
+            "rank": r["rank"],
+            "neighborhood": r["neighborhood_name"],
+            "efficiencyScore": float(r["efficiency"]),
+            "households": int(r["households"]),
+            "totalKwh": float(r["total_kwh"]),
+        }
+        for r in result["rankings"]
+    ]
+    window = "all_time"
+    if date_from is not None or date_to is not None:
+        window = "date_range"
+    generated_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     return {
-    "rankings": result["rankings"],
-    "warnings": result["warnings"],
-}
+        "generatedAt": generated_at,
+        "window": window,
+        "rows": rows,
+        "warnings": result["warnings"],
+    }
 
 
 def get_trends(

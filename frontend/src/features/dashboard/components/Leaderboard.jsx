@@ -8,8 +8,9 @@ function Leaderboard() {
 
   useEffect(() => {
     getEfficiencyRankings()
-      .then(res => {
-        setData(res.data.rankings);  
+      .then((res) => {
+        const rows = res?.data?.rows;
+        setData(Array.isArray(rows) ? rows : []);
         setLoading(false);
       })
       .catch(() => {
@@ -29,18 +30,14 @@ function Leaderboard() {
           <th>Rank</th>
           <th>Neighborhood</th>
           <th>Efficiency</th>
-          <th>Households</th>
-          <th>Total kWh</th>
         </tr>
       </thead>
       <tbody>
         {data.map((row) => (
-          <tr key={row.neighborhood_id}>
+          <tr key={`${row.rank}-${row.neighborhood}`}>
             <td>{row.rank}</td>
-            <td>{row.neighborhood_name}</td>
-            <td>{Number(row.efficiency).toFixed(2)}</td>
-            <td>{row.households}</td>
-            <td>{row.total_kwh}</td>
+            <td>{row.neighborhood}</td>
+            <td>{Number(row.efficiencyScore).toFixed(2)}</td>
           </tr>
         ))}
       </tbody>

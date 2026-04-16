@@ -15,12 +15,19 @@ export const useRankingsData = () => {
       setError(null);
       try {
         const response = await getEfficiencyRankings({});
-        
-        // Direct consumption of backend response
-        if (response.data && response.data.rankings && Array.isArray(response.data.rankings) && response.data.rankings.length > 0) {
-          // Backend already provides rank, neighborhood_name, efficiency, households, total_kwh
-          setRankings(response.data.rankings);
-          setWarnings(response.data.warnings || []);
+
+        const rows = response.data?.rows;
+        if (Array.isArray(rows) && rows.length > 0) {
+          setRankings(
+            rows.map((row) => ({
+              rank: row.rank,
+              neighborhood_name: row.neighborhood,
+              efficiency: row.efficiencyScore,
+              households: row.households,
+              total_kwh: row.totalKwh,
+            }))
+          );
+          setWarnings(response.data?.warnings || []);
           setUsingMockData(false);
         } else {
           // No data case - but keep structure consistent
