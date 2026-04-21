@@ -215,3 +215,32 @@ body {
 .compare-page .card {
   min-height: 400px;
 }
+
+/* Leaderboard Page Styles */
+.leaderboard-page .card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.leaderboard-page .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+}
+
+.leaderboard-page table tbody tr {
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.leaderboard-page table tbody tr:hover {
+  background-color: rgba(0, 102, 204, 0.05);
+}
+
+/* Medal animations for top 3 */
+.leaderboard-page table tbody tr:first-child .fs-5 {
+  animation: bounce 0.5s ease;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}

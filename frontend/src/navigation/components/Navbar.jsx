@@ -3,7 +3,8 @@ import { Link, useLocation } from "react-router-dom";
 
 const NAV_ITEMS = [
   { path: "/dashboard", label: "Dashboard", icon: "📊" },
-  { path: "/rankings", label: "Rankings", icon: "🏆" },
+  { path: "/leaderboard", label: "Leaderboard", icon: "🏆" },
+  { path: "/rankings", label: "Rankings", icon: "📋" },
   { path: "/trends", label: "Trends", icon: "📈" },
   { path: "/recommendations", label: "Recommendations", icon: "💡" },
   { path: "/map", label: "Map", icon: "🗺️" },
