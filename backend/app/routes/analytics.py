@@ -13,6 +13,21 @@ from app.utils.date_window import parse_iso_date
 analytics_bp = Blueprint('analytics', __name__)
 
 
+def get_window_date_from(window: str):
+    """Convert window param to a start date relative to the latest record."""
+    latest = db.session.execute(
+        select(func.max(EnergyRecord.date))
+    ).scalar_one()
+
+    if latest is None:
+        return None
+    if window == "30d":
+        return latest - timedelta(days=30)
+    if window == "90d":
+        return latest - timedelta(days=90)
+    return None
+
+
 @analytics_bp.route('/api/analytics/rankings')
 def efficiency_rankings():
     """Leaderboard: generatedAt, window, rows."""
