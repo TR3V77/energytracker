@@ -2,7 +2,7 @@
 
 
 class ServiceError(Exception):
-    """Raised when service validation fails; carries a suggested HTTP status."""
+    """Service validation error with suggested HTTP status."""
 
     def __init__(self, message: str, status_code: int = 400) -> None:
         self.message = message

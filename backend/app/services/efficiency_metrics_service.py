@@ -125,13 +125,13 @@ def list_efficiency_rankings(
     date_from: date | None = None,
     date_to: date | None = None,
 ) -> list[dict[str, Any]]:
-    
+    """Aggregate kWh per neighborhood and rank by efficiency."""
     energy_filters: list[Any] = []
     if date_from is not None:
         energy_filters.append(EnergyRecord.date >= date_from)
     if date_to is not None:
         energy_filters.append(EnergyRecord.date <= date_to)
- 
+
     # ------------------------------------------------------------------
     # Core leaderboard query
     #
@@ -154,7 +154,7 @@ def list_efficiency_rankings(
     efficiency_expr = (
         total_kwh_expr / func.nullif(Neighborhood.households, 0)
     )
- 
+
     stmt = (
         select(
             Neighborhood.neighborhood_id,
@@ -177,7 +177,7 @@ def list_efficiency_rankings(
         )
         .order_by(efficiency_expr.asc())
     )
- 
+
     if energy_filters:
         stmt = stmt.where(*energy_filters)
 
@@ -207,7 +207,9 @@ def list_efficiency_rankings(
     return {"rankings": rankings, "warnings": warnings}
 
 
-def _build_ranked_efficiency_list(rows: list[Any]) -> dict[str, list[dict[str, Any]]]:
+def _build_ranked_efficiency_list(
+    rows: list[Any],
+) -> dict[str, list[dict[str, Any]]]:
     """Build deterministic rankings and capture excluded-row warnings."""
     rankings: list[dict[str, Any]] = []
     warnings: list[dict[str, Any]] = []

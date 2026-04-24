@@ -1,7 +1,5 @@
 """PROJ-115: Verify neighborhoods endpoint returns geographic fields."""
 
-from datetime import date
-
 from app.extensions import db
 from app.models.neighborhood import Neighborhood
 

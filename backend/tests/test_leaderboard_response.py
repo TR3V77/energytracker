@@ -42,9 +42,17 @@ def test_rankings_rank_starts_at_one(client):
 def test_rankings_sorted_ascending_by_efficiency_score(app, client):
     """Lower score = more efficient = rank 1."""
     with app.app_context():
-        n2 = Neighborhood(neighborhood_id=2, neighborhood_name="Expensive", households=5)
+        n2 = Neighborhood(
+            neighborhood_id=2,
+            neighborhood_name="Expensive",
+            households=5,
+        )
         db.session.add(n2)
-        db.session.add(EnergyRecord(neighborhood_id=2, date=date(2026, 1, 15), total_kwh=500.0))
+        db.session.add(EnergyRecord(
+            neighborhood_id=2,
+            date=date(2026, 1, 15),
+            total_kwh=500.0,
+        ))
         db.session.commit()
 
     response = client.get("/api/analytics/rankings")

@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from app.services.recommendation_mapping import get_recommendation_ids_for_triggers
+from app.services.recommendation_mapping import (
+    get_recommendation_ids_for_triggers,
+)
 from app.services.recommendations_catalog import get_catalog_recommendation
 
 

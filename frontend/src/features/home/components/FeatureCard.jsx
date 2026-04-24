@@ -1,8 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-export const FeatureCard = ({ icon, title, description, linkTo, linkText, gradient }) => (
-  <div className="col-md-4">
+export const FeatureCard = ({ icon, title, description, linkTo, linkText, gradient, colClass = "col-md-4" }) => (
+  <div className={colClass}>
     <div className="card feature-card h-100 border-0 shadow-sm">
       <div className="accent" style={{ background: gradient, height: "4px" }} />
       <div className="card-body text-center p-4">

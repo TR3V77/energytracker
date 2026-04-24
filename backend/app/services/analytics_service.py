@@ -29,7 +29,9 @@ def get_efficiency_rankings(
     window = "all_time"
     if date_from is not None or date_to is not None:
         window = "date_range"
-    generated_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    generated_at = (
+        datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    )
     return {
         "generatedAt": generated_at,
         "window": window,

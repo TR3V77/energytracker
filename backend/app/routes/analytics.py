@@ -1,13 +1,13 @@
-from datetime import date, timedelta
+from datetime import timedelta
 
 from flask import Blueprint, request, jsonify
+from sqlalchemy import func, select
 
 from app.exceptions import ServiceError
-from app.services import analytics_service
-from app.services import recommendations_service
-from sqlalchemy import func, select
 from app.extensions import db
 from app.models.energy_record import EnergyRecord
+from app.services import analytics_service
+from app.services import recommendations_service
 from app.utils.date_window import parse_iso_date
 
 analytics_bp = Blueprint('analytics', __name__)
@@ -15,7 +15,7 @@ analytics_bp = Blueprint('analytics', __name__)
 
 @analytics_bp.route('/api/analytics/rankings')
 def efficiency_rankings():
-    """Leaderboard JSON: generatedAt, window, rows[{rank, neighborhood, efficiencyScore}]."""
+    """Leaderboard: generatedAt, window, rows."""
     date_from = parse_iso_date(request.args.get("date_from"))
     date_to = parse_iso_date(request.args.get("date_to"))
 
@@ -24,7 +24,6 @@ def efficiency_rankings():
     )
 
     return jsonify(data), 200
-
 
 
 @analytics_bp.route('/api/analytics/trends')
@@ -46,7 +45,9 @@ def recommendations():
         "threshold", default=400.0, type=float
     )
     window = request.args.get("window", default="30d")
-    neighborhood_id = request.args.get("neighborhood_id", type=int)
+    neighborhood_id = request.args.get(
+        "neighborhood_id", type=int
+    )
     anchor_date = request.args.get("anchor_date")
 
     try:
@@ -62,16 +63,20 @@ def recommendations():
     if not recs:
         return jsonify({
             "recommendations": recs,
-            "message": "No recommendations triggered for the selected filters."
+            "message": (
+                "No recommendations triggered "
+                "for the selected filters."
+            ),
         }), 200
 
     return jsonify({
         "recommendations": recs,
-        "message": "Recommendations generated successfully."
+        "message": "Recommendations generated successfully.",
     }), 200
 
+
 def get_window_date_from(window: str):
-    """Convert window param to a start date relative to the latest record."""
+    """Convert window param to start date from latest record."""
     latest = db.session.execute(
         select(func.max(EnergyRecord.date))
     ).scalar_one()
@@ -84,9 +89,10 @@ def get_window_date_from(window: str):
         return latest - timedelta(days=90)
     return None
 
+
 @analytics_bp.route('/api/leaderboard/efficiency')
 def leaderboard_efficiency():
-    """Get neighborhoods ranked by efficiency score with optional window or date filter."""
+    """Efficiency leaderboard with optional window/date."""
     window = request.args.get("window", default="all")
     date_from = parse_iso_date(request.args.get("date_from"))
     date_to = parse_iso_date(request.args.get("date_to"))
@@ -96,7 +102,10 @@ def leaderboard_efficiency():
 
     if (date_from is None) != (date_to is None):
         return jsonify({
-            "error": "Both date_from and date_to are required when filtering by date."
+            "error": (
+                "Both date_from and date_to are "
+                "required when filtering by date."
+            ),
         }), 400
 
     if date_from and date_to:
@@ -104,21 +113,24 @@ def leaderboard_efficiency():
 
         if window == "30d" and actual_days != 30:
             return jsonify({
-                "error": f"Window '30d' requires exactly 30 days but your date range spans {actual_days} days."
+                "error": (
+                    f"Window '30d' requires exactly 30 days "
+                    f"but date range spans {actual_days} days."
+                ),
             }), 400
 
         if window == "90d" and actual_days != 90:
             return jsonify({
-                "error": f"Window '90d' requires exactly 90 days but your date range spans {actual_days} days."
+                "error": (
+                    f"Window '90d' requires exactly 90 days "
+                    f"but date range spans {actual_days} days."
+                ),
             }), 400
 
         if date_from > date_to:
             return jsonify({
-                "error": "date_from must be before date_to."
+                "error": "date_from must be before date_to.",
             }), 400
-
-    if window == "all_time":
-        window = "all"
 
     if date_from is None and date_to is None:
         date_from = get_window_date_from(window)

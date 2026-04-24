@@ -34,7 +34,9 @@ TRIGGER_TO_RECOMMENDATION_IDS: dict[str, list[str]] = {
 
 def validate_trigger_mapping() -> None:
     """Validate trigger mapping shape and catalog references."""
-    for trigger_id, recommendation_ids in TRIGGER_TO_RECOMMENDATION_IDS.items():
+    for trigger_id, recommendation_ids in (
+        TRIGGER_TO_RECOMMENDATION_IDS.items()
+    ):
         if not (
             MIN_RECOMMENDATIONS_PER_TRIGGER
             <= len(recommendation_ids)
@@ -70,7 +72,8 @@ def get_recommendation_ids_for_triggers(trigger_ids: list[str]) -> list[str]:
     seen: set[str] = set()
 
     for trigger_id in trigger_ids:
-        for recommendation_id in TRIGGER_TO_RECOMMENDATION_IDS.get(trigger_id, []):
+        mapped = TRIGGER_TO_RECOMMENDATION_IDS.get(trigger_id, [])
+        for recommendation_id in mapped:
             if recommendation_id in seen:
                 continue
             seen.add(recommendation_id)
