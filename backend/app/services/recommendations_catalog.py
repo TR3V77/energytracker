@@ -74,6 +74,27 @@ RECOMMENDATIONS_CATALOG: dict[str, dict[str, Any]] = {
         ),
         "estimated_impact_pct": 9.0,
     },
+    "hvac_tuneup": {
+        "id": "hvac_tuneup",
+        "action": "HVAC Tune-Up",
+        "priority": "medium",
+        "reason": "Peak usage suggests HVAC is running inefficiently during high-demand periods.",
+        "estimated_impact_pct": 11.0,
+    },
+    "smart_thermostat": {
+        "id": "smart_thermostat",
+        "action": "Install Smart Thermostat",
+        "priority": "medium",
+        "reason": "Automate temperature schedules to reduce peak and variance in usage.",
+        "estimated_impact_pct": 8.0,
+    },
+    "rebate_outreach": {
+        "id": "rebate_outreach",
+        "action": "Rebate Program Outreach",
+        "priority": "medium",
+        "reason": "High usage neighborhood has low rebate participation — significant savings available.",
+        "estimated_impact_pct": 7.0,
+    },
 }
 
 

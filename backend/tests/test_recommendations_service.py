@@ -81,6 +81,9 @@ def test_high_priority_recommendations(mock_metrics):
         "insulation_improvements",
         "demand_response_outreach",
         "energy_audit",
+        "hvac_tuneup",
+        "smart_thermostat",
+        "rebate_outreach",
     ]
 
 
@@ -112,7 +115,7 @@ def test_multiple_neighborhoods(mock_metrics):
     flat = _flatten_by_neighborhood(results)
 
     assert len(results) == 3
-    assert len(flat) == 10
+    assert len(flat) == 13
 
 
 def test_actions_match_correct_trigger(mock_metrics):

@@ -157,6 +157,69 @@ def evaluate_recommendation_rules(
         )
         add_trigger("high_per_household_load")
 
+    # Rule 6: high kWh/household vs city average
+    city_avg_estimate = threshold * 0.75
+    if efficiency_score > city_avg_estimate * 1.25:
+        add_condition(
+            condition_id="high_kwh_vs_city_avg",
+            name="High Usage vs City Average",
+            severity="medium",
+            message=(
+                f"{neighborhood} efficiency score "
+                f"({efficiency_score:.2f} kWh/household) is more than 25% "
+                f"above the estimated city average "
+                f"({city_avg_estimate:.2f} kWh/household). "
+                f"Insulation and HVAC improvements are recommended."
+            ),
+        )
+        add_trigger("high_kwh_vs_city_avg")
+    
+    # Rule 7: high summer peak usage
+    peak_kwh = float(metrics.get("peak_kwh") or 0.0)
+    peak_proxy = peak_kwh if peak_kwh > 0 else _safe_divide(total_kwh, max(households, 1))
+    if peak_proxy >= threshold * 1.15:
+        add_condition(
+            condition_id="high_summer_peak",
+            name="High Peak Usage",
+            severity="medium",
+            message=(
+                f"{neighborhood} shows high peak usage "
+                f"({peak_proxy:.2f} kWh). "
+                f"HVAC tune-up and smart thermostat installation recommended."
+            ),
+        )
+        add_trigger("high_summer_peak")
+    
+    # Rule 8: high usage variance / spikes
+    kwh_variance = float(metrics.get("kwh_variance") or 0.0)
+    if kwh_variance >= threshold * 0.50:
+        add_condition(
+            condition_id="high_usage_variance",
+            name="High Usage Variance",
+            severity="medium",
+            message=(
+                f"{neighborhood} shows high variance in energy usage "
+                f"(variance: {kwh_variance:.2f}). "
+                f"An energy audit and smart thermostat are recommended."
+            ),
+        )
+        add_trigger("high_usage_variance")
+
+    # Rule 9: low rebate participation + high usage
+    rebate_pct = float(metrics.get("rebate_participation_pct") or 0.0)
+    if efficiency_score >= high_cutoff and rebate_pct < 0.20:
+        add_condition(
+            condition_id="low_rebate_high_usage",
+            name="Low Rebate Participation + High Usage",
+            severity="medium",
+            message=(
+                f"{neighborhood} has high energy usage but low rebate "
+                f"participation ({rebate_pct:.0%}). "
+                f"Rebate outreach and weatherization could reduce costs significantly."
+            ),
+        )
+        add_trigger("low_rebate_high_usage")
+
     recommendation_ids = get_recommendation_ids_for_triggers(triggered_ids)
     recommendations = [
         {
@@ -171,6 +234,7 @@ def evaluate_recommendation_rules(
         for recommendation_id in recommendation_ids
     ]
 
+    
     return {
         "neighborhood_id": neighborhood_id,
         "neighborhood": neighborhood,

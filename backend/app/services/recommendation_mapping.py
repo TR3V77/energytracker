@@ -29,6 +29,22 @@ TRIGGER_TO_RECOMMENDATION_IDS: dict[str, list[str]] = {
         "demand_response_outreach",
         "energy_audit",
     ],
+    "high_kwh_vs_city_avg": [
+        "insulation_improvements",
+        "hvac_upgrades",
+    ],
+    "high_summer_peak": [
+        "hvac_tuneup",
+        "smart_thermostat",
+    ],
+    "high_usage_variance": [
+        "energy_audit",
+        "smart_thermostat",
+    ],
+    "low_rebate_high_usage": [
+        "rebate_outreach",
+        "weatherization_assistance",
+    ],
 }
 
 
