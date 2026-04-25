@@ -7,7 +7,7 @@ import { LeaderboardEmptyState } from "./LeaderboardEmptyState";
 import { LeaderboardErrorState } from "./LeaderboardErrorState";
 
 export const LeaderboardPage = () => {
-  const { rankings, loading, error, refetch } = useLeaderboardData();
+  const { rankings, generatedAt, window, loading, error, refetch } = useLeaderboardData();
 
   if (loading) return <LeaderboardLoadingState />;
   if (error) return <LeaderboardErrorState error={error} onRetry={refetch} />;
@@ -15,7 +15,7 @@ export const LeaderboardPage = () => {
 
   return (
     <div className="leaderboard-page">
-      <LeaderboardHeader />
+      <LeaderboardHeader generatedAt={generatedAt} window={window} />
       <LeaderboardTable rankings={rankings} />
       
       {/* Optional: Add a note about how efficiency is calculated */}

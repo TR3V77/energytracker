@@ -1,8 +1,12 @@
 import { useState, useEffect, useMemo } from "react";
 import { getEfficiencyRankings } from "../../../services/api";
+import {
+  EMPTY_LEADERBOARD_PAYLOAD,
+  normalizeLeaderboardPayload,
+} from "../utils/leaderboardPayload";
 
 export const useLeaderboardData = () => {
-  const [rankings, setRankings] = useState([]);
+  const [leaderboardPayload, setLeaderboardPayload] = useState(EMPTY_LEADERBOARD_PAYLOAD);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -12,15 +16,11 @@ export const useLeaderboardData = () => {
       setError(null);
       try {
         const response = await getEfficiencyRankings({});
-        
-        if (response.data && response.data.rows && Array.isArray(response.data.rows)) {
-          setRankings(response.data.rows);
-        } else {
-          setRankings([]);
-        }
+        setLeaderboardPayload(normalizeLeaderboardPayload(response?.data));
       } catch (err) {
         console.error("Error fetching leaderboard:", err);
         setError(err.message || "Failed to load leaderboard data");
+        setLeaderboardPayload(EMPTY_LEADERBOARD_PAYLOAD);
       } finally {
         setLoading(false);
       }
@@ -31,14 +31,16 @@ export const useLeaderboardData = () => {
 
   //Add medal emoji logic for top 3
   const enrichedRankings = useMemo(() => {
-    return rankings.map((item, index) => ({
+    return leaderboardPayload.rows.map((item, index) => ({
       ...item,
       medal: index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : null,
     }));
-  }, [rankings]);
+  }, [leaderboardPayload.rows]);
 
   return { 
     rankings: enrichedRankings, 
+    generatedAt: leaderboardPayload.generatedAt,
+    window: leaderboardPayload.window,
     loading, 
     error, 
     refetch: () => window.location.reload() 
