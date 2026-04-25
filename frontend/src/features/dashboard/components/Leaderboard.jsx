@@ -1,3 +1,4 @@
+import React from "react";
 import { useEffect, useState } from "react";
 import { getEfficiencyRankings } from "../../../services/api";
 import { normalizeLeaderboardPayload } from "../../leaderboard/utils/leaderboardPayload";
