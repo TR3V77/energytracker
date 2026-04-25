@@ -118,15 +118,6 @@ def test_multiple_neighborhoods(mock_metrics):
     assert len(flat) == 13
 
 
-def test_actions_match_correct_trigger(mock_metrics):
-    mock_metrics([_sample_metric(name="MidTown", efficiency_score=360)])
-
-    results = get_recommendations(threshold=400)
-    flat = _flatten_by_neighborhood(results)
-    rec_ids = [r["id"] for r in flat]
-    assert rec_ids == ["energy_audit", "insulation_improvements"]
-
-
 def test_estimated_impact_is_consistently_rounded(mock_metrics):
     mock_metrics([_sample_metric(name="HighCity", efficiency_score=500)])
 

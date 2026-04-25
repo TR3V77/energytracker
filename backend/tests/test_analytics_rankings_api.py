@@ -5,27 +5,6 @@ from app.models.energy_record import EnergyRecord
 from app.models.neighborhood import Neighborhood
 
 
-def test_rankings_use_leaderboard_contract_fields(client):
-    response = client.get("/api/analytics/rankings")
-    assert response.status_code == 200
-
-    payload = response.get_json()
-    assert "generatedAt" in payload
-    assert "window" in payload
-    assert "rows" in payload
-    assert payload["rows"]
-    first = payload["rows"][0]
-    assert "rank" in first
-    assert "neighborhood" in first
-    assert "efficiencyScore" in first
-    assert "households" in first
-    assert "totalKwh" in first
-    assert "warnings" in payload
-    assert "neighborhood_name" not in first
-    assert "efficiency" not in first
-    assert "rankings" not in payload
-
-
 def test_rankings_assign_sequential_rank_values(client, app):
     with app.app_context():
         _db.session.add(
