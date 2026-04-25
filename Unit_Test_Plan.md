@@ -63,9 +63,9 @@ assignment test set, targeting the leaderboard efficiency API:
 ## Planned Execution
 Run targeted pytest command for the selected tests:
 
-1. `python -m pytest tests/test_leaderboard.py::test_leaderboard_returned_fields_match_contract -v`
-2. `python -m pytest tests/test_leaderboard.py::test_total_kwh_aggregated_correctly_for_full_window -v`
-3. `python -m pytest tests/test_leaderboard.py::test_efficiency_calculation_is_total_kwh_divided_by_households -v`
+1. `python -m pytest tests/test_leaderboard_integration.py::test_leaderboard_returned_fields_match_contract -v`
+2. `python -m pytest tests/test_leaderboard_integration.py::test_total_kwh_aggregated_correctly_for_full_window -v`
+3. `python -m pytest tests/test_leaderboard_integration.py::test_efficiency_calculation_is_total_kwh_divided_by_households -v`
 
 ## Expected Outcomes
 - All three tests execute and pass without errors.
