@@ -78,3 +78,60 @@ Run targeted pytest command for the selected tests:
   with a test database.
 - Tests seed the database directly, so a clean test DB state is required before
   each run.
+
+
+# PROJ-124 Unit Test Plan (Backend) - Davos De Hoyos
+
+## Scope
+This plan covers three new backend unit tests targeting the recommendation
+trigger conditions added in PROJ-100. All three exercise the pure function
+`evaluate_recommendation_rules` in
+`backend/app/services/recommendation_rules.py` and its catalog/mapping
+dependencies.
+
+New test file:
+
+- `backend/tests/test_recommendation_rules.py::test_high_summer_peak_triggers_hvac_tuneup_and_smart_thermostat`
+- `backend/tests/test_recommendation_rules.py::test_high_usage_variance_triggers_audit_and_thermostat`
+- `backend/tests/test_recommendation_rules.py::test_low_rebate_high_usage_deduplicates_weatherization`
+
+## Test Selection Rationale
+- `test_high_summer_peak_triggers_hvac_tuneup_and_smart_thermostat`: validates
+  that `peak_kwh >= threshold * 1.15` triggers the `high_summer_peak`
+  condition and produces the catalog-backed recommendations `hvac_tuneup`
+  and `smart_thermostat`. Asserts the shape of `triggered_conditions[*]`
+  (id, name, severity, message) and `recommendations[*]`
+  (id, action, priority, reason, estimated_impact_pct).
+- `test_high_usage_variance_triggers_audit_and_thermostat`: validates that
+  `kwh_variance >= threshold * 0.50` triggers the `high_usage_variance`
+  condition and produces the recommendations `energy_audit` and
+  `smart_thermostat`. Confirms condition severity is `medium` and the
+  return-object includes `neighborhood`, `neighborhood_id`, and `score`.
+- `test_low_rebate_high_usage_deduplicates_weatherization`: validates that
+  when both `high_consumption` and `low_rebate_high_usage` triggers fire
+  (each maps to `weatherization_assistance` in the catalog), the resulting
+  recommendation list contains `weatherization_assistance` exactly once
+  while both trigger ids appear in `triggered_conditions`.
+
+## Planned Execution
+Run the new test module under pytest with verbose output, JUnit XML, and
+HTML coverage:
+
+1. `python -m pytest tests/test_recommendation_rules.py::test_high_summer_peak_triggers_hvac_tuneup_and_smart_thermostat -v`
+2. `python -m pytest tests/test_recommendation_rules.py::test_high_usage_variance_triggers_audit_and_thermostat -v`
+3. `python -m pytest tests/test_recommendation_rules.py::test_low_rebate_high_usage_deduplicates_weatherization -v`
+
+## Expected Outcomes
+- All three tests execute and pass without errors.
+- Assertions verify trigger evaluation, catalog-backed recommendation
+  resolution, and deduplication of recommendation ids across overlapping
+  triggers.
+- Results, JUnit XML, and coverage HTML are captured and attached in the
+  execution evidence task (PROJ-125).
+
+## Risks / Notes
+- Tests target a pure function (no DB seeding required), so they are
+  hermetic and deterministic.
+- Threshold defaults to 400.0; tests pass explicit metric values aligned
+  to that threshold so future threshold changes will require revisiting
+  the fixtures.
