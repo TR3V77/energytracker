@@ -1,12 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
 import { getEfficiencyRankings } from "../../../services/api";
-import {
-  EMPTY_LEADERBOARD_PAYLOAD,
-  normalizeLeaderboardPayload,
-} from "../utils/leaderboardPayload";
 
 export const useLeaderboardData = () => {
-  const [leaderboardPayload, setLeaderboardPayload] = useState(EMPTY_LEADERBOARD_PAYLOAD);
+  const [rankings, setRankings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -16,11 +12,16 @@ export const useLeaderboardData = () => {
       setError(null);
       try {
         const response = await getEfficiencyRankings({});
-        setLeaderboardPayload(normalizeLeaderboardPayload(response?.data));
+        
+        // Extract rankings from the nested response structure
+        if (response.data && response.data.rankings && Array.isArray(response.data.rankings)) {
+          setRankings(response.data.rankings);
+        } else {
+          setRankings([]);
+        }
       } catch (err) {
         console.error("Error fetching leaderboard:", err);
         setError(err.message || "Failed to load leaderboard data");
-        setLeaderboardPayload(EMPTY_LEADERBOARD_PAYLOAD);
       } finally {
         setLoading(false);
       }
@@ -29,18 +30,23 @@ export const useLeaderboardData = () => {
     fetchLeaderboard();
   }, []);
 
-  //Add medal emoji logic for top 3
+  // Add medal emojis for top 3 ranks
   const enrichedRankings = useMemo(() => {
-    return leaderboardPayload.rows.map((item, index) => ({
-      ...item,
-      medal: index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : null,
-    }));
-  }, [leaderboardPayload.rows]);
+    return rankings.map((item) => {
+      let medal = null;
+      if (item.rank === 1) medal = "🥇";
+      else if (item.rank === 2) medal = "🥈";
+      else if (item.rank === 3) medal = "🥉";
+      
+      return {
+        ...item,
+        medal,
+      };
+    });
+  }, [rankings]);
 
   return { 
     rankings: enrichedRankings, 
-    generatedAt: leaderboardPayload.generatedAt,
-    window: leaderboardPayload.window,
     loading, 
     error, 
     refetch: () => window.location.reload() 

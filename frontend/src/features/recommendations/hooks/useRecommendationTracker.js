@@ -3,10 +3,6 @@ import { RECOMMENDATION_STATUS } from "../constants/recommendationConfig";
 
 const STORAGE_KEY = "recommendation_tracker";
 
-/**
- * Hook for tracking recommendation status in localStorage
- * Manage persistence of recommendation statuses
- */
 export const useRecommendationTracker = () => {
   const [tracker, setTracker] = useState(() => {
     try {
@@ -40,16 +36,11 @@ export const useRecommendationTracker = () => {
     return tracker[id]?.status || RECOMMENDATION_STATUS.NOT_STARTED;
   }, [tracker]);
 
-  const getDetails = useCallback((id) => {
-    if (!id) return { status: RECOMMENDATION_STATUS.NOT_STARTED };
-    return tracker[id] || { status: RECOMMENDATION_STATUS.NOT_STARTED };
-  }, [tracker]);
-
-  //Reset to empty state
+  // ✅ Make sure this clears localStorage
   const resetAllProgress = useCallback(() => {
     setTracker({});
     try {
-      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(STORAGE_KEY);  // This line must exist
     } catch (error) {
       console.error("Error resetting tracker from localStorage:", error);
     }
@@ -59,7 +50,6 @@ export const useRecommendationTracker = () => {
     tracker, 
     updateStatus, 
     getStatus, 
-    getDetails, 
     resetAllProgress,
   };
 };
