@@ -19,20 +19,20 @@ export const useMapData = () => {
       const neighborhoods = Array.isArray(neighborhoodsRes.data)
         ? neighborhoodsRes.data
         : [];
-      const rankings = rankingsRes.data?.rankings ?? [];
+      const rankings = rankingsRes.data?.rows ?? [];
 
       const rankingMap = {};
       for (const r of rankings) {
-        rankingMap[r.neighborhood_id] = r;
+        rankingMap[r.neighborhood] = r;
       }
 
       const combined = neighborhoods
         .filter((n) => n.latitude && n.longitude)
         .map((n) => ({
           ...n,
-          efficiency: rankingMap[n.neighborhood_id]?.efficiency ?? null,
-          total_kwh: rankingMap[n.neighborhood_id]?.total_kwh ?? null,
-          rank: rankingMap[n.neighborhood_id]?.rank ?? null,
+          efficiency: rankingMap[n.neighborhood_name]?.efficiencyScore ?? null,
+          total_kwh: rankingMap[n.neighborhood_name]?.totalKwh ?? null,
+          rank: rankingMap[n.neighborhood_name]?.rank ?? null,
         }));
 
       setMapData(combined);
