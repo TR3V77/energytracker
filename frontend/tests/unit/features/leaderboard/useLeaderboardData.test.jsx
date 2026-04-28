@@ -14,13 +14,13 @@ describe('useLeaderboardData', () => {
   it('consumes backend response directly without recalculating efficiency', async () => {
     const mockResponse = {
       data: {
-        rankings: [
-          { 
-            rank: 1, 
-            neighborhood_name: 'Neighborhood_5', 
-            efficiency: 320.45, 
-            households: 271, 
-            total_kwh: 86842.95 
+        rows: [
+          {
+            rank: 1,
+            neighborhood: 'Neighborhood_5',
+            efficiencyScore: 320.45,
+            households: 271,
+            totalKwh: 86842.95
           }
         ]
       }
@@ -31,18 +31,18 @@ describe('useLeaderboardData', () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false));
 
-    expect(result.current.rankings[0].efficiency).toBe(320.45);
-    expect(result.current.rankings[0]).toHaveProperty('neighborhood_name');
+    expect(result.current.rankings[0].efficiencyScore).toBe(320.45);
+    expect(result.current.rankings[0]).toHaveProperty('neighborhood');
   });
 
   it('adds medals for ranks 1, 2, 3', async () => {
     const mockResponse = {
       data: {
-        rankings: [
-          { rank: 1, neighborhood_name: 'First', efficiency: 300, households: 100, total_kwh: 30000 },
-          { rank: 2, neighborhood_name: 'Second', efficiency: 350, households: 100, total_kwh: 35000 },
-          { rank: 3, neighborhood_name: 'Third', efficiency: 400, households: 100, total_kwh: 40000 },
-          { rank: 4, neighborhood_name: 'Fourth', efficiency: 450, households: 100, total_kwh: 45000 }
+        rows: [
+          { rank: 1, neighborhood: 'First', efficiencyScore: 300, households: 100, totalKwh: 30000 },
+          { rank: 2, neighborhood: 'Second', efficiencyScore: 350, households: 100, totalKwh: 35000 },
+          { rank: 3, neighborhood: 'Third', efficiencyScore: 400, households: 100, totalKwh: 40000 },
+          { rank: 4, neighborhood: 'Fourth', efficiencyScore: 450, households: 100, totalKwh: 45000 }
         ]
       }
     };

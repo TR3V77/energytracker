@@ -13,9 +13,8 @@ export const useLeaderboardData = () => {
       try {
         const response = await getEfficiencyRankings({});
         
-        // Extract rankings from the nested response structure
-        if (response.data && response.data.rankings && Array.isArray(response.data.rankings)) {
-          setRankings(response.data.rankings);
+        if (response.data && Array.isArray(response.data.rows)) {
+          setRankings(response.data.rows);
         } else {
           setRankings([]);
         }
