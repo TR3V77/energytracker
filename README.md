@@ -177,6 +177,43 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 
 ![Burn Up Chart](img/burnupsprint2.png)
 
+## Sprint 3
+
+### Contributions
+
+**Davos:** "Owned the leaderboard backend response shape and the geographic map visualization end-to-end, built the month-over-month energy trends feature (full-stack), expanded frontend test coverage for the dashboard and leaderboard, polished the landing page, ran a flake8 cleanup pass across the backend, and added unit tests for the recommendation rules engine. Continued in a cross-functional support role — reviewed teammates' unit-test PRs (PROJ-119, PROJ-120, PROJ-121) with written feedback in the `research/` directory to keep the team's testing assignment unblocked."
+
+- **Jira Task:** Davos - Backend: Return frontend-ready leaderboard response
+  - [PROJ-91](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-91), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/commits/6c148b8)
+
+- **Jira Task:** Davos - Integration tests verifying leaderboard reflects new uploads
+  - [PROJ-90](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-90), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/commits/87d2018)
+
+- **Jira Task:** Davos - Implement month-over-month energy consumption trends (Full Stack)
+  - [PROJ-114](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-114), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/commits/088075e)
+
+- **Jira Task:** Davos - Add geographic map visualization with neighborhood geo data
+  - [PROJ-115](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-115), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/commits/8333fed)
+
+- **Jira Task:** Davos - Frontend component tests for dashboard and leaderboard
+  - [PROJ-96](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-96), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/commits/b8dccd6)
+
+- **Jira Task:** Davos - Polish landing page and fix all backend flake8 violations
+  - [PROJ-99](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-99), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/commits/a057c31)
+
+- **Jira Task:** Davos - Unit test plan: recommendation rules
+  - [PROJ-124](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-124), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/commits/4a307eb)
+
+- **Jira Task:** Davos - Unit test execution and results: recommendation rules
+  - [PROJ-125](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-125), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/commits/4a307eb)
+
+### Davos - Next Steps (Sprint 4 / Post-Demo)
+- Production deployment hardening: Nginx reverse proxy and HTTPS termination
+- Add a Redis caching layer for the leaderboard and trends endpoints to reduce database load
+- Evaluate Supabase as a managed Postgres host for post-course hosting
+- Expand backend unit test coverage beyond `recommendation_rules.py` to the dashboard and trends services
+- Add end-to-end tests (Playwright or Cypress) covering the upload → dashboard → recommendations user flow
+
 #### CSV Upload & Data Validation
 - Upload energy consumption CSV files
 - Validate schema (columns, types, missing values)
