@@ -181,6 +181,35 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 
 ### Contributions
 
+**Daniel:** "Delivered the landing page refresh and efficiency-score alignment work, defined leaderboard ranking edge-case handling, implemented the leaderboard API contract and frontend integration for efficiency rankings, mapped recommendation triggers into the rules engine, reorganized the backend into a clearer monolithic layout with shared aggregation and error handling, refreshed backend unit tests, and produced the sprint unit-test plan plus pytest execution evidence for dashboard, recommendations, and trends."
+
+- **Jira Task:** Daniel - Frontend: Improve landing page (feature cards, project overview)
+  - [PROJ-82](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-82), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/49)
+
+- **Jira Task:** Daniel - Backend: Define ranking edge-case handling for the leaderboard
+  - [PROJ-83](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-83), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/49)
+
+- **Jira Task:** Daniel - Backend: Implement leaderboard API contract
+  - [PROJ-84](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-84), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/61)
+
+- **Jira Task:** Daniel - Full stack: Integrate leaderboard response into the app
+  - [PROJ-85](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-85), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/65)
+
+- **Jira Task:** Daniel - Backend: Map recommendation triggers to the rules engine
+  - [PROJ-101](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-101), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/59)
+
+- **Jira Task:** Daniel - Backend: Reorganize backend to a monolithic structure (shared services, metrics)
+  - [PROJ-104](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-104), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/47)
+
+- **Jira Task:** Daniel - Backend: Update backend unit tests
+  - [PROJ-116](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-116), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/69)
+
+- **Jira Task:** Daniel - Documentation: Unit test plan (backend)
+  - [PROJ-117](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-117), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/70)
+
+- **Jira Task:** Daniel - Documentation: Unit test execution results / evidence (backend)
+  - [PROJ-118](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-118), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/71)
+
 **Davos:** "Owned the leaderboard backend response shape and the geographic map visualization end-to-end, built the month-over-month energy trends feature (full-stack), expanded frontend test coverage for the dashboard and leaderboard, polished the landing page, ran a flake8 cleanup pass across the backend, and added unit tests for the recommendation rules engine. Continued in a cross-functional support role — reviewed teammates' unit-test PRs (PROJ-119, PROJ-120, PROJ-121) with written feedback in the `research/` directory to keep the team's testing assignment unblocked."
 
 - **Jira Task:** Davos - Backend: Return frontend-ready leaderboard response
