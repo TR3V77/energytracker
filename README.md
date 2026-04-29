@@ -3,6 +3,7 @@
 [![Build Status](https://img.shields.io/bitbucket/pipelines/cs3398-rodians-s26/energytracker/main)](https://bitbucket.org/cs3398-rodians-s26/energytracker/addon/pipelines/home)
 
 ## Team Members
+
 [Bruce Ngere]
 [Daniel Delgado]
 [Tobi O'jori]
@@ -10,44 +11,49 @@
 [Davos De Hoyos]
 
 ## What are we creating?
-- We are creating a web-based dashboard application that tracks and 
+
+- We are creating a web-based dashboard application that tracks and
   visualizes neighborhood-level energy consumption, renewable energy adoption, and sustainability trends.
-- The system will allow users to: 
-- Upload energy usage datasets 
-- Analyze time-based consumption trends 
-- Compare neighborhoods 
-- Identify areas that require sustainability intervention 
+- The system will allow users to:
+- Upload energy usage datasets
+- Analyze time-based consumption trends
+- Compare neighborhoods
+- Identify areas that require sustainability intervention
 - The application will transform raw energy data into meaningful visual insights.
 
-
 ## Who are we doing this for?
+
 ### Primary audience:
+
 - Central Texas communities
 - City planners
 - Municipal sustainability departments
 - Urban policy makers
 
 ### Secondary audience:
+
 - Environmental researchers
 - Community advocacy groups
 - Educational institutions studying sustainability
-- Local inhabitants 
-
+- Local inhabitants
 
 ## Why are we doing this?
+
 Cities are increasingly focused on sustainability and reducing environmental impact, but decision-makers often lack clear, accessible tools to analyze localized energy data.
 
 ### Our goal is to:
+
 - Make neighborhood energy trends easier to understand
 - Support data-driven sustainability initiatives
 - Help prioritize investments in renewable energy and efficiency improvements
 - Encourage transparency and accountability in urban environmental planning
 
-
 ## General Info
+
 ![Project Logo](img/logo.png)
 
 ## Technologies
+
 - Tools: GitKraken, Jira, Slack, Bitbucket, VS Code
 - Languages: Python, HTML, JavaScript
 - Database: PostgreSQL, SQLAlchemy
@@ -57,6 +63,7 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 - Deployment: Docker
 
 ## Features
+
 ## Sprint 1
 
 ### Contributions
@@ -75,16 +82,15 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 - **Jira Task:** Daniel - Research: Find Real Dataset
   - [PROJ-54](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-54), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/src/RESEARCH/research/)
 
-
 **Trevor:** "provied the database and the data in the database for the dashboard"
 
-- **Jira Task:** Trevor - Designed and prepared the PostgreSQL database and queries  
+- **Jira Task:** Trevor - Designed and prepared the PostgreSQL database and queries
   - [PROJ-16](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-16), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/7)
 
 - **Jira Task:** Trevor - Defines the API contract and database query strategy for the Energy Tracker Dashboard.
   - [PROJ-58](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-58), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/10)
 
-- **Jira Task:** Trevor - Implemented multiple SQL verification queries to confirm successful data import and ensure database integrity. 
+- **Jira Task:** Trevor - Implemented multiple SQL verification queries to confirm successful data import and ensure database integrity.
   - [PROJ-57](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-57), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/8)
 
 ## Report
@@ -119,16 +125,16 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 
 **Trevor:** "Built the backend metrics service, recommendation rules engine, API endpoint, and unit tests for trigger-based energy recommendations."
 
-- **Jira Task:** Trevor - Implemented backend energy metrics service using SQLAlchemy and PostgreSQL.  
+- **Jira Task:** Trevor - Implemented backend energy metrics service using SQLAlchemy and PostgreSQL.
   - [PROJ-67](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-67), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/31)
 
 - **Jira Task:** Trevor - Built deterministic backend recommendation rules engine.
   - [PROJ-70](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-70), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/34)
 
-- **Jira Task:** Trevor - Added /api/recommendations endpoint with trigger-based responses. 
+- **Jira Task:** Trevor - Added /api/recommendations endpoint with trigger-based responses.
   - [PROJ-71](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-71), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/41)
 
-  - **Jira Task:** Trevor - Added pytest unit tests for recommendation rules engine. 
+  - **Jira Task:** Trevor - Added pytest unit tests for recommendation rules engine.
   - [PROJ-75](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-75), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/42)
 
 **Tobi:** "Worked on backend/API testing and frontend unit tests for the Recommendations feature, including setting up Jest, validating UI rendering, and handling API mismatch and merge conflicts while integrating with the main branch."
@@ -160,6 +166,7 @@ Cities are increasingly focused on sustainability and reducing environmental imp
   - [PROJ-80](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-80), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/26)
 
 ### Davos - Next Steps (Sprint 3)
+
 - Research Supabase for backend-as-a-service / database hosting
 - Research Redis for caching and data layer performance
 - Research Nginx for reverse proxy and deployment networking
@@ -180,6 +187,23 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 ## Sprint 3
 
 ### Contributions
+
+**Bruce:** Refactored the frontend architecture to align with SOLID principles, improving scalability and maintainability across the codebase. Delivered new UI implementations for the Leaderboard and Trends pages with a focus on intuitive, user-friendly design. Resolved a persistent data bug on the Recommendations page by introducing a refresh mechanism. Conducted peer code reviews on frontend pull requests to ensure adherence to the updated architecture standards. Expanded test coverage by writing unit tests for new features and frontend components.
+
+- **Jira Task:** Bruce - Frontend: Refactor frontend code to model SOLID Principles
+  - [PROJ-105](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-105), [Bitbucket](https://bitbucket.org/%7B8cba037a-27d0-4b3a-b3aa-b5f9a5440dca%7D/%7B9caf0e2d-495a-4ee6-bd00-a9ef30cc9c07%7D/pull-requests/53)
+
+- **Jira Task:** Bruce - Frontend: Consume frontend-ready leaderboard response
+  - [PROJ-92](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-92), [Bitbucket](https://bitbucket.org/%7B8cba037a-27d0-4b3a-b3aa-b5f9a5440dca%7D/%7B9caf0e2d-495a-4ee6-bd00-a9ef30cc9c07%7D/pull-requests/57)
+
+- **Jira Task:** Bruce - Frontend: Build leaderboard UI component/page
+  - [PROJ-93], (https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-93), [Bitbucket](https://bitbucket.org/%7B8cba037a-27d0-4b3a-b3aa-b5f9a5440dca%7D/%7B9caf0e2d-495a-4ee6-bd00-a9ef30cc9c07%7D/pull-requests/58)
+
+- **Jira Task:** Bruce - Frontend: Add refresh button for recommendations page to reset back to default preset
+  - [PROJ-108](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-108), [Bitbucket](https://bitbucket.org/%7B8cba037a-27d0-4b3a-b3aa-b5f9a5440dca%7D/%7B9caf0e2d-495a-4ee6-bd00-a9ef30cc9c07%7D/pull-requests/77)
+
+- **Jira Task:** Bruce - Frontend: Unit Tests for Leaderboard Response Consumption, Leaderboard UI Component, Reset Progress Button
+  - [PROJ-123](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-123), [Bitbucket](https://bitbucket.org/%7B8cba037a-27d0-4b3a-b3aa-b5f9a5440dca%7D/%7B9caf0e2d-495a-4ee6-bd00-a9ef30cc9c07%7D/pull-requests/80)
 
 **Daniel:** "Delivered the landing page refresh and efficiency-score alignment work, defined leaderboard ranking edge-case handling, implemented the leaderboard API contract and frontend integration for efficiency rankings, mapped recommendation triggers into the rules engine, reorganized the backend into a clearer monolithic layout with shared aggregation and error handling, refreshed backend unit tests, and produced the sprint unit-test plan plus pytest execution evidence for dashboard, recommendations, and trends."
 
@@ -237,6 +261,7 @@ Cities are increasingly focused on sustainability and reducing environmental imp
   - [PROJ-125](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-125), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/commits/4a307eb)
 
 ### Davos - Next Steps (Sprint 4 / Post-Demo)
+
 - Production deployment hardening: Nginx reverse proxy and HTTPS termination
 - Add a Redis caching layer for the leaderboard and trends endpoints to reduce database load
 - Evaluate Supabase as a managed Postgres host for post-course hosting
@@ -244,6 +269,7 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 - Add end-to-end tests (Playwright or Cypress) covering the upload → dashboard → recommendations user flow
 
 #### CSV Upload & Data Validation
+
 - Upload energy consumption CSV files
 - Validate schema (columns, types, missing values)
 - Show error messages for bad rows
@@ -251,6 +277,7 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 - Trigger automatic summary calculation
 
 ### Interactive Dashboard
+
 - Line charts showing energy usage over time
 - Bar charts comparing neighborhoods
 - Filters:
@@ -260,18 +287,20 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 - Real-time updates when filters change
 
 ### Neighborhood Efficiency Rankings
+
 - Rank neighborhoods by efficiency score
 - Example metric: `efficiency_score = total_kwh / number_of_households`
 - Show leaderboard:
 
 | Rank | Neighborhood | Efficiency Score |
-|------|-------------|-----------------|
-| 1 | Downtown | 320 |
-| 2 | Riverside | 355 |
+| ---- | ------------ | ---------------- |
+| 1    | Downtown     | 320              |
+| 2    | Riverside    | 355              |
 
 **Lower score = more efficient. This demonstrates analytics and SQL skills.**
 
 ### Trend Analysis
+
 - Show month-over-month changes
 - Show percent increase/decrease
 - Example:
@@ -279,23 +308,28 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 - Visual indicators: arrows (↑ ↓) and color coding
 
 ### Recommendations Engine
+
 - Rule-based recommendations (e.g., if `efficiency_score > threshold` → recommend energy reduction)
 - Example output: "Downtown uses 25% more energy than average. Recommend insulation improvements."
 - This demonstrates business intelligence logic.
 
 **These features are designed for city planners and sustainability analysts reviewing neighborhood energy data.**
 
-## User Stories 
+## User Stories
 
 #### Interactive Dashboard
-  - As a user, I would like to view an interactive dashboard showing energy usage charts and summary metrics so that I can understand energy consumption trends across neighborhoods.
+
+- As a user, I would like to view an interactive dashboard showing energy usage charts and summary metrics so that I can understand energy consumption trends across neighborhoods.
 
 #### Neighborhood Efficiency Rankings
-  - As a sustainability manager, I would like to see neighborhoods ranked by efficiency score so that I can identify high and low performing areas.
+
+- As a sustainability manager, I would like to see neighborhoods ranked by efficiency score so that I can identify high and low performing areas.
 
 #### Recommendations Engine
-  - As a city planner, I would like the dashboard to generate recommendations (e.g., insulation, HVAC upgrades, rebate outreach) based on the neighborhood's metrics so that I can propose actionable next steps.
+
+- As a city planner, I would like the dashboard to generate recommendations (e.g., insulation, HVAC upgrades, rebate outreach) based on the neighborhood's metrics so that I can propose actionable next steps.
 
 #### CSV Upload & Data Validation
-  - As a data administrator, I would like to see a detailed report after uploading a file showing valid records imported and specific row-level errors so that I can correct and re-upload invalid data.
-  - As an analyst, I would like to upload energy data in either CSV or JSON format so that I can import data from different sources and tools without manual conversion.
+
+- As a data administrator, I would like to see a detailed report after uploading a file showing valid records imported and specific row-level errors so that I can correct and re-upload invalid data.
+- As an analyst, I would like to upload energy data in either CSV or JSON format so that I can import data from different sources and tools without manual conversion.
