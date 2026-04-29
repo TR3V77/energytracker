@@ -1,6 +1,6 @@
 export const EFFICIENCY_THRESHOLDS = {
-  EFFICIENT: 340,
-  AVERAGE: 400,
+  EFFICIENT: 380,
+  AVERAGE: 430,
 };
 
 export const EFFICIENCY_RATINGS = {

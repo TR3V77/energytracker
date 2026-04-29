@@ -5,10 +5,10 @@ export const formatEfficiencyScore = (score) => {
   
   const formattedValue = `${score.toFixed(0)} kWh/house`;
   
-  if (score < 340) {
+  if (score < 380) {
     return { formattedValue, colorClass: "text-success", statusLabel: "Efficient" };
   }
-  if (score < 400) {
+  if (score < 430) {
     return { formattedValue, colorClass: "text-warning", statusLabel: "Average" };
   }
   return { formattedValue, colorClass: "text-danger", statusLabel: "Needs Improvement" };
