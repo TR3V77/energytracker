@@ -187,6 +187,48 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 ## Sprint 3
 
 ### Contributions
+**Trevor:** "Implemented the leaderboard aggregation query in SQLAlchemy 2.0 with correct JOIN, GROUP BY, and efficiency score calculation, built and validated the GET /api/leaderboard/efficiency endpoint with window and date range filtering, wrote leaderboard integration tests covering field contracts, aggregation accuracy, and API response structure, added four new recommendation trigger conditions tied to measurable neighborhood metrics with catalog entries and trigger mappings, fixed a bug where new trigger recommendations were silently dropped from the response, documented the full recommendations rules engine in /docs/recommendations_rules.md, updated seed data to produce a realistic mix of green/yellow/red efficiency statuses, and aligned efficiency score thresholds across three frontend files to ensure consistent status colors on all pages."
+
+- **Jira Task:** Trevor - Build leaderboard aggregation query (Backend)
+  - [PROJ-86](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-86), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/54)
+
+- **Jira Task:** Trevor - Add leaderboard efficiency endpoint (Backend)
+  - [PROJ-89](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-89), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/62)
+
+- **Jira Task:** Trevor - Validate query output for frontend/API use (Backend)
+  - [PROJ-88](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-88), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/66)
+
+- **Jira Task:** Trevor - Define trigger conditions from neighborhood metrics (Backend)
+  - [PROJ-100](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-100), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/67)
+
+- **Jira Task:** Trevor - Backend: Map recommendation triggers to the rules engine
+  - [PROJ-101](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-101), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/59)
+
+- **Jira Task:** Trevor - Document recommendation rules (Backend / Documentation)
+  - [PROJ-102](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-102), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/75)
+
+- **Jira Task:** Trevor - Unit Testing Plan
+  - [PROJ-119](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-119), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/72)
+
+- **Jira Task:** Trevor - Documentation: Unit test plan (backend)
+  - [PROJ-117](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-117), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/70)
+
+- **Jira Task:** Trevor - Unit Test Documentation and Results
+  - [PROJ-121](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-121), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/73)
+
+- **Jira Task:** Trevor - Changing data in the database
+  - [PROJ-132](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-132), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/83)
+
+- **Jira Task:** Trevor - Fix thresholds
+  - [PROJ-134](https://cs3398-rodians-s26.atlassian.net/browse/PROJ-134), [Bitbucket](https://bitbucket.org/cs3398-rodians-s26/energytracker/pull-requests/85)
+
+### Trevor - Next Steps (Sprint 4 / Post-Demo)
+- Migrate the PostgreSQL database from a local Docker container to a managed cloud service such as AWS RDS or Supabase to support persistent hosting and multi-environment access
+- Evaluate deployment options for the backend and frontend including containerized deployment via AWS ECS, Railway, or Render to establish a path toward a publicly accessible production environment
+- Define an upkeep strategy covering database backups, environment variable management, dependency updates, and a process for re-importing or migrating seed data as the project evolves
+- Explore CI/CD pipeline setup so that future code changes are automatically tested and deployed without manual intervention
+- Document environment setup and deployment steps so any team member can spin up or redeploy the project independently
+
 
 **Bruce:** Refactored the frontend architecture to align with SOLID principles, improving scalability and maintainability across the codebase. Delivered new UI implementations for the Leaderboard and Trends pages with a focus on intuitive, user-friendly design. Resolved a persistent data bug on the Recommendations page by introducing a refresh mechanism. Conducted peer code reviews on frontend pull requests to ensure adherence to the updated architecture standards. Expanded test coverage by writing unit tests for new features and frontend components.
 
@@ -267,6 +309,10 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 - Evaluate Supabase as a managed Postgres host for post-course hosting
 - Expand backend unit test coverage beyond `recommendation_rules.py` to the dashboard and trends services
 - Add end-to-end tests (Playwright or Cypress) covering the upload → dashboard → recommendations user flow
+
+## Report
+
+![Burn Up Chart](img/burnupsprint3.png)
 
 #### CSV Upload & Data Validation
 
