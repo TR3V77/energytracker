@@ -245,7 +245,7 @@ Cities are increasingly focused on sustainability and reducing environmental imp
   - [PROJ-108](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-108), [Bitbucket](https://bitbucket.org/%7B8cba037a-27d0-4b3a-b3aa-b5f9a5440dca%7D/%7B9caf0e2d-495a-4ee6-bd00-a9ef30cc9c07%7D/pull-requests/77)
 
 - **Jira Task:** Bruce - Frontend: Unit Tests for Leaderboard Response Consumption, Leaderboard UI Component, Reset Progress Button
-  - [PROJ-123](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-123), [Bitbucket](https://bitbucket.org/%7B8cba037a-27d0-4b3a-b3aa-b5f9a5440dca%7D/%7B9caf0e2d-495a-4ee6-bd00-a9ef30cc9c07%7D/pull-requests/80)
+  - [PROJ-123](https://cs3398-rodians-s26.atlassian.net/jira/software/projects/PROJ/boards/1?selectedIssue=PROJ-123), [Bitbucket](https://bitbucket.org/%7B8cba037a-27d0-4b3a-b3aa-b5f9a5440dca%7D/%7B9caf0e2d-495a-4ee6-bd00-a9ef30cc9c07%7D/pull-requests/80).
 
 **Daniel:** "Delivered the landing page refresh and efficiency-score alignment work, defined leaderboard ranking edge-case handling, implemented the leaderboard API contract and frontend integration for efficiency rankings, mapped recommendation triggers into the rules engine, reorganized the backend into a clearer monolithic layout with shared aggregation and error handling, refreshed backend unit tests, and produced the sprint unit-test plan plus pytest execution evidence for dashboard, recommendations, and trends."
 
