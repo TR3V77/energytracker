@@ -7,7 +7,7 @@
 
 A full-stack web dashboard that turns raw neighborhood-level electricity consumption data into efficiency rankings, month-over-month trend analysis, an interactive map, and rule-based sustainability recommendations. Built by a 5-person team over a 3-sprint agile cycle for CS3398 at Texas State University.
 
-**[Live Demo](https://energytracker-frontend.onrender.com)** — hosted on Render's free tier, so the backend may take 30-50s to wake up on the first request after a period of inactivity. The underlying data is synthetic, generated for demonstration purposes.
+**[Live Demo](https://energytracker-frontend.onrender.com)** — hosted on Render's free tier, so the backend may take 30-50s to wake up on the first request after a period of inactivity. The data is synthetic, not real utility data.
 
 ![Energy Tracker dashboard landing page](img/dashboard-landing.png)
 
@@ -44,43 +44,16 @@ Full sprint-by-sprint team contribution log for all 5 members is further down in
 - Trevor Strother
 - Davos De Hoyos
 
-## What are we creating?
+## What It Does
 
-- We are creating a web-based dashboard application that tracks and
-  visualizes neighborhood-level energy consumption, renewable energy adoption, and sustainability trends.
-- The system will allow users to:
-- Upload energy usage datasets
-- Analyze time-based consumption trends
-- Compare neighborhoods
-- Identify areas that require sustainability intervention
-- The application will transform raw energy data into meaningful visual insights.
+Energy Tracker takes neighborhood-level electricity consumption data (currently 10 neighborhoods in the San Marcos, TX area) and turns it into:
 
-## Who are we doing this for?
+- **Efficiency rankings** — kWh per household, sortable by neighborhood
+- **Month-over-month trends** — consumption changes with percent-change indicators
+- **An interactive map** — color-coded markers by efficiency status
+- **Rule-based recommendations** — e.g. flagging a neighborhood using 25%+ more energy than average and suggesting insulation or HVAC upgrades
 
-### Primary audience:
-
-- Central Texas communities
-- City planners
-- Municipal sustainability departments
-- Urban policy makers
-
-### Secondary audience:
-
-- Environmental researchers
-- Community advocacy groups
-- Educational institutions studying sustainability
-- Local inhabitants
-
-## Why are we doing this?
-
-Cities are increasingly focused on sustainability and reducing environmental impact, but decision-makers often lack clear, accessible tools to analyze localized energy data.
-
-### Our goal is to:
-
-- Make neighborhood energy trends easier to understand
-- Support data-driven sustainability initiatives
-- Help prioritize investments in renewable energy and efficiency improvements
-- Encourage transparency and accountability in urban environmental planning
+The target user is a city planner or municipal sustainability staffer who needs to see which neighborhoods need attention without manually digging through raw consumption tables.
 
 ## General Info
 
@@ -403,7 +376,7 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 | 1    | Downtown     | 320              |
 | 2    | Riverside    | 355              |
 
-**Lower score = more efficient. This demonstrates analytics and SQL skills.**
+**Lower score = more efficient.**
 
 ### Trend Analysis
 
@@ -417,9 +390,6 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 
 - Rule-based recommendations (e.g., if `efficiency_score > threshold` → recommend energy reduction)
 - Example output: "Downtown uses 25% more energy than average. Recommend insulation improvements."
-- This demonstrates business intelligence logic.
-
-**These features are designed for city planners and sustainability analysts reviewing neighborhood energy data.**
 
 ## User Stories
 
