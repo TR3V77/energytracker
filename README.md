@@ -1,14 +1,46 @@
 # Energy Tracker
 
-[![Build Status](https://img.shields.io/bitbucket/pipelines/cs3398-rodians-s26/energytracker/main)](https://bitbucket.org/cs3398-rodians-s26/energytracker/addon/pipelines/home)
+![React](https://img.shields.io/badge/Frontend-React-61DAFB?logo=react&logoColor=white)
+![Flask](https://img.shields.io/badge/Backend-Flask-000000?logo=flask&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-4169E1?logo=postgresql&logoColor=white)
+![Docker](https://img.shields.io/badge/Containerized-Docker-2496ED?logo=docker&logoColor=white)
+
+A full-stack web dashboard that turns raw neighborhood-level electricity consumption data into efficiency rankings, month-over-month trend analysis, an interactive map, and rule-based sustainability recommendations. Built by a 5-person team over a 3-sprint agile cycle for CS3398 at Texas State University.
+
+![Energy Tracker dashboard landing page](img/dashboard-landing.png)
+
+## Quickstart
+
+Requires [Docker](https://www.docker.com/).
+
+```bash
+git clone https://github.com/TR3V77/energytracker.git
+cd energytracker
+docker compose up --build
+```
+
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:5000
+
+## My Contributions (Trevor Strother)
+
+I owned the backend data layer and the recommendations/leaderboard business logic:
+
+- Designed and implemented the PostgreSQL schema (SQLAlchemy 2.0) storing 3K+ electricity consumption records across 10+ neighborhoods, with verification queries confirming import integrity.
+- Built the leaderboard aggregation query (JOIN + GROUP BY + efficiency-score calculation) and the `GET /api/leaderboard/efficiency` endpoint, including window and date-range filtering.
+- Built the backend energy metrics service and a deterministic rule-based recommendation engine exposed via `/api/recommendations`, adding trigger conditions tied to measurable neighborhood metrics.
+- Wrote the backend unit/integration test plan and suite (leaderboard field contracts, aggregation accuracy, recommendation triggers), and fixed a bug where new recommendation triggers were silently dropped from API responses.
+- Documented the recommendation rules engine (`/backend/docs/recommendations_rules.md`) and aligned efficiency-score thresholds across the frontend for consistent status colors.
+
+Full sprint-by-sprint team contribution log for all 5 members is further down in this README.
 
 ## Team Members
 
-[Bruce Ngere]
-[Daniel Delgado]
-[Tobi O'jori]
-[Trevor Strother]
-[Davos De Hoyos]
+- Bruce Ngere
+- Daniel Delgado
+- Tobi O'jori
+- Trevor Strother
+- Davos De Hoyos
 
 ## What are we creating?
 
