@@ -7,6 +7,8 @@
 
 A full-stack web dashboard that turns raw neighborhood-level electricity consumption data into efficiency rankings, month-over-month trend analysis, an interactive map, and rule-based sustainability recommendations. Built by a 5-person team over a 3-sprint agile cycle for CS3398 at Texas State University.
 
+**[Live Demo](https://energytracker-frontend.onrender.com)** — hosted on Render's free tier, so the backend may take 30-50s to wake up on the first request after a period of inactivity. The underlying data is synthetic, generated for demonstration purposes.
+
 ![Energy Tracker dashboard landing page](img/dashboard-landing.png)
 
 ## Quickstart
