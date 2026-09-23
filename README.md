@@ -52,6 +52,28 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 
 ![Project Logo](img/logo.png)
 
+## Dashboard Screenshots
+
+### Landing Page
+
+![Landing Page](img/dashboard-landing.png)
+
+### Neighborhood Efficiency Leaderboard
+
+![Leaderboard](img/dashboard-leaderboard.png)
+
+### Trend Analysis
+
+![Trends](img/dashboard-trends.png)
+
+### Energy Efficiency Recommendations
+
+![Recommendations](img/dashboard-recommendations.png)
+
+### Energy Efficiency Map
+
+![Map](img/dashboard-map.png)
+
 ## Technologies
 
 - Tools: GitKraken, Jira, Slack, Bitbucket, VS Code
