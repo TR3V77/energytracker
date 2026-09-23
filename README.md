@@ -118,6 +118,10 @@ Cities are increasingly focused on sustainability and reducing environmental imp
 
 ## Features
 
+## Sprint Contribution Log
+
+> The Jira and Bitbucket links below point to our team's private course workspace and are not accessible outside the team. They're kept here as our internal sprint record; see the "My Contributions" section near the top of this README for a public-facing summary of my work.
+
 ## Sprint 1
 
 ### Contributions
